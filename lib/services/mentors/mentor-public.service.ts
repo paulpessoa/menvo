@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/utils/supabase/server"
-import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
+import { createMentorAvailabilityRepository } from "@/lib/repositories/mentor-availability.repository"
+import type { AvailabilitySlot } from "@/lib/domain/mentors/availability.entity"
 
 /**
  * Everything the public mentor page may show. Never `*`: mentors_view also
@@ -47,20 +48,13 @@ export const mentorPublicService = {
         return null
       }
 
-      // Buscar disponibilidade configurada (usa Service Role para leitura pública irrestrita dos horários)
-      let availability: any[] = []
+      // Mentor já filtrado como aprovado e público acima, então o RLS de
+      // mentor_availability (migration 20261008000000) libera a leitura com o
+      // client do visitante. Antes isto usava service_role.
+      let availability: AvailabilitySlot[] = []
       try {
-        const adminSupabase = createServiceRoleClient()
-        const { data: availData, error: availError } = await adminSupabase
-          .from("mentor_availability")
-          .select("*")
-          .eq("mentor_id", mentor.id)
-          .order("day_of_week")
-          .order("start_time")
-
-        if (!availError && availData) {
-          availability = availData
-        }
+        // mentors_view tipa id como nullable (toda coluna de view é); na prática nunca é.
+        if (mentor.id) availability = await createMentorAvailabilityRepository(supabase).listByMentor(mentor.id)
       } catch (err) {
         console.error("[mentorPublicService] Erro ao buscar disponibilidade:", err)
       }

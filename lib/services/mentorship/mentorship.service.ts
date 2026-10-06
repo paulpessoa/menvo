@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/services/auth/auth.service"
 import type { Database } from "@/lib/types/supabase"
+import { createMentorAvailabilityRepository } from "@/lib/repositories/mentor-availability.repository"
 import type {
   Appointment,
   AppointmentWithProfiles,
@@ -182,32 +183,20 @@ export const mentorAvailabilityService = {
       }
     }
 
-    // 1. Remover disponibilidades antigas do mentor
-    const { error: deleteError } = await supabase
-      .from("mentor_availability")
-      .delete()
-      .eq("mentor_id", mentorId)
+    // Mesma RPC transacional da rota (migration 20261008000000): o delete +
+    // insert que existia aqui deixava o mentor sem agenda se o insert falhasse.
+    // O banco usa auth.uid(), então mentorId não é enviado.
+    const rows = await createMentorAvailabilityRepository(supabase).replaceOwn(
+      availabilities.map((av) => ({
+        day_of_week: av.day_of_week,
+        start_time: av.start_time,
+        end_time: av.end_time,
+        timezone: av.timezone || "America/Sao_Paulo"
+      })),
+      null
+    )
 
-    if (deleteError) throw deleteError
-
-    if (availabilities.length === 0) return []
-
-    // 2. Inserir as novas disponibilidades
-    const newAvailabilities: MentorAvailabilityInsert[] = availabilities.map((av) => ({
-      mentor_id: mentorId,
-      day_of_week: av.day_of_week,
-      start_time: av.start_time,
-      end_time: av.end_time,
-      timezone: av.timezone || "America/Sao_Paulo"
-    }))
-
-    const { data, error } = await supabase
-      .from("mentor_availability")
-      .insert(newAvailabilities)
-      .select()
-
-    if (error) throw error
-    return (data || []).map((item) => ({
+    return rows.map((item) => ({
       ...item,
       id: item.id as unknown as number,
       is_active: true,

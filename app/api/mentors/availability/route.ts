@@ -1,174 +1,81 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient as createServerClient } from "@/lib/utils/supabase/server"
-import { createClient } from "@supabase/supabase-js"
-import { setAvailabilitySchema } from "@/lib/schemas/availability"
-
-function getAdminClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    }
-  )
-}
+import { createClient } from "@/lib/utils/supabase/server"
+import { availabilityQuerySchema, setAvailabilitySchema } from "@/lib/schemas/availability"
+import { buildMentorAvailabilityService } from "@/lib/services/mentors/mentor-availability.composition"
 
 /**
- * GET /api/mentors/availability
- * Retorna a lista de regras semanais de disponibilidade do mentor.
- * Suporta query param ?mentor_id=... ou busca pelo usuário autenticado.
+ * GET /api/mentors/availability[?mentor_id=<uuid>] - a agenda semanal de um
+ * mentor. Sem `mentor_id`, devolve a de quem está logado.
+ *
+ * Usa o client do usuário: o RLS (migration 20261008000000) só libera a
+ * agenda de mentor aprovado e público, ou a do próprio dono. Antes esta rota
+ * usava `service_role` e devolvia a agenda de qualquer id.
  */
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const mentorIdParam = searchParams.get("mentor_id")
-
-    let targetMentorId = mentorIdParam
-
-    if (!targetMentorId) {
-      const serverSupabase = await createServerClient()
-      const {
-        data: { user },
-        error: authError
-      } = await serverSupabase.auth.getUser()
-
-      if (authError || !user) {
-        return NextResponse.json(
-          { error: "Não autenticado" },
-          { status: 401 }
-        )
-      }
-      targetMentorId = user.id
-    }
-
-    const supabase = getAdminClient()
-    const { data: slots, error } = await supabase
-      .from("mentor_availability")
-      .select("*")
-      .eq("mentor_id", targetMentorId)
-      .order("day_of_week", { ascending: true })
-      .order("start_time", { ascending: true })
-
-    if (error) {
-      console.error("[AVAILABILITY_GET] Erro ao buscar disponibilidade:", error)
-      return NextResponse.json(
-        { error: "Erro ao buscar horários de disponibilidade" },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: slots || []
-    })
-  } catch (error) {
-    console.error("[AVAILABILITY_GET] Erro inesperado:", error)
-    return NextResponse.json(
-      { error: "Erro interno do servidor" },
-      { status: 500 }
-    )
+  const query = availabilityQuerySchema.safeParse({
+    mentor_id: request.nextUrl.searchParams.get("mentor_id") ?? undefined,
+  })
+  if (!query.success) {
+    return NextResponse.json({ error: "mentor_id inválido" }, { status: 400 })
   }
+
+  const supabase = await createClient()
+  let mentorId = query.data.mentor_id
+
+  if (!mentorId) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
+    }
+    mentorId = user.id
+  }
+
+  const result = await buildMentorAvailabilityService(supabase).list(mentorId)
+  if (result.kind === "failed") {
+    return NextResponse.json({ error: "Erro ao buscar horários de disponibilidade" }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true, data: result.slots })
 }
 
 /**
- * POST /api/mentors/availability
- * Salva a grade semanal de disponibilidade do mentor autenticado.
- * Substitui os horários anteriores de forma idempotente.
+ * POST /api/mentors/availability - substitui a agenda semanal de quem está
+ * logado, numa transação (RPC `set_mentor_availability`).
  */
 export async function POST(request: NextRequest) {
-  try {
-    const serverSupabase = await createServerClient()
-    const {
-      data: { user },
-      error: authError
-    } = await serverSupabase.auth.getUser()
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
+  }
 
-    if (authError || !user) {
+  const parsed = setAvailabilitySchema.safeParse(await request.json().catch(() => ({})))
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Dados de disponibilidade inválidos", details: parsed.error.flatten() },
+      { status: 400 }
+    )
+  }
+
+  const result = await buildMentorAvailabilityService(supabase).saveOwn(parsed.data)
+
+  switch (result.kind) {
+    case "invalid_range":
       return NextResponse.json(
-        { error: "Não autenticado" },
-        { status: 401 }
-      )
-    }
-
-    const body = await request.json().catch(() => ({}))
-    const parseResult = setAvailabilitySchema.safeParse(body)
-
-    if (!parseResult.success) {
-      return NextResponse.json(
-        {
-          error: "Dados de disponibilidade inválidos",
-          details: parseResult.error.flatten()
-        },
+        { error: "O horário de término deve ser depois do horário de início", code: "INVALID_RANGE" },
         { status: 400 }
       )
-    }
-
-    const { slots, timezone } = parseResult.data
-    const supabase = getAdminClient()
-
-    // 1. Deletar disponibilidades antigas do mentor autenticado
-    const { error: deleteError } = await supabase
-      .from("mentor_availability")
-      .delete()
-      .eq("mentor_id", user.id)
-
-    if (deleteError) {
-      console.error("[AVAILABILITY_POST] Erro ao limpar slots anteriores:", deleteError)
-      return NextResponse.json(
-        { error: "Erro ao atualizar horários de disponibilidade" },
-        { status: 500 }
-      )
-    }
-
-    let insertedSlots: any[] = []
-
-    // 2. Inserir novos horários se fornecidos
-    if (slots.length > 0) {
-      const recordsToInsert = slots.map((slot) => ({
-        mentor_id: user.id,
-        day_of_week: slot.day_of_week,
-        start_time: slot.start_time.length === 5 ? `${slot.start_time}:00` : slot.start_time,
-        end_time: slot.end_time.length === 5 ? `${slot.end_time}:00` : slot.end_time,
-        timezone: slot.timezone || timezone || "America/Sao_Paulo"
-      }))
-
-      const { data: inserted, error: insertError } = await supabase
-        .from("mentor_availability")
-        .insert(recordsToInsert)
-        .select()
-
-      if (insertError) {
-        console.error("[AVAILABILITY_POST] Erro ao inserir novos slots:", insertError)
-        return NextResponse.json(
-          { error: "Erro ao salvar novos horários de disponibilidade" },
-          { status: 500 }
-        )
-      }
-
-      insertedSlots = inserted || []
-    }
-
-    // 3. Atualizar timezone no perfil se fornecido
-    if (timezone) {
-      await supabase
-        .from("profiles")
-        .update({ timezone, updated_at: new Date().toISOString() })
-        .eq("id", user.id)
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: insertedSlots,
-      message: "Disponibilidade salva com sucesso"
-    })
-  } catch (error) {
-    console.error("[AVAILABILITY_POST] Erro inesperado:", error)
-    return NextResponse.json(
-      { error: "Erro interno do servidor" },
-      { status: 500 }
-    )
+    case "failed":
+      return NextResponse.json({ error: "Erro ao salvar horários de disponibilidade" }, { status: 500 })
+    case "saved":
+      return NextResponse.json({
+        success: true,
+        data: result.slots,
+        message: "Disponibilidade salva com sucesso",
+      })
   }
 }
