@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/utils/supabase/server"
+import { buildMentorProfileService } from "@/lib/services/mentors/mentor-profile.composition"
 
 export async function searchCatalogAction(params: {
   filters: {
@@ -174,12 +175,5 @@ export async function getMentorReviewsAction(mentorId: string) {
 
 export async function resolveMentorSlugsAction(names: string[]) {
   if (!names || names.length === 0) return []
-  
-  const supabase = await createClient()
-  const { data, error } = await (supabase.from("mentors_view") as any)
-    .select("full_name, slug, id")
-    .in("full_name", names)
-    
-  if (error) throw error
-  return (data as any[]) || []
+  return buildMentorProfileService(await createClient()).resolveSlugs(names)
 }

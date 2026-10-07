@@ -7,7 +7,7 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 import { confirmCapability } from "./confirm"
 
 jest.mock("@/lib/services/mentors/mentors.service", () => ({ mentorService: { searchCatalog: jest.fn() } }))
-jest.mock("@/lib/services/mentors/mentor-public.service", () => ({ mentorPublicService: {} }))
+jest.mock("@/lib/services/mentors/mentor-profile.composition", () => ({ buildMentorProfileService: jest.fn() }))
 jest.mock("@/lib/services/appointments/availability.service", () => ({ computeAvailableSlots: jest.fn() }))
 
 const mentee = { id: "u1", role: "mentee" as const }

@@ -1,0 +1,11 @@
+-- Remove mentor_visibility_settings (docs/blueprint/mentors-audit.md, decisão D1).
+--
+-- A tabela foi criada fora das migrations e só era usada por
+-- /api/mentors/visibility, que aceitava um único valor ("public") e não tinha
+-- nenhum chamador no app. A visibilidade real de um mentor vem de
+-- profiles.is_public + mentor_profiles.verification_status (ver mentors_view).
+--
+-- Separada da migration de mentor_availability de propósito: se quiser
+-- guardar os dados antes, rode antes de aplicar:
+--   select * from public.mentor_visibility_settings;
+drop table if exists public.mentor_visibility_settings;

@@ -12,7 +12,7 @@ import { toLangChainTools } from "./adapters/langchain"
 import { registerMcpCapabilities } from "./adapters/mcp"
 
 jest.mock("@/lib/services/mentors/mentors.service", () => ({ mentorService: { searchCatalog: jest.fn() } }))
-jest.mock("@/lib/services/mentors/mentor-public.service", () => ({ mentorPublicService: {} }))
+jest.mock("@/lib/services/mentors/mentor-profile.composition", () => ({ buildMentorProfileService: jest.fn() }))
 jest.mock("@/lib/services/appointments/availability.service", () => ({ computeAvailableSlots: jest.fn() }))
 
 const names = (caps: readonly { name: string }[]) => caps.map((c) => c.name)
@@ -133,8 +133,8 @@ describe("adapters", () => {
 
   it("MCP: handler devolve JSON indentado e o fallback de mentor não encontrado", async () => {
     const registerTool = jest.fn()
-    const { mentorPublicService } = jest.requireMock("@/lib/services/mentors/mentor-public.service")
-    mentorPublicService.getMentorBySlugOrId = jest.fn().mockResolvedValue(null)
+    const { buildMentorProfileService } = jest.requireMock("@/lib/services/mentors/mentor-profile.composition")
+    buildMentorProfileService.mockReturnValue({ findPublic: jest.fn().mockResolvedValue(null) })
     registerMcpCapabilities({ registerTool } as never, supabase)
     const availability = registerTool.mock.calls.find((c) => c[0] === "getMentorAvailability")![2]
     const result = await availability({ slug: "x", days: 7 })
