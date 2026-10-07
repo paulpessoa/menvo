@@ -122,14 +122,13 @@ export const MentorCard: React.FC<MentorCardProps> = ({
           ================================================================ */}
       <div className="relative w-full aspect-[4/3] overflow-hidden bg-slate-100 dark:bg-slate-800">
         {hasPhoto ? (
-          // `unoptimized`: avatares vêm de hosts arbitrários (LinkedIn, Google,
-          // storage externo…). Sem ele, o loader do Next rejeita qualquer host
-          // fora de `images.remotePatterns` e a foto some para esses mentores.
+          // Como os domínios externos (LinkedIn, Google, Supabase)
+          // já foram adicionados ao next.config.mjs, permitimos que
+          // o Next.js faça a otimização de imagens (WebP/AVIF).
           <Image
             src={rawPhoto!}
             alt={mentor.full_name || 'Mentor'}
             fill
-            unoptimized
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             className="object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out"
             onError={() => setImageError(true)}
