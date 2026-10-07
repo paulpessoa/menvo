@@ -104,11 +104,20 @@ export async function middleware(request: NextRequest) {
     }
   })
 
+  // Sem cookie de sessão do Supabase (visitante anônimo) não há usuário a
+  // validar: pular o getUser() evita uma ida ao Supabase em toda página
+  // pública e reduz o TTFB. O resultado é o mesmo (user = null).
+  const hasAuthCookie = request.cookies
+    .getAll()
+    .some(({ name }) => name.startsWith("sb-") && name.includes("-auth-token"))
+
   let user = null
-  try {
-    const { data, error } = await supabase.auth.getUser()
-    if (!error) user = data.user
-  } catch (error) { }
+  if (hasAuthCookie) {
+    try {
+      const { data, error } = await supabase.auth.getUser()
+      if (!error) user = data.user
+    } catch (error) { }
+  }
 
   // Strip locale prefix for route matching
   const pathnameWithoutLocale = locales.reduce(
