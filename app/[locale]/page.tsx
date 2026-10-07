@@ -4,20 +4,24 @@ import { Button } from "@/components/ui/button"
 
 import { Badge } from "@/components/ui/badge"
 import { Calendar, MessageSquare, Search } from "lucide-react"
-import { getTranslations } from "next-intl/server"
+import { useTranslations } from "next-intl"
 import { preload } from "react-dom"
+import { Suspense } from "react"
 
-import { MentorCard } from "@/components/mentors/MentorCard"
 import { DeferredHeroActions } from "@/components/home/DeferredHeroActions"
-import { getFeaturedMentors } from "@/lib/services/mentors/home-highlights"
+import { FeaturedMentorsSection } from "@/components/home/FeaturedMentorsSection"
 
 const HERO_POSTER = "/images/ai-demo-poster.webp"
 
-export default async function Home() {
-  const t = await getTranslations("home")
+/**
+ * Home pública. Síncrona de propósito: nada aqui pode suspender, senão o
+ * `loading.tsx` em tela cheia é pintado antes do hero e o layout pula (CLS).
+ * Dados remotos ficam atrás de `<Suspense>` próprio.
+ */
+export default function Home() {
+  const t = useTranslations("home")
   // A capa do vídeo é o maior elemento visível (LCP): pedir cedo, com prioridade.
   preload(HERO_POSTER, { as: "image", fetchPriority: "high" })
-  const featuredMentors = await getFeaturedMentors()
 
   return (
     <div className="flex flex-col">
@@ -118,31 +122,10 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Featured Mentors Section */}
-      {featuredMentors.length > 0 && (
-        <section className="w-full py-16 md:py-24 bg-muted/20">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-3 text-center mb-12">
-              <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-foreground">
-                {t("featuredMentors.title")}
-              </h2>
-              <p className="max-w-[700px] text-muted-foreground text-base md:text-lg mx-auto">
-                {t("featuredMentors.description")}
-              </p>
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {featuredMentors.map((mentor) => (
-                <MentorCard key={mentor.id ?? mentor.slug} mentor={mentor} />
-              ))}
-            </div>
-            <div className="flex justify-center mt-12">
-              <Button variant="outline" asChild>
-                <Link href="/mentors">{t("featuredMentors.viewAll")}</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-      )}
+      {/* Featured Mentors Section: abaixo da dobra, então o streaming não gera CLS */}
+      <Suspense fallback={null}>
+        <FeaturedMentorsSection />
+      </Suspense>
     </div>
   )
 }
