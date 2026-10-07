@@ -21,14 +21,6 @@ export interface MentorAvailabilityRepository {
 
 const COLUMNS = "id, mentor_id, day_of_week, start_time, end_time, timezone, created_at, updated_at"
 
-// A RPC nasceu na migration 20261008000000 e ainda não está em lib/types/supabase.ts.
-// Depois de aplicar a migration e rodar `npm run db:types`, este tipo e o cast abaixo
-// podem sair e `db.rpc("set_mentor_availability", ...)` passa a ser tipado sozinho.
-type SetAvailabilityRpc = (
-  fn: "set_mentor_availability",
-  args: { p_slots: NewAvailabilitySlot[]; p_timezone: string | null }
-) => PromiseLike<{ data: AvailabilitySlot[] | null; error: { message: string } | null }>
-
 export function createMentorAvailabilityRepository(db: SupabaseClient<Database>): MentorAvailabilityRepository {
   return {
     async listByMentor(mentorId) {
@@ -43,8 +35,11 @@ export function createMentorAvailabilityRepository(db: SupabaseClient<Database>)
     },
 
     async replaceOwn(slots, timezone) {
-      const rpc = db.rpc.bind(db) as unknown as SetAvailabilityRpc
-      const { data, error } = await rpc("set_mentor_availability", { p_slots: slots, p_timezone: timezone })
+      const { data, error } = await db.rpc("set_mentor_availability", {
+        // Spread: o tipo Json do gerador não aceita interfaces (sem index signature).
+        p_slots: slots.map((slot) => ({ ...slot })),
+        p_timezone: timezone ?? undefined,
+      })
       if (error) throw new RepositoryError("mentorAvailability.replaceOwn", error)
       return data ?? []
     },

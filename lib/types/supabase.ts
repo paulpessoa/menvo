@@ -69,6 +69,42 @@ export type Database = {
           },
         ]
       }
+      activity_logs: {
+        Row: {
+          actor_id: string | null
+          changes: Json
+          created_at: string
+          id: string
+          operation: string
+          record_id: string | null
+          search_text: string
+          subject_user_id: string | null
+          table_name: string
+        }
+        Insert: {
+          actor_id?: string | null
+          changes?: Json
+          created_at?: string
+          id?: string
+          operation: string
+          record_id?: string | null
+          search_text?: string
+          subject_user_id?: string | null
+          table_name: string
+        }
+        Update: {
+          actor_id?: string | null
+          changes?: Json
+          created_at?: string
+          id?: string
+          operation?: string
+          record_id?: string | null
+          search_text?: string
+          subject_user_id?: string | null
+          table_name?: string
+        }
+        Relationships: []
+      }
       admin_audit_logs: {
         Row: {
           action: string
@@ -1469,55 +1505,6 @@ export type Database = {
           },
         ]
       }
-      mentor_visibility_settings: {
-        Row: {
-          created_at: string
-          id: string
-          mentor_id: string
-          updated_at: string
-          visibility_scope: string
-          visible_to_organizations: string[] | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          mentor_id: string
-          updated_at?: string
-          visibility_scope?: string
-          visible_to_organizations?: string[] | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          mentor_id?: string
-          updated_at?: string
-          visibility_scope?: string
-          visible_to_organizations?: string[] | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mentor_visibility_settings_mentor_id_fkey"
-            columns: ["mentor_id"]
-            isOneToOne: true
-            referencedRelation: "mentor_stats"
-            referencedColumns: ["mentor_id"]
-          },
-          {
-            foreignKeyName: "mentor_visibility_settings_mentor_id_fkey"
-            columns: ["mentor_id"]
-            isOneToOne: true
-            referencedRelation: "mentors_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mentor_visibility_settings_mentor_id_fkey"
-            columns: ["mentor_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       messages: {
         Row: {
           content: string
@@ -2459,6 +2446,10 @@ export type Database = {
         Returns: boolean
       }
       is_org_admin: { Args: { p_organization_id: string }; Returns: boolean }
+      mentor_is_publicly_listed: {
+        Args: { p_mentor_id: string }
+        Returns: boolean
+      }
       org_members_quiz_done: {
         Args: { p_org: string }
         Returns: {
@@ -2517,6 +2508,25 @@ export type Database = {
           p_server_key: string
         }
         Returns: undefined
+      }
+      set_mentor_availability: {
+        Args: { p_slots: Json; p_timezone?: string }
+        Returns: {
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          mentor_id: string
+          start_time: string
+          timezone: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "mentor_availability"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       shares_mentorship_with: {
         Args: { p_profile_id: string }
