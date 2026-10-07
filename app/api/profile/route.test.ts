@@ -52,8 +52,8 @@ describe("GET /api/profile: creating the profile of a new account", () => {
       data: {
         user: {
           id: "u1",
-          email: "poliannachiappetta@hotmail.com",
-          user_metadata: { name: "Polianna Chiappetta", given_name: "Polianna", family_name: "Chiappetta" }
+          email: "maria.silva@example.com",
+          user_metadata: { name: "Maria Silva", given_name: "Maria", family_name: "Silva" }
         }
       },
       error: null
@@ -63,7 +63,7 @@ describe("GET /api/profile: creating the profile of a new account", () => {
 
     expect(res.status).toBe(200)
     expect(inserted).toEqual([
-      { id: "u1", email: "poliannachiappetta@hotmail.com", first_name: "Polianna", last_name: "Chiappetta" }
+      { id: "u1", email: "maria.silva@example.com", first_name: "Maria", last_name: "Silva" }
     ])
   })
 

@@ -7,13 +7,13 @@ import { extractIdentity, planNameFix, syncProfileIdentity } from "./oauth-ident
 const google = {
   iss: "https://accounts.google.com",
   sub: "1234567890",
-  name: "Polianna Chiappetta",
-  full_name: "Polianna Chiappetta",
-  given_name: "Polianna",
-  family_name: "Chiappetta",
+  name: "Maria Silva",
+  full_name: "Maria Silva",
+  given_name: "Maria",
+  family_name: "Silva",
   avatar_url: "https://lh3.googleusercontent.com/a/x",
   picture: "https://lh3.googleusercontent.com/a/x",
-  email: "poliannachiappetta@hotmail.com",
+  email: "maria.silva@example.com",
   email_verified: true,
   provider_id: "1234567890"
 }
@@ -21,23 +21,23 @@ const google = {
 const linkedin = {
   iss: "https://www.linkedin.com",
   sub: "AbCdEf",
-  name: "Polianna Chiappetta",
-  given_name: "Polianna",
-  family_name: "Chiappetta",
+  name: "Maria Silva",
+  given_name: "Maria",
+  family_name: "Silva",
   picture: "https://media.licdn.com/x",
   locale: { country: "BR", language: "pt" }, // objeto, não texto
-  email: "poliannachiappetta@hotmail.com",
+  email: "maria.silva@example.com",
   email_verified: true,
   provider_id: "AbCdEf"
 }
 
 describe("extractIdentity", () => {
   it("reads Google (full_name / given_name / family_name)", () => {
-    expect(extractIdentity(google)).toEqual({ firstName: "Polianna", lastName: "Chiappetta" })
+    expect(extractIdentity(google)).toEqual({ firstName: "Maria", lastName: "Silva" })
   })
 
   it("reads LinkedIn OIDC, which has no full_name, first_name or last_name", () => {
-    expect(extractIdentity(linkedin)).toEqual({ firstName: "Polianna", lastName: "Chiappetta" })
+    expect(extractIdentity(linkedin)).toEqual({ firstName: "Maria", lastName: "Silva" })
   })
 
   it("reads the app's own e-mail signup keys", () => {
@@ -83,23 +83,23 @@ describe("extractIdentity", () => {
 })
 
 describe("planNameFix", () => {
-  const identity = { firstName: "Polianna", lastName: "Chiappetta" }
+  const identity = { firstName: "Maria", lastName: "Silva" }
 
   it("fills an empty name (what LinkedIn/Google users ended up with)", () => {
     expect(planNameFix({ first_name: "", last_name: "" }, identity)).toEqual({
-      first_name: "Polianna",
-      last_name: "Chiappetta"
+      first_name: "Maria",
+      last_name: "Silva"
     })
     expect(planNameFix({ first_name: null, last_name: null }, identity)).toEqual({
-      first_name: "Polianna",
-      last_name: "Chiappetta"
+      first_name: "Maria",
+      last_name: "Silva"
     })
   })
 
   it("replaces the generic 'Usuário Teste' with the real name", () => {
     expect(planNameFix({ first_name: "Usuário", last_name: "Teste" }, identity)).toEqual({
-      first_name: "Polianna",
-      last_name: "Chiappetta"
+      first_name: "Maria",
+      last_name: "Silva"
     })
   })
 
@@ -109,8 +109,8 @@ describe("planNameFix", () => {
   })
 
   it("fills only the missing part of a partial name", () => {
-    expect(planNameFix({ first_name: "Polianna", last_name: "" }, identity)).toEqual({ last_name: "Chiappetta" })
-    expect(planNameFix({ first_name: "", last_name: "Chiappetta" }, identity)).toEqual({ first_name: "Polianna" })
+    expect(planNameFix({ first_name: "Maria", last_name: "" }, identity)).toEqual({ last_name: "Silva" })
+    expect(planNameFix({ first_name: "", last_name: "Silva" }, identity)).toEqual({ first_name: "Maria" })
   })
 
   it("does nothing when the provider gave no usable name", () => {
@@ -118,7 +118,7 @@ describe("planNameFix", () => {
   })
 
   it("does nothing when the profile already matches", () => {
-    expect(planNameFix({ first_name: "Polianna", last_name: "Chiappetta" }, identity)).toBeNull()
+    expect(planNameFix({ first_name: "Maria", last_name: "Silva" }, identity)).toBeNull()
   })
 })
 
@@ -148,17 +148,17 @@ describe("syncProfileIdentity", () => {
     const result = await syncProfileIdentity(client, { id: "u1", user_metadata: linkedin })
 
     expect(result).toEqual({ updated: true })
-    expect(writes).toEqual([{ first_name: "Polianna", last_name: "Chiappetta" }])
+    expect(writes).toEqual([{ first_name: "Maria", last_name: "Silva" }])
   })
 
   it("fixes a profile stuck on 'Usuário Teste' using the Google name", async () => {
     const { client, writes } = makeClient({ first_name: "Usuário", last_name: "Teste" })
     await syncProfileIdentity(client, { id: "u1", user_metadata: google })
-    expect(writes).toEqual([{ first_name: "Polianna", last_name: "Chiappetta" }])
+    expect(writes).toEqual([{ first_name: "Maria", last_name: "Silva" }])
   })
 
   it("leaves a real, user-chosen name alone", async () => {
-    const { client, writes } = makeClient({ first_name: "Poli", last_name: "Chiappetta" })
+    const { client, writes } = makeClient({ first_name: "Poli", last_name: "Silva" })
     const result = await syncProfileIdentity(client, { id: "u1", user_metadata: google })
 
     expect(result).toEqual({ updated: false })
@@ -207,6 +207,6 @@ describe("syncProfileIdentity", () => {
       id: "u1",
       user_metadata: google
     })
-    expect(JSON.stringify(spy.mock.calls)).not.toContain("Polianna")
+    expect(JSON.stringify(spy.mock.calls)).not.toContain("Maria")
   })
 })
