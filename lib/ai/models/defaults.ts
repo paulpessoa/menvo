@@ -18,7 +18,7 @@ export const DEFAULT_MODEL_CONFIG: Record<AiCapability, ModelChain> = {
     source: "default",
     primary: {
       provider: "google",
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-3.8-flash-lite",
       params: { temperature: 0, maxOutputTokens: 64, maxRetries: 1 }
     },
     fallbacks: [
@@ -34,7 +34,7 @@ export const DEFAULT_MODEL_CONFIG: Record<AiCapability, ModelChain> = {
     source: "default",
     primary: {
       provider: "google",
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-3.8-flash-lite",
       params: { temperature: 0, maxOutputTokens: 512, maxRetries: 1 }
     },
     fallbacks: [
@@ -50,7 +50,7 @@ export const DEFAULT_MODEL_CONFIG: Record<AiCapability, ModelChain> = {
     source: "default",
     primary: {
       provider: "google",
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-3.8-flash-lite",
       params: { temperature: 0.4, maxOutputTokens: 150, maxRetries: 1 }
     },
     fallbacks: [
@@ -82,7 +82,7 @@ export const DEFAULT_MODEL_CONFIG: Record<AiCapability, ModelChain> = {
     source: "default",
     primary: {
       provider: "google",
-      model: "gemini-2.5-flash",
+      model: "gemini-3.8-flash",
       params: { temperature: 0.4, maxOutputTokens: 2048, maxRetries: 1 }
     },
     // gpt-5-mini is a reasoning model and rejects a non-default temperature.
@@ -99,7 +99,7 @@ export const DEFAULT_MODEL_CONFIG: Record<AiCapability, ModelChain> = {
     source: "default",
     primary: {
       provider: "google",
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-3.8-flash-lite",
       params: { temperature: 0, maxOutputTokens: 256, maxRetries: 2 }
     },
     fallbacks: []

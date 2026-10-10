@@ -3,7 +3,7 @@ import { createClient } from "@/lib/utils/supabase/server"
 import { quizIdParamSchema } from "@/lib/schemas/quiz"
 import { buildQuizService } from "@/lib/services/quiz/quiz.composition"
 
-// gemini-2.5-flash took ~10s for one analysis in a real run (2026-09-23);
+// gemini-3.8-flash took ~10s for one analysis in a real run (2026-09-23);
 // the platform default could kill the function after claiming the row but
 // before saving, leaving the results page waiting. Same cap as /api/assistant.
 export const maxDuration = 60

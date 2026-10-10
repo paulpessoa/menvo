@@ -14,7 +14,7 @@ import type { ModelSpec } from "./schema"
 const ORIGINAL_ENV = { ...process.env }
 
 function spec(overrides: Partial<ModelSpec> = {}): ModelSpec {
-  return { provider: "google", model: "gemini-2.5-flash-lite", params: {}, ...overrides }
+  return { provider: "google", model: "gemini-3.8-flash-lite", params: {}, ...overrides }
 }
 
 describe("factory", () => {
@@ -38,7 +38,7 @@ describe("factory", () => {
   describe("createChatModel", () => {
     it("maps google params to maxOutputTokens", () => {
       const model = createChatModel(
-        spec({ provider: "google", model: "gemini-2.5-flash", params: { temperature: 0.3, maxOutputTokens: 512 } }),
+        spec({ provider: "google", model: "gemini-3.8-flash", params: { temperature: 0.3, maxOutputTokens: 512 } }),
         { isFallback: false, onCall: jest.fn() }
       ) as unknown as ChatGoogleGenerativeAI
 

@@ -97,15 +97,15 @@ revoke all on public.ai_model_config from anon;
 -- gpt-5-mini is a reasoning model and rejects a custom temperature, so its
 -- params omit it on purpose.
 insert into public.ai_model_config (capability, provider, model, params, fallback, notes) values
-  ('route', 'google', 'gemini-2.5-flash-lite',
+  ('route', 'google', 'gemini-3.8-flash-lite',
     '{"temperature": 0, "maxOutputTokens": 64, "maxRetries": 1}',
     '[{"provider": "groq", "model": "openai/gpt-oss-20b", "params": {"temperature": 0, "maxOutputTokens": 64}}]',
     'Intent classification when rules do not decide.'),
-  ('extract', 'google', 'gemini-2.5-flash-lite',
+  ('extract', 'google', 'gemini-3.8-flash-lite',
     '{"temperature": 0, "maxOutputTokens": 512, "maxRetries": 1}',
     '[{"provider": "groq", "model": "openai/gpt-oss-20b", "params": {"temperature": 0, "maxOutputTokens": 512}}]',
     'Free text/voice -> structured slot.'),
-  ('followup', 'google', 'gemini-2.5-flash-lite',
+  ('followup', 'google', 'gemini-3.8-flash-lite',
     '{"temperature": 0.4, "maxOutputTokens": 150, "maxRetries": 1}',
     '[{"provider": "groq", "model": "openai/gpt-oss-20b", "params": {"temperature": 0.4, "maxOutputTokens": 150}}]',
     'One follow-up question.'),
@@ -113,17 +113,17 @@ insert into public.ai_model_config (capability, provider, model, params, fallbac
     '{"temperature": 0.3, "maxOutputTokens": 1024, "maxRetries": 1}',
     '[{"provider": "groq", "model": "openai/gpt-oss-120b", "params": {"temperature": 0.3, "maxOutputTokens": 1024}}]',
     'Copilot with tools (/api/assistant). Replaces qwen/qwen3.8-27b.'),
-  ('analyze', 'google', 'gemini-2.5-flash',
+  ('analyze', 'google', 'gemini-3.8-flash',
     '{"temperature": 0.4, "maxOutputTokens": 2048, "maxRetries": 1}',
     '[{"provider": "openai", "model": "gpt-5-mini", "params": {"maxOutputTokens": 2048}}]',
     'Final diagnostic analysis. Replaces gpt-3.5-turbo (analyze-quiz).'),
-  ('classify_batch', 'google', 'gemini-2.5-flash-lite',
+  ('classify_batch', 'google', 'gemini-3.8-flash-lite',
     '{"temperature": 0, "maxOutputTokens": 256, "maxRetries": 2}',
     '[]',
     'Daily feedback theme job; not interactive.'),
   -- Not in §11.2: AI mentor match (/api/ai/match, waiting-list match). Seeded
   -- with what production runs today so this migration changes no behavior;
-  -- move primary to gemini-2.5-flash-lite only after `npm run eval:match` passes.
+  -- move primary to gemini-3.8-flash-lite only after `npm run eval:match` passes.
   ('rank', 'openai', 'gpt-4o-mini',
     '{"temperature": 0.2, "maxOutputTokens": 1024, "maxRetries": 1}',
     '[{"provider": "groq", "model": "openai/gpt-oss-20b", "params": {"temperature": 0.2, "maxOutputTokens": 1024}}]',

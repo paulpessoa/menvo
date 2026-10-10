@@ -19,7 +19,7 @@ describe("resolveModelChain", () => {
         model: "openai/gpt-oss-20b",
         params: { temperature: 0 },
         fallback: [
-          { provider: "google", model: "gemini-2.5-flash-lite", params: {} },
+          { provider: "google", model: "gemini-3.8-flash-lite", params: {} },
           { provider: "openai", model: "gpt-5-nano", params: { maxOutputTokens: 50 } }
         ],
         active: true
@@ -30,7 +30,7 @@ describe("resolveModelChain", () => {
 
     expect(chain.source).toBe("db")
     expect(chain.primary).toEqual({ provider: "groq", model: "openai/gpt-oss-20b", params: { temperature: 0 } })
-    expect(chain.fallbacks.map((f) => f.model)).toEqual(["gemini-2.5-flash-lite", "gpt-5-nano"])
+    expect(chain.fallbacks.map((f) => f.model)).toEqual(["gemini-3.8-flash-lite", "gpt-5-nano"])
     expect(warn).not.toHaveBeenCalled()
   })
 

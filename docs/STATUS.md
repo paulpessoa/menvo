@@ -317,7 +317,7 @@ MCP público e assistente passaram a registrar as tools a partir de um único re
   - `lib/ai/protocol.ts`: added `chips`, `progress`, and `diagnostic_complete` events, exported `ChipOption`. Unit-tested round-trip serialization.
 - **Diagnostic Engine & Domain Logic (`lib/ai-menvo/diagnostic/`):**
   - `steps.ts`: deterministic definitions of all 7 questions, chips options, schemas, and input types.
-  - `extract.ts`: structured extraction using registry capability `extract` (`gemini-2.5-flash-lite` -> `openai/gpt-oss-20b`) when users type free text; includes CVV 188 crisis safeguard check per §12.2.
+  - `extract.ts`: structured extraction using registry capability `extract` (`gemini-3.8-flash-lite` -> `openai/gpt-oss-20b`) when users type free text; includes CVV 188 crisis safeguard check per §12.2.
   - `followup.ts`: ambiguity check and gentle 1-sentence follow-up generator via registry capability `followup`.
   - `engine.ts`: conversational turn orchestrator that advances steps, saves intermediate state, checks/consumes monthly quota, calls `analyzeQuiz` with sanitization against active platform mentors (`mentors_view`), and returns recommended mentor cards via SSE.
 - **Service Layer (`lib/services/diagnostic/diagnostic.service.ts`):**

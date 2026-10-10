@@ -3,7 +3,7 @@ import { createMeteringCallback } from "./callback"
 describe("createMeteringCallback", () => {
   it("records tokens, cache and latency from usage_metadata on success", async () => {
     const onCall = jest.fn()
-    const cb = createMeteringCallback({ provider: "google", model: "gemini-2.5-flash-lite", isFallback: false, onCall })
+    const cb = createMeteringCallback({ provider: "google", model: "gemini-3.8-flash-lite", isFallback: false, onCall })
 
     await cb.handleChatModelStart?.({} as never, [], "run-1")
     await cb.handleLLMEnd?.(
@@ -25,7 +25,7 @@ describe("createMeteringCallback", () => {
     expect(onCall).toHaveBeenCalledWith(
       expect.objectContaining({
         provider: "google",
-        model: "gemini-2.5-flash-lite",
+        model: "gemini-3.8-flash-lite",
         inputTokens: 900,
         outputTokens: 40,
         cachedInputTokens: 600,

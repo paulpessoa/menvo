@@ -291,7 +291,7 @@ Consequências:
 3. O nome do arquivo engana (é o match, não o Groq): renomear para
    `lib/services/ai/match.service.ts` no mesmo PR e atualizar os 3 imports e o
    `jest.mock` de `app/api/admin/waiting-list/match/route.test.ts`.
-4. **Troca de modelo depois:** mudar `rank` para `gemini-2.5-flash-lite`
+4. **Troca de modelo depois:** mudar `rank` para `gemini-3.8-flash-lite`
    (0,10/0,40 contra 0,15/0,60) só com `npm run eval:match` verde, via
    `UPDATE`, sem deploy.
 
