@@ -381,7 +381,7 @@ insert into public.ai_model_pricing (provider, model, input_per_mtok, output_per
   ('openai', 'gpt-4o-mini',            0.15,  0.60, 0.075,  '2026-01-01', 'OpenAI list price'),
   ('groq',   'openai/gpt-oss-20b',     0.075, 0.30, 0.0375, '2026-01-01', 'Groq list price'),
   ('groq',   'qwen/qwen3.8-27b',       0.80,  4.00, null,   '2026-01-01', 'Groq list price; slated for retirement (plan §11.2)'),
-  ('google', 'gemini-3.5-flash-lite',  0.30,  2.50, 0.03,   '2026-01-01', 'Gemini API paid tier'),
+  ('google', 'gemini-3.8-flash-lite',  0.30,  2.50, 0.03,   '2026-01-01', 'Gemini API paid tier'),
   ('local',  'keyword',                0,     0,    0,      '2026-01-01', 'Deterministic fallback, no LLM')
 on conflict do nothing;
 

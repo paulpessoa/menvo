@@ -66,7 +66,7 @@ export const DEFAULT_MODEL_CONFIG: Record<AiCapability, ModelChain> = {
     source: "default",
     primary: {
       provider: "google",
-      model: "gemini-3.5-flash-lite",
+      model: "gemini-3.8-flash-lite",
       params: { temperature: 0.3, maxOutputTokens: 1024, maxRetries: 1 }
     },
     fallbacks: [

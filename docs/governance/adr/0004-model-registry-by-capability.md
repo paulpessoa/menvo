@@ -23,7 +23,7 @@ diferentes (plano §0, dívida 5):
 
 | Onde | Modelo hoje | Fallback | Medição |
 |---|---|---|---|
-| `lib/services/assistant/agent.ts` | `gemini-3.5-flash-lite` (Gemini instanciado; `qwen/qwen3.8-27b` no Groq instanciado e **nunca usado**) | nenhum | `streamEvents` → `lib/ai/langchain-metering.ts` |
+| `lib/services/assistant/agent.ts` | `gemini-3.8-flash-lite` (Gemini instanciado; `qwen/qwen3.8-27b` no Groq instanciado e **nunca usado**) | nenhum | `streamEvents` → `lib/ai/langchain-metering.ts` |
 | `lib/services/ai/groq.service.ts` (match) | `gpt-4o-mini` via `fetch` | `openai/gpt-oss-20b` (Groq) via `fetch`, depois palavra-chave | manual (`AiCallRecord`) |
 | `supabase/functions/analyze-quiz` | `gpt-3.5-turbo` via `fetch` (Deno, `service_role`) | análise fixa | **nenhuma** |
 

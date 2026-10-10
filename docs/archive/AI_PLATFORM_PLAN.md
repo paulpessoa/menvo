@@ -606,10 +606,10 @@ O núcleo `lib/ai/` sai da Fase 0–1 com fronteiras claras:
 |---|---|---:|---:|---:|---|
 | Google | `gemini-2.5-flash-lite` | 0,10 | 0,01 | 0,40 | áudio entrada 0,30 |
 | Google | `gemini-3.1-flash-lite` | 0,25 | 0,025 | 1,50 | áudio entrada 0,50 |
-| Google | `gemini-3.5-flash-lite` | 0,30 | - | 2,50 | modelo atual do assistente; sem cache |
+| Google | `gemini-3.8-flash-lite` | 0,30 | - | 2,50 | modelo atual do assistente; sem cache |
 | Google | `gemini-2.5-flash` | 0,30 | 0,03 | 2,50 | áudio entrada 1,00 |
 | Google | `gemini-3.8-flash` | 0,75 | 0,075 | 3,75 | até 31/12/2026; **1,50 / 0,15 / 7,50 a partir de 01/01/2027** |
-| Google | `gemini-3.5-flash` | 1,50 | 0,15 | 9,00 | |
+| Google | `gemini-3.8-flash` | 1,50 | 0,15 | 9,00 | |
 | Groq | `openai/gpt-oss-20b` | 0,075 | - | 0,30 | |
 | Groq | `openai/gpt-oss-120b` | 0,15 | - | 0,60 | |
 | Groq | `qwen/qwen3.8-27b` | 0,80 | - | 4,00 | preview; hoje referenciado no código, **aposentar** |
@@ -632,7 +632,7 @@ modelos, por isso ficam fora do registro até terem preço público.
 | `route` (classificar intenção, só quando a regra não decide) | `gemini-2.5-flash-lite` | `openai/gpt-oss-20b` (Groq) | O mais barato de cada provedor; tarefa trivial |
 | `extract` (texto/voz → slot estruturado) | `gemini-2.5-flash-lite` | `openai/gpt-oss-20b` (Groq) | Saída curta e estruturada |
 | `followup` (pergunta de aprofundamento) | `gemini-2.5-flash-lite` | `openai/gpt-oss-20b` (Groq) | Uma frase |
-| `converse` (copiloto com tools) | `gemini-3.5-flash-lite` | `openai/gpt-oss-120b` (Groq) | Já validado com tools no código atual; o fallback é mais barato e de outro provedor |
+| `converse` (copiloto com tools) | `gemini-3.8-flash-lite` | `openai/gpt-oss-120b` (Groq) | Já validado com tools no código atual; o fallback é mais barato e de outro provedor |
 | `analyze` (análise final do diagnóstico) | `gemini-2.5-flash` | `gpt-5-mini` (OpenAI) | Melhor qualidade por um custo baixo; tem cache (o prompt fixo é grande) |
 | `classify_batch` (tema de feedback, job diário) | `gemini-2.5-flash-lite` | - | Não é interativo |
 | `stt` (Fase 3, se necessário) | `whisper-large-v3-turbo` (Groq) | `gpt-4o-mini-transcribe` | US$ 0,04/h |

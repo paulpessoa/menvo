@@ -2,7 +2,7 @@ import { recordAiCalls, type AiCallRecord } from "./metering"
 
 const call: AiCallRecord = {
   provider: "google",
-  model: "gemini-3.5-flash-lite",
+  model: "gemini-3.8-flash-lite",
   inputTokens: 1200,
   outputTokens: 80,
   cachedInputTokens: 0,

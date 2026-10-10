@@ -2,7 +2,7 @@
 --
 -- The problem: `record_ai_usage` was executable by any authenticated user, who
 -- could call it straight from the Supabase REST API with up to 10M tokens per
--- call. One forged row (~US$ 28 on gemini-3.5-flash-lite) exhausts the global
+-- call. One forged row (~US$ 28 on gemini-3.8-flash-lite) exhausts the global
 -- `ai_budget`, and `consume_ai_quota` then blocks AI for every user until the
 -- next month. Any usage number reported by a caller the user controls is
 -- forgeable, so per-run caps would only shrink the damage, not remove it.
@@ -114,10 +114,10 @@ grant execute on function public.record_ai_usage(text, text, text, text, int, in
 -- ─── Pricing corrections and the models of AI_PLATFORM_PLAN.md §11.2 ────────
 -- Prices are append-only (new effective_from), so costs already recorded stay
 -- as they were. Checked 2026-09-23 against the providers' official pages:
--- gemini-3.5-flash-lite has no context caching, and Groq publishes no cached
+-- gemini-3.8-flash-lite has no context caching, and Groq publishes no cached
 -- price for gpt-oss-20b (NULL = cached tokens billed at the input price).
 insert into public.ai_model_pricing (provider, model, input_per_mtok, output_per_mtok, cached_input_per_mtok, effective_from, notes) values
-  ('google', 'gemini-3.5-flash-lite', 0.30,  2.50, null,  '2026-09-23', 'No context caching on this model'),
+  ('google', 'gemini-3.8-flash-lite', 0.30,  2.50, null,  '2026-09-23', 'No context caching on this model'),
   ('groq',   'openai/gpt-oss-20b',    0.075, 0.30, null,  '2026-09-23', 'Groq publishes no cached-input price'),
   ('groq',   'openai/gpt-oss-120b',   0.15,  0.60, null,  '2026-09-23', 'Groq list price'),
   ('google', 'gemini-2.5-flash-lite', 0.10,  0.40, 0.01,  '2026-09-23', 'Gemini API paid tier'),

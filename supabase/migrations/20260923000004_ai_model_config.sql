@@ -109,7 +109,7 @@ insert into public.ai_model_config (capability, provider, model, params, fallbac
     '{"temperature": 0.4, "maxOutputTokens": 150, "maxRetries": 1}',
     '[{"provider": "groq", "model": "openai/gpt-oss-20b", "params": {"temperature": 0.4, "maxOutputTokens": 150}}]',
     'One follow-up question.'),
-  ('converse', 'google', 'gemini-3.5-flash-lite',
+  ('converse', 'google', 'gemini-3.8-flash-lite',
     '{"temperature": 0.3, "maxOutputTokens": 1024, "maxRetries": 1}',
     '[{"provider": "groq", "model": "openai/gpt-oss-120b", "params": {"temperature": 0.3, "maxOutputTokens": 1024}}]',
     'Copilot with tools (/api/assistant). Replaces qwen/qwen3.8-27b.'),
