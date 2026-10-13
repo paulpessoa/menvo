@@ -56,3 +56,39 @@ describe("createAppointmentSchema", () => {
     }
   })
 })
+
+describe("noShowAppointmentSchema", () => {
+  it("accepts appointmentId and optional notes", async () => {
+    const { noShowAppointmentSchema } = await import("./appointment")
+    const result = noShowAppointmentSchema.safeParse({
+      appointmentId: "123",
+      notes: "Mentorado não apareceu"
+    })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.appointmentId).toBe("123")
+      expect(result.data.notes).toBe("Mentorado não apareceu")
+    }
+  })
+
+  it("converts numeric appointmentId to string", async () => {
+    const { noShowAppointmentSchema } = await import("./appointment")
+    const result = noShowAppointmentSchema.safeParse({
+      appointmentId: 456
+    })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.appointmentId).toBe("456")
+      expect(result.data.notes).toBeUndefined()
+    }
+  })
+
+  it("rejects notes longer than 1000 characters", async () => {
+    const { noShowAppointmentSchema } = await import("./appointment")
+    const result = noShowAppointmentSchema.safeParse({
+      appointmentId: "123",
+      notes: "a".repeat(1001)
+    })
+    expect(result.success).toBe(false)
+  })
+})

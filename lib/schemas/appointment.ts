@@ -69,6 +69,13 @@ export const updateFeedbackSchema = z.object({
 
 export type UpdateFeedbackInput = z.infer<typeof updateFeedbackSchema>
 
+export const noShowAppointmentSchema = z.object({
+  appointmentId: z.union([z.string(), z.number()]).transform(val => String(val)),
+  notes: z.string().max(1000, "Comentário não pode exceder 1000 caracteres").optional().nullable()
+})
+
+export type NoShowAppointmentInput = z.infer<typeof noShowAppointmentSchema>
+
 // ---------------------------------------------------------------------------
 // Admin: gestão de sessões (/dashboard/admin/appointments)
 // ---------------------------------------------------------------------------

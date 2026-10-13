@@ -11,13 +11,15 @@ import {
   ExternalLink,
   XCircle,
   CheckCircle2,
-  Linkedin
+  Linkedin,
+  UserX
 } from "lucide-react"
 import { AppointmentStatusBadge } from "./appointment-status-badge"
 import { ConfirmAppointmentButton } from "./confirm-appointment-button"
 import { CancelAppointmentButton } from "./cancel-appointment-button"
 import { ChatButton } from "./chat-button"
 import { CompleteAppointmentModal } from "./complete-appointment-modal"
+import { NoShowModal } from "./no-show-modal"
 import { useState } from "react"
 import { useTranslations, useFormatter } from "next-intl"
 import { useRouter } from "@/i18n/routing"
@@ -77,6 +79,7 @@ export function AppointmentCard({
   const format = useFormatter()
   const router = useRouter()
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
+  const [isNoShowModalOpen, setIsNoShowModalOpen] = useState(false)
   const [isCompleting, setIsCompleting] = useState(false)
   const isChatEnabled = useFeatureFlag("chat_flag")
 
@@ -92,6 +95,23 @@ export function AppointmentCard({
       toast.error(error instanceof Error ? error.message : "Erro ao concluir a sessão.")
     } finally {
       setIsCompleting(false)
+    }
+  }
+
+  const handleNoShowSuccess = (notes?: string) => {
+    const trimmedNotes = notes?.trim()
+    const reason = trimmedNotes
+      ? `Mentorado não compareceu: ${trimmedNotes}`
+      : "Mentorado não compareceu à sessão"
+    if (onAppointmentUpdate) {
+      onAppointmentUpdate({
+        ...appointment,
+        status: "cancelled",
+        cancellation_reason: reason,
+        notes_mentor: trimmedNotes || "Mentorado não compareceu à sessão.",
+        cancelled_by: currentUserId,
+        cancelled_at: new Date().toISOString()
+      })
     }
   }
 
@@ -170,10 +190,21 @@ export function AppointmentCard({
     isPast &&
     !hasUserEvaluated
   const canMentorComplete = isMentor && appointment.status === "confirmed" && isPast
+  const canReportNoShow =
+    isMentor &&
+    isPast &&
+    (appointment.status === "confirmed" || appointment.status === "completed")
 
   const showLinkedin = !isChatEnabled && (canChat || canConfirm) && !!otherPerson?.linkedin_url
   const hasActions =
-    (isChatEnabled && (canChat || canConfirm)) || showLinkedin || canComplete || canConfirm || canCancel || canJoinMeet || canMentorComplete
+    (isChatEnabled && (canChat || canConfirm)) ||
+    showLinkedin ||
+    canComplete ||
+    canConfirm ||
+    canCancel ||
+    canJoinMeet ||
+    canMentorComplete ||
+    canReportNoShow
 
   const handleProfileClick = () => {
     if (!isMentor && otherPerson?.id) {
@@ -332,6 +363,18 @@ export function AppointmentCard({
             </Button>
           )}
 
+          {canReportNoShow && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 font-medium"
+              onClick={() => setIsNoShowModalOpen(true)}
+            >
+              <UserX className="h-4 w-4 mr-2" />
+              {t("markNoShow")}
+            </Button>
+          )}
+
           {canComplete && (
             <Button
               size="sm"
@@ -387,6 +430,14 @@ export function AppointmentCard({
         onCompleted={() => {
           onAppointmentUpdate?.(appointment)
         }}
+      />
+
+      <NoShowModal
+        open={isNoShowModalOpen}
+        onOpenChange={setIsNoShowModalOpen}
+        appointmentId={appointment.id}
+        menteeName={otherPerson.full_name}
+        onSuccess={handleNoShowSuccess}
       />
     </Card>
   )

@@ -474,6 +474,19 @@ export const mentorshipSessionsService = {
     }
   },
 
+  // Registrar falta / ausência do mentorado (BFF: POST /api/appointments/no-show)
+  markNoShow: async (appointmentId: string, notes?: string): Promise<void> => {
+    const res = await fetch("/api/appointments/no-show", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ appointmentId, notes })
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error(data.error || "Erro ao registrar ausência")
+    }
+  },
+
   // Atualizar feedback público de agendamento (BFF: PATCH /api/feedback)
   updateFeedback: async (feedbackId: string, publicFeedback: string): Promise<void> => {
     const res = await fetch("/api/appointments/feedback", {

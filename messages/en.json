@@ -1648,6 +1648,13 @@
     "joinMeet": "Join Meet",
     "markAsCompleted": "Mark as Completed",
     "sessionCompletedSuccess": "Session completed successfully!",
+    "markNoShow": "No-show",
+    "noShowTitle": "Report Mentee Absence",
+    "noShowDescription": "Did the mentee not attend the session? This will update the mentorship status to cancelled due to absence and record your notes.",
+    "noShowCommentLabel": "Comments or notes (optional)",
+    "noShowCommentPlaceholder": "E.g.: I waited for 15 minutes on the video call room, but the mentee did not join.",
+    "noShowConfirmButton": "Confirm Absence",
+    "noShowSuccess": "Mentee absence recorded successfully.",
     "confirm": {
       "title": "Confirming Appointment...",
       "successTitle": "Appointment Confirmed!",

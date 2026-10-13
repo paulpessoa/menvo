@@ -1642,6 +1642,13 @@
     "joinMeet": "Entrar no Meet",
     "markAsCompleted": "Marcar Concluída",
     "sessionCompletedSuccess": "Sessão concluída com sucesso!",
+    "markNoShow": "Não compareceu",
+    "noShowTitle": "Registrar Ausência do Mentorado",
+    "noShowDescription": "O mentorado não compareceu à sessão? Isso atualizará o agendamento no histórico como cancelado por ausência e registrará suas observações.",
+    "noShowCommentLabel": "Comentário ou observações (opcional)",
+    "noShowCommentPlaceholder": "Ex.: Aguardei por 15 minutos na sala da videochamada, mas o mentorado não compareceu.",
+    "noShowConfirmButton": "Confirmar Ausência",
+    "noShowSuccess": "Ausência do mentorado registrada com sucesso.",
     "confirm": {
       "title": "Confirmando Agendamento...",
       "successTitle": "Agendamento Confirmado!",

@@ -1624,6 +1624,13 @@
     "joinMeet": "Entrar al Meet",
     "markAsCompleted": "Marcar como completada",
     "sessionCompletedSuccess": "¡Sesión completada con éxito!",
+    "markNoShow": "No se presentó",
+    "noShowTitle": "Registrar Ausencia del Mentee",
+    "noShowDescription": "¿El mentee no asistió a la sesión? Esto actualizará la cita en el historial como cancelada por ausencia y registrará tus observaciones.",
+    "noShowCommentLabel": "Comentario u observaciones (opcional)",
+    "noShowCommentPlaceholder": "Ej.: Esperé 15 minutos en la sala de la videollamada, pero el mentee no ingresó.",
+    "noShowConfirmButton": "Confirmar Ausencia",
+    "noShowSuccess": "Ausencia del mentee registrada con éxito.",
     "confirm": {
       "title": "Confirmando Cita...",
       "successTitle": "¡Cita Confirmada!",
