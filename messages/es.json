@@ -1622,6 +1622,8 @@
     "cancelledAt": "Cancelada el {date}",
     "evaluate": "Evaluar",
     "joinMeet": "Entrar al Meet",
+    "markAsCompleted": "Marcar como completada",
+    "sessionCompletedSuccess": "¡Sesión completada con éxito!",
     "confirm": {
       "title": "Confirmando Cita...",
       "successTitle": "¡Cita Confirmada!",

@@ -84,7 +84,7 @@ export function AppointmentCard({
     try {
       setIsCompleting(true)
       await mentorshipService.markCompleted(String(appointment.id))
-      toast.success(t("sessionCompletedSuccess", { defaultValue: "Sessão concluída com sucesso!" }))
+      toast.success(t("sessionCompletedSuccess"))
       if (onAppointmentUpdate) {
         onAppointmentUpdate({ ...appointment, status: "completed" })
       }
@@ -328,7 +328,7 @@ export function AppointmentCard({
               disabled={isCompleting}
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
-              {t("markAsCompleted", { defaultValue: "Marcar Concluída" })}
+              {t("markAsCompleted")}
             </Button>
           )}
 

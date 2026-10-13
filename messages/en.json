@@ -1646,6 +1646,8 @@
     "cancelledAt": "Cancelled on {date}",
     "evaluate": "Evaluate",
     "joinMeet": "Join Meet",
+    "markAsCompleted": "Mark as Completed",
+    "sessionCompletedSuccess": "Session completed successfully!",
     "confirm": {
       "title": "Confirming Appointment...",
       "successTitle": "Appointment Confirmed!",
