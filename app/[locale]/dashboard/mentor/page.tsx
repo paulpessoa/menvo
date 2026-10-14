@@ -32,8 +32,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FeedbackManagement } from "@/components/FeedbackManagement"
 import { MentorUpcomingSessions, type MentorAppointment } from "@/components/dashboard/MentorUpcomingSessions"
 import { MentorActivationChecklist } from "@/components/dashboard/MentorActivationChecklist"
+import { MentorPauseToggle } from "@/components/dashboard/MentorPauseToggle"
+import { MentorPausedBanner } from "@/components/dashboard/MentorPausedBanner"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { SharedDiagnosticsSection } from "@/components/diagnostic/SharedDiagnosticsSection"
+import { cn } from "@/lib/utils"
 
 interface MentorStats {
   totalAppointments: number
@@ -103,17 +106,27 @@ export default function MentorDashboard() {
           {/* Header e Boas-vindas */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight">
-                {getGreeting()}, {profile?.first_name || "Mentor"}!
-              </h1>
-              <p className="text-muted-foreground text-base md:text-lg">{t("mentor.welcome")}</p>
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-3xl md:text-4xl font-black tracking-tight">
+                  {getGreeting()}, {profile?.first_name || "Mentor"}!
+                </h1>
+                <Badge
+                  variant={profile?.is_public ? "default" : "secondary"}
+                  className={cn(
+                    "text-xs font-semibold rounded-lg px-2.5 py-1",
+                    profile?.is_public
+                      ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
+                      : "bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+                  )}
+                >
+                  <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", profile?.is_public ? "bg-emerald-500" : "bg-amber-500")} />
+                  {profile?.is_public ? "Mentorias ativas" : "Mentorias pausadas"}
+                </Badge>
+              </div>
+              <p className="text-muted-foreground text-base md:text-lg mt-1">{t("mentor.welcome")}</p>
             </div>
             <div className="flex items-center gap-3">
-              <Button asChild variant="ghost" size="sm" className="rounded-xl font-medium text-muted-foreground hover:text-foreground hidden sm:flex">
-                <Link href="/support">
-                  <Shield className="h-4 w-4 mr-2" /> Suporte
-                </Link>
-              </Button>
+              <MentorPauseToggle isPublic={profile?.is_public} />
               <Button asChild size="sm" className="rounded-xl font-bold h-10 px-5 bg-primary hover:bg-primary/90 text-white shadow-xs">
                 <Link href="/dashboard/mentor/availability">
                   <Clock className="h-4 w-4 mr-2" /> {t("mentor.actions.availability")}
@@ -166,6 +179,9 @@ function MentorDashboardTabs({ stats, profile, upcomingAppointments, loading, lo
 
             {/* TAB: VISÃO GERAL */}
             <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
+
+              {/* Alerta de Mentorias Pausadas */}
+              <MentorPausedBanner isPublic={profile?.is_public} />
 
               {/* Checklist de ativação: some sozinho quando tudo estiver pronto */}
               <MentorActivationChecklist profile={profile as any} stats={stats} />
