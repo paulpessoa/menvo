@@ -56,6 +56,13 @@ export default function AdminVerificationsPage() {
   const [activeTab, setActiveTab] = useState("pending")
 
   const loadVerifications = useCallback(async (status: string) => {
+    // Only "pending" and "completed" have API routes; "scheduled" is a
+    // placeholder tab, so fetching it would just 404.
+    if (status !== "pending" && status !== "completed") {
+      setVerifications([])
+      setLoading(false)
+      return
+    }
     try {
       if (user?.id) {
         setLoading(true)
@@ -306,7 +313,7 @@ export default function AdminVerificationsPage() {
       <div className="flex flex-col space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-4">
-            <TabsTrigger value="pending">Pendentes ({verifications.length})</TabsTrigger>
+            <TabsTrigger value="pending">Pendentes{activeTab === "pending" ? ` (${verifications.length})` : ""}</TabsTrigger>
             <TabsTrigger value="scheduled">Agendados</TabsTrigger>
             <TabsTrigger value="completed">Concluídos</TabsTrigger>
           </TabsList>
