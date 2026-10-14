@@ -32,8 +32,12 @@ jest.mock('@supabase/ssr', () => ({
 
 import { middleware } from './middleware'
 
-function makeRequest(path: string) {
-  return new NextRequest(new URL(`http://localhost:3000${path}`))
+function makeRequest(path: string, options?: { authenticated?: boolean }) {
+  const req = new NextRequest(new URL(`http://localhost:3000${path}`))
+  if (options?.authenticated) {
+    req.cookies.set('sb-test-auth-token', 'mock-auth-token')
+  }
+  return req
 }
 
 describe('middleware role protection', () => {
@@ -56,7 +60,7 @@ describe('middleware role protection', () => {
       data: [{ roles: { name: 'mentee' } }]
     })
 
-    const res = await middleware(makeRequest('/pt-BR/dashboard/admin'))
+    const res = await middleware(makeRequest('/pt-BR/dashboard/admin', { authenticated: true }))
 
     expect(res.status).toBe(307)
     expect(res.headers.get('location')).toContain('/pt-BR/unauthorized')
@@ -68,7 +72,7 @@ describe('middleware role protection', () => {
       data: [{ roles: { name: 'admin' } }]
     })
 
-    const res = await middleware(makeRequest('/pt-BR/dashboard/admin'))
+    const res = await middleware(makeRequest('/pt-BR/dashboard/admin', { authenticated: true }))
 
     expect(res.status).not.toBe(307)
   })
@@ -77,7 +81,7 @@ describe('middleware role protection', () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-2' } }, error: null })
     mockReturns.mockResolvedValue({ data: [] })
 
-    const res = await middleware(makeRequest('/pt-BR/messages'))
+    const res = await middleware(makeRequest('/pt-BR/messages', { authenticated: true }))
 
     expect(res.status).toBe(307)
     expect(res.headers.get('location')).toContain('/pt-BR/onboarding')
@@ -89,7 +93,7 @@ describe('middleware role protection', () => {
       data: [{ roles: { name: 'mentee' } }]
     })
 
-    const res = await middleware(makeRequest('/pt-BR/messages'))
+    const res = await middleware(makeRequest('/pt-BR/messages', { authenticated: true }))
 
     expect(res.status).not.toBe(307)
   })

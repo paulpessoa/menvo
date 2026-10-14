@@ -132,6 +132,7 @@ export async function createCalendarEvent(
     const response = await calendar.events.insert({
       calendarId: getCalendarId(),
       conferenceDataVersion: 1,
+      sendUpdates: 'all',
       requestBody: event,
     });
 
@@ -184,6 +185,7 @@ export async function updateCalendarEvent(
     const response = await calendar.events.patch({
       calendarId: getCalendarId(),
       eventId: eventId,
+      sendUpdates: 'all',
       requestBody: updateBody,
     });
 
@@ -208,6 +210,7 @@ export async function deleteCalendarEvent(
     await calendar.events.delete({
       calendarId: getCalendarId(),
       eventId: eventId,
+      sendUpdates: 'all',
     });
 
     return true;
