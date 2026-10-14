@@ -18,6 +18,7 @@ import {
   mentorshipUtils
 } from "@/lib/services/mentorship/mentorship.service"
 import { toast } from "sonner"
+import { AvailabilityAlertButton } from "@/components/mentorship/AvailabilityAlertButton"
 import {
   MENTORSHIP_REASON_MAX_LENGTH,
   MENTORSHIP_REASON_MIN_LENGTH,
@@ -168,12 +169,17 @@ export default function BookingForm({
               <MenvoDots className="/40" />
             </div>
           ) : availableSlots.length === 0 ? (
-            <div className="text-center py-12 border rounded-xl bg-muted/30">
-              <Clock className="h-12 w-12 mx-auto mb-4 opacity-20" />
-              <p className="font-medium">Nenhum horário disponível</p>
-              <p className="text-sm text-muted-foreground">
-                Este mentor ainda não configurou sua agenda.
-              </p>
+            <div className="text-center py-12 border rounded-xl bg-muted/30 space-y-4">
+              <Clock className="h-12 w-12 mx-auto opacity-20" />
+              <div>
+                <p className="font-medium">Nenhum horário disponível</p>
+                <p className="text-sm text-muted-foreground">
+                  Este mentor ainda não configurou horários livres nas próximas semanas.
+                </p>
+              </div>
+              <div className="pt-2 flex justify-center">
+                <AvailabilityAlertButton mentorId={mentorId} mentorName={mentorName} />
+              </div>
             </div>
           ) : (
             <div className="space-y-6 mt-4">

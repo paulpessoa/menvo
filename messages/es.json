@@ -1591,6 +1591,33 @@
       "backToDashboard": "Volver al Dashboard",
       "title": "Mis Mentorías",
       "description": "Sigue tus solicitudes y sesiones de mentoría programadas"
+    },
+    "booking": {
+      "modalTitle": "Agendar Mentoría",
+      "standardDuration": "Las mentorías de {name} tienen una duración estándar de 45 minutos. Selecciona un horario a continuación para continuar.",
+      "noSlotsTitle": "Ningún horario disponible",
+      "noSlotsDesc": "No encontramos horarios libres en las próximas 2 semanas. Por favor, intenta de nuevo más tarde.",
+      "selectedSlot": "Horario Seleccionado",
+      "atTime": "A las {time} (Duración: 45 min)",
+      "messageLabel": "¿Qué te gustaría discutir en esta sesión?",
+      "messagePlaceholder": "Ej: Me gustaría resolver dudas sobre transición de carrera, arquitectura de código y recibir consejos para entrevistas...",
+      "charCounter": "Mínimo 20 caracteres: {count}/20",
+      "requiredNote": "Los campos con * son obligatorios",
+      "chooseOtherSlot": "Elegir otro horario",
+      "confirmButton": "Confirmar Agendamiento",
+      "submitting": "Agendando...",
+      "successMessage": "¡Solicitud enviada! Redirigiendo...",
+      "pendingEvaluationsTitle": "¡Tienes evaluaciones pendientes!",
+      "pendingEvaluationsDesc": "Para mantener la comunidad activa y con alta calidad, por favor evalúa tus sesiones completadas antes de agendar una nueva mentoría.",
+      "evaluateNow": "Evaluar Ahora",
+      "notifyMe": "Avisarme cuando haya horarios",
+      "notifyMeActive": "Aviso activado",
+      "notifyMeSuccess": "¡Listo! Te enviaremos un correo tan pronto como se abran nuevos horarios.",
+      "notifyMeModalTitle": "Recibir aviso de horarios",
+      "notifyMeModalDesc": "Ingresa tu correo para recibir una notificación cuando {name} abra nuevos horarios de mentoría.",
+      "notifyMeEmailPlaceholder": "tu@correo.com",
+      "notifyMeSubmit": "Activar aviso",
+      "notifyMeSubmitting": "Activando..."
     }
   },
   "appointments": {

@@ -1608,7 +1608,15 @@
       "successMessage": "Solicitação enviada! Redirecionando...",
       "pendingEvaluationsTitle": "Você possui avaliações pendentes!",
       "pendingEvaluationsDesc": "Para manter a comunidade ativa e com alto padrão de qualidade, por favor avalie suas sessões concluídas antes de agendar uma nova mentoria.",
-      "evaluateNow": "Avaliar Agora"
+      "evaluateNow": "Avaliar Agora",
+      "notifyMe": "Me avise quando abrir horário",
+      "notifyMeActive": "Aviso ativado",
+      "notifyMeSuccess": "Pronto! Enviaremos um e-mail assim que novos horários forem abertos.",
+      "notifyMeModalTitle": "Receber aviso de horários",
+      "notifyMeModalDesc": "Informe seu e-mail para receber uma notificação assim que {name} cadastrar novos horários de mentoria.",
+      "notifyMeEmailPlaceholder": "seu@email.com",
+      "notifyMeSubmit": "Ativar aviso",
+      "notifyMeSubmitting": "Ativando..."
     }
   },
   "appointments": {

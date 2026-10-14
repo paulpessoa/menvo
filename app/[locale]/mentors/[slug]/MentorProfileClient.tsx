@@ -46,6 +46,7 @@ const LoginRequiredModal = dynamic(
   { ssr: false }
 )
 import { useTranslations } from "next-intl"
+import { AvailabilityAlertButton } from "@/components/mentorship/AvailabilityAlertButton"
 import { MentorshipReviews } from "@/components/mentors/MentorshipReviews"
 import { useFavorites } from "@/hooks/useFavorites"
 import { useAuth } from "@/lib/auth"
@@ -417,27 +418,30 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                 ) : (
                   // Mobile uses the sticky action bar below instead.
                   <div className="hidden md:flex gap-2">
-                    <Button
-                      id="tour-schedule-button"
-                      className="flex-1 rounded-2xl h-14 font-bold bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-base sm:text-lg"
-                      disabled={isFullyBooked}
-                      onClick={() => {
-                        if (!user) {
-                          setShowLoginModal(true)
-                        } else {
-                          setIsScheduleModalOpen(true)
-                        }
-                      }}
-                    >
-                      {isFullyBooked ? (
-                        t("fullSchedule")
-                      ) : (
+                    {isFullyBooked ? (
+                      <AvailabilityAlertButton
+                        mentorId={mentor.id}
+                        mentorName={mentor.full_name}
+                        className="flex-1 rounded-2xl h-14 font-bold shadow-xl text-base sm:text-lg"
+                      />
+                    ) : (
+                      <Button
+                        id="tour-schedule-button"
+                        className="flex-1 rounded-2xl h-14 font-bold bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-base sm:text-lg"
+                        onClick={() => {
+                          if (!user) {
+                            setShowLoginModal(true)
+                          } else {
+                            setIsScheduleModalOpen(true)
+                          }
+                        }}
+                      >
                         <div className="flex items-center gap-2">
                           <Calendar className="w-5 h-5" />
                           <span>Disponível</span>
                         </div>
-                      )}
-                    </Button>
+                      </Button>
+                    )}
                     <div className="flex gap-2 shrink-0">
                       <Button
                         variant="outline"
@@ -509,19 +513,25 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
         {!isOwner && (
           <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 animate-in slide-in-from-bottom duration-500 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
             <div className="flex gap-2 max-w-[600px] mx-auto">
-              <Button
-                size="xl"
-                onClick={() => {
-                  if (!user) setShowLoginModal(true)
-                  else setIsScheduleModalOpen(true)
-                }}
-                className="flex-1 rounded-2xl font-black shadow-2xl shadow-primary/40 h-14"
-                disabled={isFullyBooked}
-              >
-                {isFullyBooked
-                  ? t("fullSchedule")
-                  : t("bookMentorship")}
-              </Button>
+              {isFullyBooked ? (
+                <AvailabilityAlertButton
+                  mentorId={mentor.id}
+                  mentorName={mentor.full_name}
+                  size="xl"
+                  className="flex-1 rounded-2xl font-black shadow-2xl h-14"
+                />
+              ) : (
+                <Button
+                  size="xl"
+                  onClick={() => {
+                    if (!user) setShowLoginModal(true)
+                    else setIsScheduleModalOpen(true)
+                  }}
+                  className="flex-1 rounded-2xl font-black shadow-2xl shadow-primary/40 h-14"
+                >
+                  {t("bookMentorship")}
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="icon"

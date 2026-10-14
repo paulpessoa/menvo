@@ -19,8 +19,8 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 🚦 System Health
 - **TypeScript:** 0 errors (`npx tsc --noEmit`)
-- **Unit Tests:** 237/237 passed across 47 test suites (`npm test`)
-- **Production Build:** 66/66 pages generated successfully (`npm run build`)
+- **Unit Tests:** 811/811 passed across 114 test suites (`npm test`)
+- **Production Build:** 100% pages generated successfully (`npm run build`)
 - **Runtime:** Next.js 15 (App Router) + React 19 + Tailwind CSS + Supabase Auth & PostgreSQL
 
 ---

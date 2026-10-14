@@ -16,6 +16,7 @@ import {
   setAvailabilitySchema,
 } from "@/lib/schemas/availability"
 import { mentorApproachResponseSchema, mentorSlugParamSchema } from "@/lib/schemas/mentors"
+import { createAvailabilityAlertSchema, queryAvailabilityAlertSchema } from "@/lib/schemas/availability-alert"
 
 const json = <T extends z.ZodTypeAny>(schema: T) => ({ "application/json": { schema } })
 const error = (description: string) => ({ description, content: json(apiErrorSchema) })
@@ -66,3 +67,39 @@ registry.registerPath({
     404: error("Mentor não encontrado ou não listado no diretório"),
   },
 })
+
+registry.registerPath({
+  method: "get",
+  path: "/api/mentors/availability-alerts",
+  tags: ["mentors"],
+  summary: "Verifica se o usuário logado possui alerta ativo para o mentor",
+  description:
+    "Sem sessão autenticada, devolve `hasActiveAlert: false`. Com sessão, verifica se há registro pendente em `mentor_availability_alerts`.",
+  request: { query: queryAvailabilityAlertSchema },
+  responses: {
+    200: {
+      description: "Status do alerta de disponibilidade",
+      content: json(z.object({ success: z.boolean(), hasActiveAlert: z.boolean() })),
+    },
+    400: error("`mentor_id` não é um UUID válido"),
+  },
+})
+
+registry.registerPath({
+  method: "post",
+  path: "/api/mentors/availability-alerts",
+  tags: ["mentors"],
+  summary: "Inscreve usuário ou e-mail para receber alerta quando o mentor abrir horários",
+  description:
+    "Grava interesse do mentorado (C-M3). Se logado, associa ao `auth.uid()`. Se visitante, requer e-mail no body.",
+  request: { body: { content: json(createAvailabilityAlertSchema) } },
+  responses: {
+    200: {
+      description: "Aviso registrado com sucesso",
+      content: json(z.object({ success: z.boolean(), message: z.string() })),
+    },
+    400: error("E-mail inválido ou dados incorretos"),
+    500: error("Falha ao salvar alerta"),
+  },
+})
+

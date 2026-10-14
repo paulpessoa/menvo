@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { availabilityQuerySchema, setAvailabilitySchema } from "@/lib/schemas/availability"
 import { buildMentorAvailabilityService } from "@/lib/services/mentors/mentor-availability.composition"
+import { buildAvailabilityAlertService } from "@/lib/services/mentors/availability-alert.composition"
 
 /**
  * GET /api/mentors/availability[?mentor_id=<uuid>] - a agenda semanal de um
@@ -72,6 +73,13 @@ export async function POST(request: NextRequest) {
     case "failed":
       return NextResponse.json({ error: "Erro ao salvar horários de disponibilidade" }, { status: 500 })
     case "saved":
+      if (result.slots.length > 0) {
+        buildAvailabilityAlertService(supabase)
+          .notifySubscribers(user.id)
+          .catch((err) => {
+            console.error("[mentorAvailability.notifySubscribers]", err)
+          })
+      }
       return NextResponse.json({
         success: true,
         data: result.slots,

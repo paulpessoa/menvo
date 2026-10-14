@@ -1352,3 +1352,57 @@ export async function sendMentorContactEmail(data: MentorContactEmailData) {
   const subject = `${data.mentorName} quer ajudar você.`;
   return await sendEmail(data.menteeEmail, subject, getEmailLayout(escapeHtml(subject), content, { signatureType: "team", footerExtra }), data.mentorEmail);
 }
+
+export interface MentorAvailabilityAlertEmailData {
+  menteeEmail: string;
+  mentorName: string;
+  mentorSlug: string;
+  mentorJobTitle?: string | null;
+  mentorCompany?: string | null;
+  mentorAvatarUrl?: string | null;
+}
+
+/**
+ * Sends a notification email to a user who requested an availability alert
+ * when a mentor opens new slots (C-M3).
+ */
+export async function sendMentorAvailabilityAlertEmail(data: MentorAvailabilityAlertEmailData) {
+  const mentorProfileUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/mentors/${data.mentorSlug}`;
+
+  const content = `
+    <p>Olá!</p>
+    <p>Você pediu para ser avisado quando <strong>${escapeHtml(data.mentorName)}</strong> abrisse novos horários de mentoria na Menvo.</p>
+    <p>O mentor acabou de disponibilizar novos horários em sua agenda semanal. Aproveite para agendar a sua sessão antes que os horários sejam preenchidos!</p>
+
+    <div style="background:#f8fafc;border-radius:16px;padding:24px;margin:24px 0;border:1px solid ${COLORS.divider};">
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width:100%;">
+        <tr>
+          ${data.mentorAvatarUrl ? `<td style="width:72px;vertical-align:top;padding-right:16px;">
+            <img src="${data.mentorAvatarUrl}" alt="${escapeHtml(data.mentorName)}" width="64" height="64" style="border-radius:50%;display:block;object-fit:cover;width:64px;height:64px;border:3px solid ${COLORS.primary};" />
+          </td>` : ''}
+          <td style="vertical-align:middle;">
+            <p style="font-weight:800;color:#111827;font-size:18px;margin:0 0 4px 0;">${escapeHtml(data.mentorName)}</p>
+            ${data.mentorJobTitle ? `<p style="font-size:14px;color:${COLORS.primary};font-weight:600;margin:0;">${escapeHtml(data.mentorJobTitle)}${data.mentorCompany ? ` @ ${escapeHtml(data.mentorCompany)}` : ''}</p>` : ''}
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="button-container">
+      <a href="${mentorProfileUrl}" class="button">Ver Horários e Agendar</a>
+    </div>
+
+    <div class="divider"></div>
+    <p style="font-size: 13px; color: ${COLORS.muted};"><strong>Dica:</strong> As mentorias na Menvo são gratuitas e voluntárias. Escolha o melhor horário para você com antecedência.</p>
+  `;
+
+  const footerExtra = `
+    <p style="margin-top: 16px;">Você recebeu este e-mail porque solicitou ser avisado sobre novos horários de ${escapeHtml(data.mentorName)} na Menvo.
+      Este é um e-mail pontual.
+    </p>
+  `;
+
+  const subject = `${data.mentorName} abriu novos horários de mentoria na Menvo`;
+  return await sendEmail(data.menteeEmail, subject, getEmailLayout(escapeHtml(subject), content, { signatureType: "team", footerExtra }));
+}
+

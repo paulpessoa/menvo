@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/auth"
 import { useLocale, useTranslations } from "next-intl"
 import { Link } from "@/i18n/routing"
 import { trackBookingConfirmed } from "@/lib/utils/google-analytics/events"
+import { AvailabilityAlertButton } from "./AvailabilityAlertButton"
 
 interface TimeSlot {
   day_of_week: number
@@ -281,9 +282,12 @@ export function BookMentorshipModal({
                     <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
                       {t("noSlotsDesc")}
                     </p>
-                    <Button asChild variant="outline" className="rounded-xl mt-2">
-                      <Link href="/mentors">Explorar Outros Mentores</Link>
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-2 justify-center items-center pt-2">
+                      <AvailabilityAlertButton mentorId={mentorId} mentorName={mentorName} />
+                      <Button asChild variant="outline" className="rounded-xl">
+                        <Link href="/mentors">Explorar Outros Mentores</Link>
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">

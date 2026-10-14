@@ -1614,7 +1614,15 @@
       "successMessage": "Request sent! Redirecting...",
       "pendingEvaluationsTitle": "You have pending evaluations!",
       "pendingEvaluationsDesc": "To keep our community thriving and high quality, please evaluate your completed sessions before scheduling a new mentorship.",
-      "evaluateNow": "Evaluate Now"
+      "evaluateNow": "Evaluate Now",
+      "notifyMe": "Notify me when slots open",
+      "notifyMeActive": "Alert active",
+      "notifyMeSuccess": "All set! We will email you as soon as new slots open.",
+      "notifyMeModalTitle": "Get notified of new slots",
+      "notifyMeModalDesc": "Enter your email to get notified when {name} opens new mentorship slots.",
+      "notifyMeEmailPlaceholder": "your@email.com",
+      "notifyMeSubmit": "Activate alert",
+      "notifyMeSubmitting": "Activating..."
     }
   },
   "appointments": {

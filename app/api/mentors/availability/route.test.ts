@@ -10,6 +10,11 @@ jest.mock("@/lib/utils/supabase/server", () => ({ createClient: jest.fn() }))
 jest.mock("@/lib/services/mentors/mentor-availability.composition", () => ({
   buildMentorAvailabilityService: jest.fn(),
 }))
+jest.mock("@/lib/services/mentors/availability-alert.composition", () => ({
+  buildAvailabilityAlertService: jest.fn(() => ({
+    notifySubscribers: jest.fn().mockResolvedValue({ notified: 0 }),
+  })),
+}))
 
 const MENTOR = "11111111-1111-4111-8111-111111111111"
 const slot = {
