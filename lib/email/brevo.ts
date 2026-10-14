@@ -696,6 +696,55 @@ export async function sendMentorAgendaReminder(data: {
   );
 }
 
+/**
+ * E-mail para mentorados que acabaram de criar conta: o Mural de Mentorados só
+ * mostra perfis completos (a partir de 14/10), então o pedido é preencher o
+ * perfil. Vai como transacional (sem link de descadastro de campanha), por isso
+ * o rodapé explica como parar de receber: responder este e-mail.
+ */
+export function buildNewMenteeProfileHtml(data: { name: string }): string {
+  const firstName = escapeHtml(data.name.split(" ")[0] || data.name);
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br";
+
+  const content = `
+    <p>Oi, ${firstName}!</p>
+    <p>Que bom ter você na Menvo, uma plataforma gratuita de mentoria, sobre qualquer assunto, feita por voluntários.</p>
+    <p>Uma novidade: mentores e mentoras agora encontram mentorados no <strong>Mural de Mentorados</strong> e oferecem ajuda por conta própria, sem esperar você agendar. Para aparecer lá, e para quem for te ajudar entender do que você precisa, seu perfil tem que estar completo. Leva uns 5 minutos:</p>
+    <ol style="padding-left: 20px; margin-bottom: 15px;">
+      <li style="font-size: 14px; margin-bottom: 8px;"><strong>Ative "Perfil público"</strong> (a partir de 18 anos). Só mentores logados veem, e seu e-mail e telefone nunca aparecem.</li>
+      <li style="font-size: 14px; margin-bottom: 8px;"><strong>Conte na bio o que você busca agora.</strong> Exemplo: "Estou no 3º período de ADS e quero meu primeiro estágio em front-end. Preciso de ajuda com portfólio e entrevistas."</li>
+      <li style="font-size: 14px; margin-bottom: 8px;"><strong>Escolha os tópicos</strong> em que quer mentoria e diga onde quer chegar.</li>
+      <li style="font-size: 14px; margin-bottom: 8px;"><strong>Adicione seu LinkedIn.</strong> Hoje é por lá que os mentores entram em contato.</li>
+      <li style="font-size: 14px; margin-bottom: 8px;"><strong>Anexe seu currículo</strong>, se tiver.</li>
+    </ol>
+    <div class="button-container">
+        <a href="${baseUrl}/profile" class="button">Completar meu perfil</a>
+    </div>
+    <p>O mural mostra só perfis completos, e quem atualiza o perfil aparece primeiro.</p>
+    <p>Prefere não aparecer? É só deixar "Perfil público" desligado. Você continua podendo buscar e agendar mentores normalmente.</p>
+    <p>Ficou com dúvida? É só responder este e-mail. Sou eu mesmo que leio.</p>
+    <p>Um abraço,</p>
+  `;
+
+  const footerExtra = `
+    <p style="margin-top: 16px;">Você recebeu este e-mail porque criou uma conta na Menvo. Se não quiser mais receber mensagens como esta, responda este e-mail pedindo para parar.</p>
+  `;
+
+  return getEmailLayout("Menvo", content, { signatureType: "personal", footerExtra });
+}
+
+export async function sendNewMenteeProfileEmail(data: {
+  email: string;
+  name: string;
+}): Promise<{ success: boolean; error?: string }> {
+  return await sendEmail(
+    data.email,
+    "Seu perfil na Menvo: 5 minutos para os mentores te encontrarem",
+    buildNewMenteeProfileHtml({ name: data.name })
+  );
+}
+
+
 // ---------------------------------------------------------------------------
 // Retenção automática de contas importadas (JotForm) nunca ativadas
 // ---------------------------------------------------------------------------
