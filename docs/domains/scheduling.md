@@ -67,7 +67,7 @@ Um slot projetado só é exibido como disponível para o mentorado se passar por
    - Se o mentor conectou a própria agenda em `/mentor/availability`, `computeAvailableSlots` consulta `calendar.freebusy.query` **só na agenda dele** (tokens em `google_calendar_tokens`, escopo `calendar.freebusy`) e esconde os slots que colidem.
    - **Só consulta, só remove:** nunca grava na agenda do mentor nem adiciona horários. Título e detalhes dos eventos não são lidos.
    - **Só eventos "Ocupado" bloqueiam.** Eventos marcados "Livre" (`transparency: transparent`, o padrão de eventos de dia inteiro) não aparecem no freebusy. Isso é do Google, não do código.
-   - **Falha silenciosa por desenho:** sem conexão, token expirado ou erro do Google, o filtro é ignorado e todos os slots cadastrados aparecem (log `[AVAILABILITY] Google Calendar sync skipped`). `start_date` igual a `end_date` gera intervalo vazio e também cai nesse caso; a tela sempre manda 14 dias.
+   - **Falha silenciosa por desenho:** sem conexão, token expirado, erro ou timeout do Google (timeout de 3s para evitar estourar serverless), o filtro é ignorado e todos os slots cadastrados aparecem (log `[AVAILABILITY] Google Calendar sync skipped`). `start_date` igual a `end_date` gera intervalo vazio e também cai nesse caso; a tela sempre manda 14 dias.
    - Verificado em produção em 2026-10-02: evento "Ocupado" às 20:30 escondeu o slot; evento de dia inteiro "Livre" não bloqueou.
 
 > O filtro acima é **por mentor**, na agenda pessoal dele. Já o Google Meet de toda sessão é criado

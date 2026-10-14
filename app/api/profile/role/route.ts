@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { updateUserRoleSchema } from "@/lib/schemas/profile"
+import { sendNewMenteeProfileEmail } from "@/lib/email/brevo"
 
 export async function POST(request: NextRequest) {
   try {
@@ -137,6 +138,21 @@ export async function POST(request: NextRequest) {
         await supabaseAdmin
           .from("user_roles")
           .insert({ user_id: user.id, role_id: roleId })
+
+        if (role === "mentee" && user.email) {
+          const recipientName =
+            user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
+            (profileUpdates.full_name as string) ||
+            "Mentorado"
+
+          sendNewMenteeProfileEmail({
+            email: user.email,
+            name: recipientName,
+          }).catch((err) => {
+            console.error("[ONBOARDING] Erro ao enviar e-mail de perfil completo:", err)
+          })
+        }
       }
     }
 
@@ -146,7 +162,8 @@ export async function POST(request: NextRequest) {
       role,
       status: role === "mentor" ? "pending" : "approved",
     })
-  } catch (error) { console.error('TEST ERROR:', error);
+  } catch (error) {
+    console.error("[POST /api/profile/role] Erro:", error)
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

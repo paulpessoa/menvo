@@ -47,13 +47,19 @@ export async function computeAvailableSlots(
       const { createUserGoogleCalendarClient } = await import('@/lib/google-calendar-db')
       const { calendar } = await createUserGoogleCalendarClient(mentorId)
       
-      const freebusyRes = await calendar.freebusy.query({
-        requestBody: {
-          timeMin: startDate.toISOString(),
-          timeMax: endDate.toISOString(),
-          items: [{ id: 'primary' }]
+      const freebusyRes = await calendar.freebusy.query(
+        {
+          requestBody: {
+            timeMin: startDate.toISOString(),
+            timeMax: endDate.toISOString(),
+            items: [{ id: 'primary' }]
+          }
+        },
+        {
+          timeout: 3000,
+          signal: AbortSignal.timeout(3000)
         }
-      })
+      )
       
       const calendars = freebusyRes.data.calendars
       if (calendars && calendars.primary && calendars.primary.busy) {
