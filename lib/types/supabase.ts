@@ -14,48 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      mentor_availability_alerts: {
-        Row: {
-          id: string
-          mentor_id: string
-          mentee_id: string | null
-          email: string
-          created_at: string
-          notified_at: string | null
-        }
-        Insert: {
-          id?: string
-          mentor_id: string
-          mentee_id?: string | null
-          email: string
-          created_at?: string
-          notified_at?: string | null
-        }
-        Update: {
-          id?: string
-          mentor_id?: string
-          mentee_id?: string | null
-          email?: string
-          created_at?: string
-          notified_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "mentor_availability_alerts_mentor_id_fkey"
-            columns: ["mentor_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mentor_availability_alerts_mentee_id_fkey"
-            columns: ["mentee_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       account_retention: {
         Row: {
           campaign: string
@@ -1423,6 +1381,76 @@ export type Database = {
           },
           {
             foreignKeyName: "mentor_availability_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentor_availability_alerts: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          mentee_id: string | null
+          mentor_id: string
+          notified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          mentee_id?: string | null
+          mentor_id: string
+          notified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          mentee_id?: string | null
+          mentor_id?: string
+          notified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_availability_alerts_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "mentor_availability_alerts_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_availability_alerts_mentee_id_fkey"
+            columns: ["mentee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_availability_alerts_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "mentor_availability_alerts_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mentor_availability_alerts_mentor_id_fkey"
             columns: ["mentor_id"]
             isOneToOne: false
             referencedRelation: "profiles"
