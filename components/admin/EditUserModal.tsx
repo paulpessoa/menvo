@@ -67,10 +67,8 @@ export function EditUserModal({
     const file = event.target.files?.[0]
     if (!file || !user) return
 
-    // Nota: O endpoint de upload atual usa a sessão do usuário logado.
-    // Se quisermos que o Admin envie fotos para OUTRO usuário, precisamos de um endpoint Admin ou passar o targetUserId.
-    // Por agora, vou manter a edição de URL mas adicionar um disclaimer ou tentar o upload.
-    const result = await imageUpload.upload(file)
+    // Passa targetUserId para que o upload seja atribuído ao usuário editado e não sobrescreva a foto do admin
+    const result = await imageUpload.upload(file, { targetUserId: user.id })
 
     if (result.success) {
       const avatarUrl = result.data.url + "?t=" + Date.now()

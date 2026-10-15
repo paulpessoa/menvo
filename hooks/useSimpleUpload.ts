@@ -7,7 +7,7 @@ interface SimpleUploadResult {
 }
 
 interface UseSimpleUploadReturn {
-  upload: (file: File) => Promise<SimpleUploadResult>
+  upload: (file: File, extraData?: Record<string, string>) => Promise<SimpleUploadResult>
   isUploading: boolean
   progress: number
   error: string | null
@@ -18,7 +18,7 @@ export function useSimpleUpload(endpoint: string): UseSimpleUploadReturn {
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
-  const upload = useCallback(async (file: File): Promise<SimpleUploadResult> => {
+  const upload = useCallback(async (file: File, extraData?: Record<string, string>): Promise<SimpleUploadResult> => {
     setIsUploading(true)
     setProgress(0)
     setError(null)
@@ -40,6 +40,13 @@ export function useSimpleUpload(endpoint: string): UseSimpleUploadReturn {
       // Prepare form data
       const formData = new FormData()
       formData.append('file', file)
+      if (extraData) {
+        Object.entries(extraData).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            formData.append(key, value)
+          }
+        })
+      }
 
       console.log('📤 Sending upload request to:', endpoint)
 
