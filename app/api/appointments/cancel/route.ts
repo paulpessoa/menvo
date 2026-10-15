@@ -4,6 +4,7 @@ import { createClient as createServerClient } from '@/lib/utils/supabase/server'
 
 import { cancelAppointmentSchema } from '@/lib/schemas/appointment';
 import { sendAppointmentCancellation } from '@/lib/email/brevo';
+import { deleteCalendarEvent } from '@/lib/services/mentorship/google-calendar.service';
 
 export async function POST(request: NextRequest) {
   try {
@@ -91,7 +92,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Remover evento do Google Calendar se existir
+    // Remover evento do Google Calendar se existir (liberando a agenda e notificando participantes)
+    if (appointment.google_event_id) {
+      try {
+        await deleteCalendarEvent(user.id, appointment.google_event_id);
+      } catch (calError: any) {
+        console.warn('⚠️ [CANCEL] Não foi possível remover evento do Google Calendar:', calError?.message);
+      }
+    }
     
     // Notificar a outra parte por e-mail com motivo do cancelamento
     try {

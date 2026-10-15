@@ -6,6 +6,7 @@ import { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/utils/supabase/server';
 import { sendAppointmentCancellation } from '@/lib/email/brevo';
+import { deleteCalendarEvent } from '@/lib/services/mentorship/google-calendar.service';
 
 jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(),
@@ -17,6 +18,10 @@ jest.mock('@/lib/utils/supabase/server', () => ({
 
 jest.mock('@/lib/email/brevo', () => ({
   sendAppointmentCancellation: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/services/mentorship/google-calendar.service', () => ({
+  deleteCalendarEvent: jest.fn().mockResolvedValue(true),
 }));
 
 describe('POST /api/appointments/cancel', () => {
@@ -178,5 +183,84 @@ describe('POST /api/appointments/cancel', () => {
       reason: 'Imprevisto de saúde',
       cancelledByName: 'Dr. Mentor',
     });
+  });
+
+  it('should delete Google Calendar event if appointment has google_event_id', async () => {
+    mockServerSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'mentor-1', email: 'mentor@menvo.com.br' } },
+      error: null,
+    });
+
+    const mockAppointment = {
+      id: 'app-with-cal',
+      status: 'confirmed',
+      scheduled_at: '2026-09-15T14:00:00Z',
+      google_event_id: 'g-event-123',
+      mentor: { id: 'mentor-1', full_name: 'Dr. Mentor', email: 'mentor@menvo.com.br' },
+      mentee: { id: 'mentee-1', full_name: 'Aluno João', email: 'joao@example.com' },
+    };
+
+    mockAdminSupabase.from.mockImplementation((table: string) => {
+      if (table === 'appointments') {
+        return {
+          select: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              single: jest.fn().mockResolvedValue({ data: mockAppointment, error: null }),
+            }),
+          }),
+          update: jest.fn().mockReturnValue({
+            eq: jest.fn().mockResolvedValue({ error: null }),
+          }),
+        };
+      }
+      return {};
+    });
+
+    const req = createMockRequest({ appointmentId: 'app-with-cal', reason: 'Reagendamento' });
+    const response = await POST(req);
+
+    expect(response.status).toBe(200);
+    expect(deleteCalendarEvent).toHaveBeenCalledWith('mentor-1', 'g-event-123');
+  });
+
+  it('should continue cancellation even if Google Calendar deletion throws', async () => {
+    mockServerSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'mentor-1', email: 'mentor@menvo.com.br' } },
+      error: null,
+    });
+
+    (deleteCalendarEvent as jest.Mock).mockRejectedValueOnce(new Error('Google API Error'));
+
+    const mockAppointment = {
+      id: 'app-error-cal',
+      status: 'confirmed',
+      scheduled_at: '2026-09-15T14:00:00Z',
+      google_event_id: 'g-event-fail',
+      mentor: { id: 'mentor-1', full_name: 'Dr. Mentor', email: 'mentor@menvo.com.br' },
+      mentee: { id: 'mentee-1', full_name: 'Aluno João', email: 'joao@example.com' },
+    };
+
+    mockAdminSupabase.from.mockImplementation((table: string) => {
+      if (table === 'appointments') {
+        return {
+          select: jest.fn().mockReturnValue({
+            eq: jest.fn().mockReturnValue({
+              single: jest.fn().mockResolvedValue({ data: mockAppointment, error: null }),
+            }),
+          }),
+          update: jest.fn().mockReturnValue({
+            eq: jest.fn().mockResolvedValue({ error: null }),
+          }),
+        };
+      }
+      return {};
+    });
+
+    const req = createMockRequest({ appointmentId: 'app-error-cal', reason: 'Reagendamento' });
+    const response = await POST(req);
+
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.success).toBe(true);
   });
 });
