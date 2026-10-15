@@ -586,6 +586,20 @@ export type Database = {
             foreignKeyName: "appointment_checkins_participant_id_fkey"
             columns: ["participant_id"]
             isOneToOne: false
+            referencedRelation: "mentor_stats"
+            referencedColumns: ["mentor_id"]
+          },
+          {
+            foreignKeyName: "appointment_checkins_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "mentors_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_checkins_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -2502,6 +2516,36 @@ export type Database = {
         Returns: boolean
       }
       check_user_role: { Args: { target_role: string }; Returns: boolean }
+      checkin_row_for_token: {
+        Args: { p_token: string }
+        Returns: {
+          answered_at: string | null
+          appointment_id: string
+          created_at: string
+          details_submitted_at: string | null
+          expires_at: string | null
+          id: string
+          next_step: string | null
+          outcome: string | null
+          participant_id: string
+          reminded_at: string | null
+          role: string
+          sent_at: string | null
+          token_hash: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "appointment_checkins"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      checkin_summary: {
+        Args: {
+          p_checkin: Database["public"]["Tables"]["appointment_checkins"]["Row"]
+        }
+        Returns: Json
+      }
       claim_quiz_analysis: {
         Args: { p_id: string; p_server_key: string }
         Returns: {
@@ -2635,6 +2679,10 @@ export type Database = {
         Returns: string
       }
       request_mentor_verification: { Args: never; Returns: undefined }
+      resolve_appointment_checkin: {
+        Args: { p_appointment_id: string }
+        Returns: undefined
+      }
       save_google_calendar_tokens: {
         Args: {
           p_access_token: string
