@@ -1,8 +1,6 @@
--- Camada 12 · Contrato appointment_feedbacks: private_notes so dono/avaliado/admin
--- Estado atual: policy "Users can view feedbacks" com using(true) vaza private_notes
--- para qualquer authenticated. Este teste documenta o comportamento DESEJADO
--- (falha ate a migration corrigir) e garante que rating/public_feedback publicos
--- seguem legiveis.
+-- Camada 12 · Contrato appointment_feedbacks: private_notes apenas dono/avaliado/admin.
+-- A leitura de feedbacks aprovados para terceiros/público é feita via view
+-- pública appointment_feedbacks_public, garantindo sigilo das notas privadas.
 begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
@@ -37,14 +35,12 @@ on conflict (id) do update set private_notes = excluded.private_notes, admin_not
 set local role authenticated;
 set local request.jwt.claim.sub = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaa0023';
 
--- DESEJADO: stranger ve a linha mas private_notes nulo (ou 0 linhas se filtrado por view).
--- Hoje com using(true) ele ve tudo -> este teste FALHA ate a migration.
--- Escrevemos a assercao do DESEJADO e marcamos como todo() se quiser passar no CI antes da migracao.
--- Aqui deixamos falhando de proposito para travar o PR ate corrigir.
+-- DESEJADO: stranger não lê notas privadas na tabela base appointment_feedbacks,
+-- mas lê rating/public_feedback através da view pública appointment_feedbacks_public.
 select is(
   (select private_notes from public.appointment_feedbacks where id = 'cccccccc-cccc-cccc-cccc-cccccccc0021'),
   null,
-  'estranho nao le private_notes (DESEJADO: null, ATUAL: vaza)'
+  'estranho nao le private_notes'
 );
 
 select is(
@@ -53,11 +49,11 @@ select is(
   'estranho nao le admin_notes'
 );
 
--- mas rating/public_feedback aprovados seguem legiveis
+-- mas rating/public_feedback aprovados seguem legiveis na view publica
 select is(
-  (select rating from public.appointment_feedbacks where id = 'cccccccc-cccc-cccc-cccc-cccccccc0021'),
+  (select rating from public.appointment_feedbacks_public where id = 'cccccccc-cccc-cccc-cccc-cccccccc0021'),
   5,
-  'estranho le rating publico'
+  'estranho le rating publico via view'
 );
 
 reset role;
