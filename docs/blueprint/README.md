@@ -49,6 +49,6 @@ Achados desta revisão que não cabem num domínio específico.
 | Média | Rate limit em memória (`lib/rate-limit.ts`) | Em serverless cada instância tem o seu contador. Mover para Upstash/Vercel KV ou para o Postgres quando o abuso aparecer |
 | Média | `@supabase/auth-helpers-react` (descontinuado) junto com `@supabase/ssr` | Remover o auth-helpers e ficar só com `@supabase/ssr` |
 | Média | `axios` e `fetch` convivendo | Padronizar em `fetch` (Next estende o `fetch` com cache) |
-| Baixa | Arquivos soltos na raiz: `schema_dump.sql`, `test-org.ts`, `mentor-agenda-reminder-preview.html` | Mover para `scripts/` ou `docs/archive/`, ou apagar se não forem usados |
+| Baixa | Arquivos soltos na raiz: `schema_dump.sql`, `test-org.ts`, previews HTML | ✅ Apagados do repositório em 2026-10-14 |
 | Baixa | `next.config.mjs` com `eslint.ignoreDuringBuilds` | Ok agora que o CI roda o lint separado; manter |
-| Baixa | Dois templates de PR (`PULL_REQUEST_TEMPLATE.md` e `pull_request_template.md`) | Manter um só |
+| Baixa | Dois templates de PR | ✅ Apenas `.github/PULL_REQUEST_TEMPLATE.md` mantido |
