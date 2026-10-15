@@ -11,6 +11,8 @@ import {
   mentorReviewKindSchema
 } from "@/lib/ai-menvo/mentor-review/draft"
 
+export const maxDuration = 60
+
 const bodySchema = z.object({
   userId: z.string().uuid(),
   kind: mentorReviewKindSchema,
