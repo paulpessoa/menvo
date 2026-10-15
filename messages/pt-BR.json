@@ -812,6 +812,21 @@
       }
     }
   },
+  "termsGate": {
+    "title": "Atualizamos nossos Termos de Uso",
+    "description": "Para continuar usando a Menvo, leia e aceite os Termos de Uso.",
+    "summaryTitle": "Em resumo:",
+    "summaryVolunteer": "A Menvo é uma iniciativa voluntária e gratuita: participar não cria vínculo trabalhista nem obrigação de pagamento.",
+    "summaryContact": "Mentores e mentorados podem entrar em contato entre si pela plataforma.",
+    "summaryOpenSource": "O código da Menvo é aberto (licença MIT); o nome e a marca não fazem parte dessa licença.",
+    "readTerms": "Ler os Termos de Uso",
+    "readPrivacy": "Política de Privacidade",
+    "checkbox": "Li e aceito os Termos de Uso e tenho 16 anos ou mais",
+    "accept": "Aceitar e continuar",
+    "accepting": "Registrando...",
+    "error": "Não foi possível registrar seu aceite. Tente novamente.",
+    "signupRequired": "Você precisa aceitar os Termos de Uso para criar a conta."
+  },
   "terms": {
     "badge": "Termos de Serviço",
     "title": "Termos de Uso",

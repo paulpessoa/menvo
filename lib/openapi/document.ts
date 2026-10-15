@@ -8,6 +8,7 @@ import { OpenApiGeneratorV31 } from "@asteasolutions/zod-to-openapi"
 import { registry } from "./registry"
 import "./paths/quiz"
 import "./paths/mentors"
+import "./paths/legal"
 
 export function buildOpenApiDocument() {
   return new OpenApiGeneratorV31(registry.definitions).generateDocument({
@@ -21,6 +22,7 @@ export function buildOpenApiDocument() {
     tags: [
       { name: "quiz", description: "Diagnóstico de carreira (quiz) e análise por IA" },
       { name: "mentors", description: "Agenda e perfil público de mentores" },
+      { name: "legal", description: "Aceite dos Termos de Uso" },
     ],
   })
 }

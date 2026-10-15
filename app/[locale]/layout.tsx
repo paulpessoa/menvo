@@ -14,6 +14,7 @@ import { MaintenanceGuard } from "@/components/MaintenanceGuard"
 import { Suspense } from "react"
 import { DeferredConsoleEasterEgg, DeferredFeedbackBanner, DeferredCookieConsentBanner } from "@/components/DeferredClientWidgets"
 import { AnalyticsWrapper } from "@/components/AnalyticsWrapper"
+import { TermsGate } from "@/components/legal/TermsGate"
 
 const inter = Inter({ subsets: ["latin"], display: "swap" })
 
@@ -165,6 +166,7 @@ export default async function RootLayout({
               <AnalyticsWrapper />
             </div>
             <Toaster />
+            <TermsGate />
           </Providers>
         </NextIntlClientProvider>
       </body>

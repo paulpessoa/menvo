@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import { Checkbox } from "@/components/ui/checkbox"
 import {  AlertTriangle, Mail, Lock , Loader2 } from "lucide-react"
 import { useRouter, Link } from "@/i18n/routing"
 import { useSearchParams } from "next/navigation"
@@ -25,6 +26,7 @@ function SignupForm() {
   const t = useTranslations("register")
   const tl = useTranslations("login")
   const tc = useTranslations("common")
+  const tg = useTranslations("termsGate")
   const { user, loading, signUp, signInWithProvider, getDefaultRedirectPath } =
     useAuth()
   const nextParam = useSearchParams().get("next")
@@ -34,6 +36,7 @@ function SignupForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -67,10 +70,18 @@ function SignupForm() {
       return
     }
 
+    if (!acceptedTerms) {
+      setError(tg("signupRequired"))
+      return
+    }
+
     setIsLoading(true)
 
     try {
       await signUp(email, password, firstName.trim(), lastName.trim(), safeNext)
+      // Best effort: there is no session until the email is confirmed, so this
+      // may be rejected. The TermsGate then asks once on the first login.
+      void fetch("/api/legal/accept-terms", { method: "POST" }).catch(() => undefined)
       setSuccess(true)
       toast.success(t("success"))
     } catch (err: any) {
@@ -265,6 +276,21 @@ function SignupForm() {
                 className="h-11 rounded-xl bg-muted/20 border-none focus-visible:ring-primary text-sm"
                 required
               />
+            </div>
+
+            <div className="flex items-start gap-3 pt-1">
+              <Checkbox
+                id="acceptTerms"
+                checked={acceptedTerms}
+                onCheckedChange={(value) => setAcceptedTerms(value === true)}
+                className="mt-0.5"
+              />
+              <Label htmlFor="acceptTerms" className="text-xs leading-snug text-muted-foreground">
+                {tg("checkbox")}{" "}
+                <Link href="/terms" target="_blank" rel="noopener noreferrer" className="font-bold text-primary hover:underline">
+                  ({tg("readTerms")})
+                </Link>
+              </Label>
             </div>
 
             <Button className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform mt-4" type="submit" disabled={isLoading || !!isSocialLoading}>

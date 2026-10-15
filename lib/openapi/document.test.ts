@@ -14,7 +14,7 @@ const API_DIR = path.join(process.cwd(), "app", "api")
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const
 
 /** Domínios já no padrão: toda rota deles precisa estar no documento. */
-const documentedDomains = ["quiz", "mentors"]
+const documentedDomains = ["quiz", "mentors", "legal"]
 
 /** Rotas de infraestrutura da própria documentação. */
 const ignoredDomains = ["openapi"]
