@@ -2639,6 +2639,14 @@ export type Database = {
         Args: { p_mentor_id: string }
         Returns: boolean
       }
+      mentor_public_stats: {
+        Args: { p_mentor_id: string }
+        Returns: {
+          average_rating: number
+          total_reviews: number
+          total_sessions: number
+        }[]
+      }
       org_members_quiz_done: {
         Args: { p_org: string }
         Returns: {

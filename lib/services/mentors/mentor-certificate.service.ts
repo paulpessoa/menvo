@@ -12,6 +12,8 @@ export interface MentorCertificateData {
   issueDateFormatted: string
   totalSessions: number
   totalHours: number
+  /** Minutos exatos (45 por sessão); o certificado mostra "45 min" em vez de "0,8 h". */
+  totalMinutes: number
   averageRating: number | null
   totalReviews: number
   verificationCode: string
@@ -66,7 +68,7 @@ export const mentorCertificateService = {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slugOrId)
 
     let query = (supabase.from("mentors_view") as any)
-      .select("id, slug, full_name, job_title, average_rating, total_sessions, total_reviews, created_at, verified")
+      .select("id, slug, full_name, job_title, created_at, verified")
       .eq("verified", true)
 
     if (isUuid) {
@@ -84,7 +86,15 @@ export const mentorCertificateService = {
       return null
     }
 
-    const totalSessions = data.total_sessions ?? 0
+    // Os números vêm de mentor_public_stats, não de mentors_view: a view soma
+    // só o que o RLS deixa quem consulta ver, e um visitante via 0 sessões.
+    const { data: statsRows, error: statsError } = await supabase.rpc("mentor_public_stats", { p_mentor_id: data.id })
+    if (statsError) {
+      console.error("[mentorCertificateService.getCertificate] stats", statsError.message)
+      return null
+    }
+    const stats = statsRows?.[0]
+    const totalSessions = stats?.total_sessions ?? 0
     if (totalSessions <= 0) {
       return null
     }
@@ -106,8 +116,9 @@ export const mentorCertificateService = {
       issueDateFormatted: formatDate(now, locale),
       totalSessions,
       totalHours,
-      averageRating: data.average_rating ? Math.round(data.average_rating * 10) / 10 : null,
-      totalReviews: data.total_reviews ?? 0,
+      totalMinutes: totalSessions * 45,
+      averageRating: stats?.average_rating != null ? Number(stats.average_rating) : null,
+      totalReviews: stats?.total_reviews ?? 0,
       verificationCode,
       verificationUrl,
       isValid: true

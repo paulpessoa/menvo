@@ -13,6 +13,7 @@ const mockData: MentorCertificateData = {
   issueDateFormatted: "14 de outubro de 2026",
   totalSessions: 25,
   totalHours: 18.8,
+  totalMinutes: 1125,
   averageRating: 5.0,
   totalReviews: 24,
   verificationCode: "MV-11111111-0019",
@@ -33,12 +34,24 @@ describe("VolunteerCertificate", () => {
   it("renders certificate details correctly", () => {
     render(<VolunteerCertificate data={mockData} />)
 
-    expect(screen.getByText("CERTIFICADO DE ATUAÇÃO VOLUNTÁRIA")).toBeInTheDocument()
+    expect(screen.getByText("Certificado de Atuação Voluntária")).toBeInTheDocument()
     expect(screen.getByText("Paulo Pessoa")).toBeInTheDocument()
-    expect(screen.getByText("18.8h")).toBeInTheDocument()
+    expect(screen.getByText("18,8 h")).toBeInTheDocument()
     expect(screen.getByText("25")).toBeInTheDocument()
-    expect(screen.getByText("5.0 ★")).toBeInTheDocument()
+    expect(screen.getByText("Sessões concluídas")).toBeInTheDocument()
+    expect(screen.getByText("5,0")).toBeInTheDocument()
+    expect(screen.getByText("Nota média (24 avaliações)")).toBeInTheDocument()
     expect(screen.getAllByText(/MV-11111111-0019/).length).toBeGreaterThanOrEqual(1)
+  })
+
+  it("never shows a rating that does not exist, and shows short sessions in minutes", () => {
+    render(<VolunteerCertificate data={{ ...mockData, totalSessions: 1, totalHours: 0.8, totalMinutes: 45, averageRating: null, totalReviews: 0 }} />)
+
+    expect(screen.getByText("45 min")).toBeInTheDocument()
+    expect(screen.getByText("Sessão concluída")).toBeInTheDocument()
+    expect(screen.getByText("—")).toBeInTheDocument()
+    expect(screen.getByText("Ainda sem avaliações")).toBeInTheDocument()
+    expect(screen.queryByText(/5[.,]0/)).not.toBeInTheDocument()
   })
 
   it("calls window.print when clicking Imprimir", () => {
