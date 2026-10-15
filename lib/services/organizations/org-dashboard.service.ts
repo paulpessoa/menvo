@@ -16,6 +16,14 @@ export interface OrgDashboardMember {
   quizDone: boolean
 }
 
+export interface OrgDashboardImpact {
+  period: "all" | "30d" | "90d" | "1y"
+  totalSessionsCompleted: number
+  totalHoursCompleted: number
+  totalDiagnosticsDone: number
+  averageRating: number | null
+}
+
 export interface OrgDashboardSummary {
   beneficiaries: number
   mentors: number
@@ -23,6 +31,7 @@ export interface OrgDashboardSummary {
   pendingInvites: number
   sessionsBookedByBeneficiaries: number
   sessionsGivenByOrgMentors: number
+  impact: OrgDashboardImpact
 }
 
 export interface OrgDashboard {
@@ -40,7 +49,8 @@ export interface OrgDashboard {
  */
 export async function getOrgDashboard(
   supabase: SupabaseClient,
-  organizationId: string
+  organizationId: string,
+  period: "all" | "30d" | "90d" | "1y" = "all"
 ): Promise<OrgDashboard | null> {
   const { data: organization, error: orgError } = await supabase
     .from("organizations" as any)
@@ -65,13 +75,30 @@ export async function getOrgDashboard(
     .map(m => m.profiles?.email)
     .filter((email): email is string => Boolean(email))
 
+  const now = Date.now()
+  let startDateIso: string | null = null
+  if (period === "30d") startDateIso = new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString()
+  else if (period === "90d") startDateIso = new Date(now - 90 * 24 * 60 * 60 * 1000).toISOString()
+  else if (period === "1y") startDateIso = new Date(now - 365 * 24 * 60 * 60 * 1000).toISOString()
+
+  let bookedBuilder = supabase
+    .from("appointments")
+    .select("id, mentee_id, status, duration_minutes, scheduled_at")
+    .in("mentee_id", memberIds)
+
+  let givenBuilder = supabase
+    .from("appointments")
+    .select("id, mentor_id, status, duration_minutes, scheduled_at")
+    .in("mentor_id", memberIds)
+
+  if (startDateIso) {
+    bookedBuilder = bookedBuilder.gte("scheduled_at", startDateIso)
+    givenBuilder = givenBuilder.gte("scheduled_at", startDateIso)
+  }
+
   const [{ data: bookedAppointments }, { data: givenAppointments }, { data: quizzes }, { data: roleRows }] = await Promise.all([
-    memberIds.length
-      ? supabase.from("appointments").select("mentee_id").in("mentee_id", memberIds)
-      : Promise.resolve({ data: [] as { mentee_id: string }[] }),
-    memberIds.length
-      ? supabase.from("appointments").select("mentor_id").in("mentor_id", memberIds)
-      : Promise.resolve({ data: [] as { mentor_id: string }[] }),
+    memberIds.length ? bookedBuilder : Promise.resolve({ data: [] as any[] }),
+    memberIds.length ? givenBuilder : Promise.resolve({ data: [] as any[] }),
     // quiz_responses has no direct-select policy any more (RLS audit,
     // STATUS.md 2026-09-23) - org admins see "did the quiz?" only through
     // this security-definer RPC, which checks is_org_admin() itself and
@@ -87,12 +114,15 @@ export async function getOrgDashboard(
       : Promise.resolve({ data: [] as { user_id: string; roles: { name: string } | null }[] })
   ])
 
+  const bookedList = (bookedAppointments ?? []) as { id: string; mentee_id: string; status: string; duration_minutes?: number }[]
+  const givenList = (givenAppointments ?? []) as { id: string; mentor_id: string; status: string; duration_minutes?: number }[]
+
   const bookedByMentee = new Map<string, number>()
-  for (const appt of (bookedAppointments ?? []) as { mentee_id: string }[]) {
+  for (const appt of bookedList) {
     bookedByMentee.set(appt.mentee_id, (bookedByMentee.get(appt.mentee_id) ?? 0) + 1)
   }
   const givenByMentor = new Map<string, number>()
-  for (const appt of (givenAppointments ?? []) as { mentor_id: string }[]) {
+  for (const appt of givenList) {
     givenByMentor.set(appt.mentor_id, (givenByMentor.get(appt.mentor_id) ?? 0) + 1)
   }
   const quizEmailSet = new Set(((quizzes ?? []) as { email: string }[]).map(q => q.email))
@@ -101,8 +131,6 @@ export async function getOrgDashboard(
   for (const row of (roleRows ?? []) as { user_id: string; roles: { name: string } | null }[]) {
     const name = row.roles?.name
     if (name !== "mentor" && name !== "mentee") continue
-    // A person can hold both roles historically; mentor wins for display,
-    // matching how the platform treats mentor as the "upgraded" role.
     if (name === "mentor" || !platformRoleByUser.has(row.user_id)) {
       platformRoleByUser.set(row.user_id, name)
     }
@@ -121,6 +149,36 @@ export async function getOrgDashboard(
     quizDone: m.profiles?.email ? quizEmailSet.has(m.profiles.email) : false
   }))
 
+  // Completed sessions calculation
+  const completedApptsMap = new Map<string, { id: string; duration_minutes?: number }>()
+  for (const a of bookedList) {
+    if (a.status === "completed" && a.id) completedApptsMap.set(a.id, a)
+  }
+  for (const a of givenList) {
+    if (a.status === "completed" && a.id) completedApptsMap.set(a.id, a)
+  }
+
+  const completedAppts = Array.from(completedApptsMap.values())
+  const totalSessionsCompleted = completedAppts.length
+  const totalMinutes = completedAppts.reduce((sum, a) => sum + (a.duration_minutes || 45), 0)
+  const totalHoursCompleted = Number((totalMinutes / 60).toFixed(1))
+
+  let averageRating: number | null = null
+  const completedIds = Array.from(completedApptsMap.keys())
+  if (completedIds.length > 0) {
+    const { data: feedbacks } = await supabase
+      .from("appointment_feedbacks")
+      .select("rating")
+      .in("appointment_id", completedIds)
+      .not("rating", "is", null)
+
+    const ratings = (feedbacks ?? []).map((f: any) => f.rating).filter((r): r is number => typeof r === "number")
+    if (ratings.length > 0) {
+      const sum = ratings.reduce((acc, r) => acc + r, 0)
+      averageRating = Number((sum / ratings.length).toFixed(1))
+    }
+  }
+
   const activeMembers = members_.filter(m => m.status === "active")
   const summary: OrgDashboardSummary = {
     beneficiaries: activeMembers.filter(m => m.platformRole !== "mentor").length,
@@ -128,7 +186,14 @@ export async function getOrgDashboard(
     pendingRequests: members_.filter(m => m.status === "requested").length,
     pendingInvites: members_.filter(m => m.status === "invited").length,
     sessionsBookedByBeneficiaries: activeMembers.reduce((sum, m) => sum + m.sessionsBooked, 0),
-    sessionsGivenByOrgMentors: activeMembers.reduce((sum, m) => sum + m.sessionsGiven, 0)
+    sessionsGivenByOrgMentors: activeMembers.reduce((sum, m) => sum + m.sessionsGiven, 0),
+    impact: {
+      period,
+      totalSessionsCompleted,
+      totalHoursCompleted,
+      totalDiagnosticsDone: members_.filter(m => m.quizDone).length,
+      averageRating,
+    },
   }
 
   return { organization, members: members_, summary }

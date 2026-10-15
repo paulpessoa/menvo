@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table"
-import {  Building2, Check, X, UserPlus, Trash2, Users, GraduationCap, CalendarCheck , Loader2 } from "lucide-react"
+import { Building2, Check, X, UserPlus, Trash2, Users, GraduationCap, CalendarCheck, Loader2, Download, Clock, Sparkles, Star } from "lucide-react"
 import { toast } from "sonner"
 
 interface OrgOption {
@@ -46,6 +46,13 @@ interface Summary {
   pendingInvites: number
   sessionsBookedByBeneficiaries: number
   sessionsGivenByOrgMentors: number
+  impact?: {
+    period: "all" | "30d" | "90d" | "1y"
+    totalSessionsCompleted: number
+    totalHoursCompleted: number
+    totalDiagnosticsDone: number
+    averageRating: number | null
+  }
 }
 
 function MemberRow({
@@ -101,6 +108,7 @@ export default function OrgAdminDashboardPage() {
   const [loading, setLoading] = useState(true)
   const [orgOptions, setOrgOptions] = useState<OrgOption[]>([])
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null)
+  const [selectedPeriod, setSelectedPeriod] = useState<"all" | "30d" | "90d" | "1y">("all")
   const [organization, setOrganization] = useState<{ name: string; slug: string; join_policy?: "open" | "invite_only" } | null>(null)
   const [members, setMembers] = useState<Member[]>([])
   const [summary, setSummary] = useState<Summary | null>(null)
@@ -109,9 +117,9 @@ export default function OrgAdminDashboardPage() {
   const [busyUserId, setBusyUserId] = useState<string | null>(null)
   const [updatingPolicy, setUpdatingPolicy] = useState(false)
 
-  const loadOrg = useCallback(async (orgId: string) => {
+  const loadOrg = useCallback(async (orgId: string, period: "all" | "30d" | "90d" | "1y" = "all") => {
     try {
-      const response = await fetch(`/api/org/${orgId}`)
+      const response = await fetch(`/api/org/${orgId}?period=${period}`)
       const json = await response.json()
       if (!response.ok) throw new Error(json.error || "Falha ao carregar organização")
       setOrganization(json.data.organization)
@@ -121,6 +129,69 @@ export default function OrgAdminDashboardPage() {
       toast.error(error.message)
     }
   }, [])
+
+  const handlePeriodChange = async (period: "all" | "30d" | "90d" | "1y") => {
+    setSelectedPeriod(period)
+    if (selectedOrgId) {
+      await loadOrg(selectedOrgId, period)
+    }
+  }
+
+  const exportCsv = () => {
+    if (!organization || !summary) return
+    const periodLabels: Record<string, string> = {
+      all: "Todo o período",
+      "30d": "Últimos 30 dias",
+      "90d": "Últimos 90 dias",
+      "1y": "Último ano",
+    }
+    const periodText = periodLabels[selectedPeriod] || selectedPeriod
+
+    const lines: string[] = [
+      `Relatório de Impacto - Organização: "${organization.name}"`,
+      `Período: "${periodText}"`,
+      `Data de Emissão: "${new Date().toLocaleDateString("pt-BR")}"`,
+      `Sessões Concluídas: "${summary.impact?.totalSessionsCompleted ?? 0}"`,
+      `Horas de Mentoria: "${summary.impact?.totalHoursCompleted ?? 0}h"`,
+      `Diagnósticos Realizados: "${summary.impact?.totalDiagnosticsDone ?? 0}"`,
+      `Nota Média: "${summary.impact?.averageRating ? summary.impact.averageRating.toFixed(1) : "N/A"}"`,
+      "",
+      "Nome,E-mail,Papel na Organização,Perfil Plataforma,Status,Sessões Solicitadas,Sessões Ministradas,Diagnóstico Concluído,Data de Entrada",
+    ]
+
+    for (const m of members) {
+      const escape = (val: string | null | undefined) => `"${(val || "").replace(/"/g, '""')}"`
+      const roleLabel = m.role === "admin" ? "Admin" : "Membro"
+      const platformRoleLabel = m.platformRole === "mentor" ? "Mentor" : "Beneficiário"
+      const statusLabel = m.status === "invited" ? "Convidado" : m.status === "requested" ? "Solicitado" : "Ativo"
+      const quizLabel = m.quizDone ? "Sim" : "Não"
+      const dateLabel = m.joinedAt ? new Date(m.joinedAt).toLocaleDateString("pt-BR") : ""
+
+      lines.push([
+        escape(m.fullName),
+        escape(m.email),
+        escape(roleLabel),
+        escape(platformRoleLabel),
+        escape(statusLabel),
+        m.sessionsBooked,
+        m.sessionsGiven,
+        escape(quizLabel),
+        escape(dateLabel),
+      ].join(","))
+    }
+
+    const csvContent = "\uFEFF" + lines.join("\r\n")
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.setAttribute("href", url)
+    link.setAttribute("download", `relatorio-impacto-${organization.slug}-${selectedPeriod}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    toast.success("Relatório CSV exportado com sucesso!")
+  }
 
   useEffect(() => {
     const init = async () => {
@@ -255,6 +326,112 @@ export default function OrgAdminDashboardPage() {
       <p className="text-muted-foreground mb-6">
         Link público para compartilhar: <code>/o/{organization?.slug}</code>
       </p>
+
+      {/* Relatório de Impacto (C-O3) */}
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-muted/30 p-4 rounded-2xl border">
+          <div>
+            <h2 className="font-bold text-lg flex items-center gap-2 text-foreground">
+              <Sparkles className="w-5 h-5 text-primary" />
+              Relatório de Impacto
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Métricas consolidadas de voluntariado e impacto social da organização.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex rounded-xl bg-background border p-1 text-xs">
+              {(
+                [
+                  { id: "all", label: "Tudo" },
+                  { id: "30d", label: "30 dias" },
+                  { id: "90d", label: "90 dias" },
+                  { id: "1y", label: "1 ano" },
+                ] as const
+              ).map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => handlePeriodChange(p.id)}
+                  className={`px-3 py-1 rounded-lg font-medium transition-all ${
+                    selectedPeriod === p.id
+                      ? "bg-primary text-white shadow-xs font-semibold"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportCsv}
+              disabled={!summary || members.length === 0}
+              className="rounded-xl flex items-center gap-1.5 text-xs font-semibold h-8"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Exportar CSV</span>
+            </Button>
+          </div>
+        </div>
+
+        {summary?.impact && (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="rounded-2xl border">
+              <CardContent className="pt-6 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Clock className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-foreground">{summary.impact.totalHoursCompleted}h</p>
+                  <p className="text-xs text-muted-foreground">Horas de mentoria</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl border">
+              <CardContent className="pt-6 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <CalendarCheck className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-foreground">{summary.impact.totalSessionsCompleted}</p>
+                  <p className="text-xs text-muted-foreground">Sessões concluídas</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl border">
+              <CardContent className="pt-6 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-foreground">{summary.impact.totalDiagnosticsDone}</p>
+                  <p className="text-xs text-muted-foreground">Diagnósticos feitos</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl border">
+              <CardContent className="pt-6 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
+                  <Star className="h-5 w-5 fill-current" />
+                </div>
+                <div>
+                  <p className="text-2xl font-black text-foreground">
+                    {summary.impact.averageRating ? `${summary.impact.averageRating.toFixed(1)} ★` : "—"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Avaliação média</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </div>
 
       {summary && (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">

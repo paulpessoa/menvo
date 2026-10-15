@@ -15,8 +15,12 @@ export async function GET(
     const guard = await requireOrgAdmin(organizationId)
     if (!guard.ok) return guard.response
 
+    const url = new URL(request.url)
+    const rawPeriod = url.searchParams.get("period")
+    const period = rawPeriod === "30d" || rawPeriod === "90d" || rawPeriod === "1y" ? rawPeriod : "all"
+
     const supabase = await createClient()
-    const dashboard = await getOrgDashboard(supabase, organizationId)
+    const dashboard = await getOrgDashboard(supabase, organizationId, period)
 
     if (!dashboard) {
       return errorResponse("Organização não encontrada", "NOT_FOUND", 404)
