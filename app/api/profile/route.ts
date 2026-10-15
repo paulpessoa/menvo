@@ -14,6 +14,7 @@ import {
   withMenteeFields,
 } from "@/lib/services/mentees/mentee-profile-fields"
 import { cvLink } from "@/lib/services/mentees/cv-storage"
+import { OWN_PROFILE_COLUMNS } from "@/lib/services/auth/own-profile-columns"
 
 // Built on first use, never at import time: `next build` imports every route
 // to collect page data, and a module-scope client throws when the key is
@@ -42,12 +43,9 @@ async function toProfileResponse<T extends { id: string }>(row: T) {
   return { ...profile, cv_url: cvLink(row.id, profile.cv_url) }
 }
 
-const PROFILE_COLUMNS =
-  "id, email, first_name, last_name, full_name, avatar_url, slug, bio, expertise_areas, linkedin_url, created_at, updated_at, city, state, country, timezone, languages, job_title, company, mentorship_topics, github_url, website_url, phone, portfolio_url, onboarding_flags" as const
-
 // Campos de mentor ficam em mentor_profiles; o embed os traz junto e
 // withMentorFields os devolve achatados, no mesmo formato de antes.
-const PROFILE_SELECT = `${PROFILE_COLUMNS}, ${MENTOR_PROFILE_EMBED}, ${MENTEE_PROFILE_EMBED_WITH_CV}` as const
+const PROFILE_SELECT = `${OWN_PROFILE_COLUMNS}, ${MENTOR_PROFILE_EMBED}, ${MENTEE_PROFILE_EMBED_WITH_CV}` as const
 
 async function getAuthenticatedUser(request: NextRequest) {
   const authHeader = request.headers.get("authorization")
