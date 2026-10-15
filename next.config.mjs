@@ -69,6 +69,12 @@ const nextConfig = {
         hostname: "media.licdn.com",
         port: "",
         pathname: "/**"
+      },
+      {
+        protocol: "https",
+        hostname: "*.gstatic.com",
+        port: "",
+        pathname: "/**"
       }
     ]
   },
