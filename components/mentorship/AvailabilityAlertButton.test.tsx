@@ -6,7 +6,7 @@ jest.mock("@/lib/auth", () => ({ useAuth: jest.fn() }))
 jest.mock("next-intl", () => ({
   useTranslations: () => (key: string, params?: { name?: string }) => {
     const map: Record<string, string> = {
-      notifyMe: "Me avise quando abrir horário",
+      notifyMe: "Me avise",
       notifyMeActive: "Aviso ativado",
       notifyMeSuccess: "Aviso cadastrado",
       notifyMeModalTitle: "Receber aviso de horários",
@@ -29,7 +29,7 @@ describe("AvailabilityAlertButton", () => {
     ;(useAuth as jest.Mock).mockReturnValue({ user: null })
     render(<AvailabilityAlertButton mentorId="m1" mentorName="Ana Silva" />)
 
-    expect(screen.getByText("Me avise quando abrir horário")).toBeInTheDocument()
+    expect(screen.getByText("Me avise")).toBeInTheDocument()
   })
 
   it("calls POST immediately when clicked by logged in user", async () => {
@@ -40,7 +40,7 @@ describe("AvailabilityAlertButton", () => {
 
     render(<AvailabilityAlertButton mentorId="m1" mentorName="Ana Silva" />)
 
-    const button = screen.getByRole("button", { name: /me avise quando abrir horário/i })
+    const button = screen.getByRole("button", { name: /me avise/i })
     fireEvent.click(button)
 
     await waitFor(() => {
@@ -59,7 +59,7 @@ describe("AvailabilityAlertButton", () => {
     ;(useAuth as jest.Mock).mockReturnValue({ user: null })
     render(<AvailabilityAlertButton mentorId="m1" mentorName="Ana Silva" />)
 
-    fireEvent.click(screen.getByRole("button", { name: /me avise quando abrir horário/i }))
+    fireEvent.click(screen.getByRole("button", { name: /me avise/i }))
 
     expect(screen.getByText("Receber aviso de horários")).toBeInTheDocument()
     expect(screen.getByPlaceholderText("seu@email.com")).toBeInTheDocument()

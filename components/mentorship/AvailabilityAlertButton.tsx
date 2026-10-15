@@ -86,18 +86,18 @@ export function AvailabilityAlertButton({
         size={size}
         onClick={handleClick}
         disabled={loading}
-        className={`rounded-xl transition-all font-semibold flex items-center gap-2 ${
+        className={`rounded-xl transition-all font-semibold flex items-center justify-center gap-2 min-w-0 ${
           hasAlert ? "border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100" : ""
         } ${className}`}
       >
         {loading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader2 className="w-4 h-4 animate-spin shrink-0" />
         ) : hasAlert ? (
-          <Check className="w-4 h-4 text-emerald-600" />
+          <Check className="w-4 h-4 text-emerald-600 shrink-0" />
         ) : (
-          <Bell className="w-4 h-4" />
+          <Bell className="w-4 h-4 shrink-0" />
         )}
-        <span>{hasAlert ? t("notifyMeActive") : t("notifyMe")}</span>
+        <span className="truncate">{hasAlert ? t("notifyMeActive") : t("notifyMe")}</span>
       </Button>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

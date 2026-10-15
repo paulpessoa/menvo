@@ -431,17 +431,17 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                   </div>
                 ) : (
                   // Mobile uses the sticky action bar below instead.
-                  <div className="hidden md:flex gap-2">
+                  <div className="hidden md:flex gap-2 items-center">
                     {isFullyBooked ? (
                       <AvailabilityAlertButton
                         mentorId={mentor.id}
                         mentorName={mentor.full_name}
-                        className="flex-1 rounded-2xl h-14 font-bold shadow-xl text-base sm:text-lg"
+                        className="flex-1 min-w-0 rounded-2xl h-14 font-bold shadow-xl text-sm sm:text-base px-3"
                       />
                     ) : (
                       <Button
                         id="tour-schedule-button"
-                        className="flex-1 rounded-2xl h-14 font-bold bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-base sm:text-lg"
+                        className="flex-1 min-w-0 rounded-2xl h-14 font-bold bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-sm sm:text-base px-3"
                         onClick={() => {
                           if (!user) {
                             setShowLoginModal(true)
@@ -450,9 +450,9 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                           }
                         }}
                       >
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-5 h-5" />
-                          <span>Disponível</span>
+                        <div className="flex items-center justify-center gap-2 min-w-0">
+                          <Calendar className="w-5 h-5 shrink-0" />
+                          <span className="truncate">Disponível</span>
                         </div>
                       </Button>
                     )}
@@ -461,11 +461,11 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                         variant="outline"
                         size="icon"
                         onClick={() => toggleFavorite(mentor.id)}
-                        className={`h-14 w-14 rounded-2xl border-2 transition-all ${isFavorite ? 'bg-red-50 border-red-100 text-red-500' : 'text-gray-400 hover:text-red-400'}`}
+                        className={`h-14 w-14 shrink-0 rounded-2xl border-2 transition-all ${isFavorite ? 'bg-red-50 border-red-100 text-red-500' : 'text-gray-400 hover:text-red-400'}`}
                       >
                         <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
                       </Button>
-                      <Button variant="outline" size="icon" onClick={handleShare} className="h-14 w-14 rounded-2xl border-2 text-gray-400 hover:text-primary">
+                      <Button variant="outline" size="icon" onClick={handleShare} className="h-14 w-14 shrink-0 rounded-2xl border-2 text-gray-400 hover:text-primary">
                         <Share2 className="h-5 w-5" />
                       </Button>
                     </div>
@@ -526,24 +526,22 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
         {/* Mobile Sticky Action Bar */}
         {!isOwner && (
           <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 animate-in slide-in-from-bottom duration-500 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
-            <div className="flex gap-2 max-w-[600px] mx-auto">
+            <div className="flex gap-2 max-w-[600px] mx-auto items-center">
               {isFullyBooked ? (
                 <AvailabilityAlertButton
                   mentorId={mentor.id}
                   mentorName={mentor.full_name}
-                  size="xl"
-                  className="flex-1 rounded-2xl font-black shadow-2xl h-14"
+                  className="flex-1 min-w-0 rounded-2xl font-bold shadow-xl h-14 text-sm px-3"
                 />
               ) : (
                 <Button
-                  size="xl"
                   onClick={() => {
                     if (!user) setShowLoginModal(true)
                     else setIsScheduleModalOpen(true)
                   }}
-                  className="flex-1 rounded-2xl font-black shadow-2xl shadow-primary/40 h-14"
+                  className="flex-1 min-w-0 rounded-2xl font-black shadow-2xl shadow-primary/40 h-14 text-sm sm:text-base px-3"
                 >
-                  {t("bookMentorship")}
+                  <span className="truncate">{t("bookMentorship")}</span>
                 </Button>
               )}
               <Button
