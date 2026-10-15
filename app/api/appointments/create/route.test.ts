@@ -10,6 +10,10 @@ jest.mock('@/lib/utils/supabase/server', () => ({
   createClient: jest.fn(),
 }))
 
+jest.mock('@/lib/services/appointments/checkin-responses.service', () => ({
+  findPendingMenteeCheckin: jest.fn().mockResolvedValue(null)
+}))
+
 jest.mock('@/lib/email/brevo', () => ({
   sendAppointmentRequest: jest.fn().mockResolvedValue({ success: true }),
   sendAdminNewAppointmentNotification: jest.fn().mockResolvedValue({ success: true }),

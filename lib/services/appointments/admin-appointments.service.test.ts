@@ -232,9 +232,28 @@ describe("listAdminAppointments", () => {
     const { client } = makeClient({ list })
     const result = await listAdminAppointments(client, { status: "confirmed", now: NOW })
 
-    expect(result.counts).toEqual({ all: 4, pending: 1, confirmed: 2, cancelled: 1 })
+    expect(result.counts).toEqual({ all: 4, pending: 1, confirmed: 2, cancelled: 1, awaiting_checkin: 0, checkin_conflict: 0 })
     expect(result.appointments.map(a => a.id)).toEqual(["b", "c"])
     expect(result.total).toBe(2)
+  })
+
+  it("filters sessions waiting for the post-session check-in and check-in conflicts", async () => {
+    const past = "2026-09-30T12:00:00.000Z"
+    const { client } = makeClient({
+      list: [
+        row({ id: "waiting", status: "confirmed", scheduled_at: past, appointment_checkins: [{ role: "mentor", outcome: null, sent_at: past }] }),
+        row({ id: "conflict", status: "completed", scheduled_at: past, checkin_conflict: true }),
+        row({ id: "future", status: "confirmed" })
+      ]
+    })
+
+    const waiting = await listAdminAppointments(client, { status: "awaiting_checkin", now: NOW })
+    expect(waiting.appointments.map(a => a.id)).toEqual(["waiting"])
+    expect(waiting.appointments[0].checkin).toEqual({ mentor: "waiting", mentee: "not_sent", conflict: false })
+    expect(waiting.counts).toMatchObject({ awaiting_checkin: 1, checkin_conflict: 1 })
+
+    const conflicts = await listAdminAppointments(client, { status: "checkin_conflict", now: NOW })
+    expect(conflicts.appointments.map(a => a.id)).toEqual(["conflict"])
   })
 
   it("filters by search text and treats status=all as no filter", async () => {

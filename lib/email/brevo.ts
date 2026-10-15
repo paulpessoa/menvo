@@ -235,29 +235,60 @@ export async function sendAppointmentReminder(data: {
   );
 }
 
+export type SessionCheckinOutcome = "happened" | "not_happened" | "rescheduled";
+
+export interface SessionCheckinEmailData {
+  email: string;
+  firstName: string;
+  otherPersonName: string;
+  scheduledAt: string;
+  role: "mentor" | "mentee";
+  checkinUrl: string;
+  isReminder: boolean;
+}
+
 /**
- * Envia solicitação de feedback após a mentoria (assinado pessoalmente pelo Paul Pessoa)
+ * Corpo do e-mail de check-in pós-sessão, separado do envio para a prévia
+ * do admin usar o mesmo HTML. Os três botões levam à página /checkin/[token]
+ * com a opção já marcada; a resposta só é gravada no clique de confirmação
+ * lá, porque scanners de e-mail abrem todos os links sozinhos.
  */
-export async function sendFeedbackRequest(data: {
-  userEmail: string;
-  userName: string;
-  mentorName: string;
-  appointmentId: string | number;
-}): Promise<void> {
-  const feedbackUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/dashboard/mentee?feedback=${data.appointmentId}`;
-  const content = `
-    <h2>Como foi sua mentoria?</h2>
-    <p>Olá, ${escapeHtml(data.userName)}! Sua sessão com <strong>${escapeHtml(data.mentorName)}</strong> terminou há pouco tempo.</p>
-    <p>Sua avaliação é essencial para fortalecer a comunidade e reconhecer a dedicação voluntária do mentor na plataforma.</p>
+function sessionCheckinContent(data: Omit<SessionCheckinEmailData, "email">): string {
+  const link = (outcome: SessionCheckinOutcome) => `${data.checkinUrl}?r=${outcome}`;
+  const secondary = `display: inline-block; padding: 12px 22px; margin: 6px 4px; border-radius: 10px; border: 2px solid ${COLORS.divider}; color: ${COLORS.text}; text-decoration: none; font-size: 14px; font-weight: 600;`;
+  const intro = data.isReminder
+    ? `<p>Oi, ${escapeHtml(data.firstName)}! Passando de novo para saber da sua mentoria com <strong>${escapeHtml(data.otherPersonName)}</strong> em ${formatDateTimeBR(data.scheduledAt)}.</p>`
+    : `<p>Oi, ${escapeHtml(data.firstName)}! Sua mentoria com <strong>${escapeHtml(data.otherPersonName)}</strong> estava marcada para ${formatDateTimeBR(data.scheduledAt)}.</p>`;
+  const why = data.role === "mentee"
+    ? "Sua resposta leva um clique e ajuda a gente a saber se a Menvo está funcionando de verdade para você."
+    : "Sua resposta leva um clique e conta as suas horas de mentoria voluntária.";
+  return `
+    <h2>A mentoria aconteceu?</h2>
+    ${intro}
+    <p>${why}</p>
     <div class="button-container">
-        <a href="${feedbackUrl}" class="button">Avaliar Mentoria Agora</a>
+        <a href="${link("happened")}" class="button">Sim, aconteceu</a>
+        <div style="margin-top: 8px;">
+          <a href="${link("not_happened")}" style="${secondary}">Não rolou</a>
+          <a href="${link("rescheduled")}" style="${secondary}">Remarcamos</a>
+        </div>
     </div>
-    <p>Leva menos de 1 minuto e faz toda a diferença para quem doa seu tempo para ensinar.</p>
   `;
-  await sendEmail(
-    data.userEmail,
-    "Como foi sua mentoria? Deixe sua avaliação",
-    getEmailLayout("Avaliação de Mentoria", content, { signatureType: "personal" })
+}
+
+/**
+ * Pergunta a cada participante, depois da sessão, se a mentoria aconteceu
+ * (docs/domains/session-checkin.md). Substitui o antigo pedido de feedback,
+ * que só ia para o mentorado e nunca perguntava se a sessão tinha ocorrido.
+ */
+export async function sendSessionCheckin(data: SessionCheckinEmailData): Promise<{ success: boolean; error?: string }> {
+  const subject = data.isReminder
+    ? `Lembrete: sua mentoria com ${data.otherPersonName} aconteceu?`
+    : `Sua mentoria com ${data.otherPersonName} aconteceu?`;
+  return await sendEmail(
+    data.email,
+    subject,
+    getEmailLayout("Check-in da Mentoria", sessionCheckinContent(data), { signatureType: "personal" })
   );
 }
 
@@ -1126,7 +1157,7 @@ export async function sendTestEmail(params: {
   const subjects: Record<string, string> = {
     confirmation: "[TESTE] Sessão de Mentoria Confirmada",
     verification: "[TESTE] Seu perfil de Mentor foi Aprovado",
-    feedback: "[TESTE] Como foi sua mentoria? Seu feedback faz a diferença",
+    session_checkin: "[TESTE] Sua mentoria com Dra. Beatriz Santos aconteceu?",
     cancellation: "[TESTE] Mentoria Cancelada",
     reminder: "[TESTE] Lembrete: Sua mentoria é hoje",
     retention_notice_30d: "[TESTE] Sua conta na Menvo será apagada em 30 dias",
@@ -1179,17 +1210,16 @@ export function getEmailTemplatePreviewHtml(templateKey: string): string {
       `;
       return getEmailLayout("Perfil Aprovado", content, { signatureType: "personal" });
     }
-    case 'feedback': {
-      const content = `
-        <h2>Como foi sua mentoria?</h2>
-        <p>Olá, Lucas! Sua sessão com <strong>Dra. Beatriz Santos</strong> terminou há pouco tempo.</p>
-        <p>Sua avaliação é essencial para fortalecer a comunidade e reconhecer a dedicação voluntária do mentor na plataforma.</p>
-        <div class="button-container">
-            <a href="https://www.menvo.com.br/dashboard/mentee" class="button">Avaliar Mentoria Agora</a>
-        </div>
-        <p>Leva menos de 1 minuto e faz toda a diferença para quem doa seu tempo para ensinar.</p>
-      `;
-      return getEmailLayout("Avaliação de Mentoria", content, { signatureType: "personal" });
+    case 'session_checkin': {
+      const content = sessionCheckinContent({
+        firstName: "Lucas",
+        otherPersonName: "Dra. Beatriz Santos",
+        scheduledAt: "2026-09-15T17:00:00.000Z",
+        role: "mentee",
+        checkinUrl: "https://www.menvo.com.br/checkin/exemplo",
+        isReminder: false
+      });
+      return getEmailLayout("Check-in da Mentoria", content, { signatureType: "personal" });
     }
     case 'cancellation': {
       const content = `

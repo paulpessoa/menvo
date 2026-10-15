@@ -5,9 +5,14 @@ import { POST } from './route'
 import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/utils/supabase/server'
 import { sendAppointmentRequest } from '@/lib/email/brevo'
+import { findPendingMenteeCheckin } from '@/lib/services/appointments/checkin-responses.service'
 
 jest.mock('@/lib/utils/supabase/server', () => ({
   createClient: jest.fn(),
+}))
+
+jest.mock('@/lib/services/appointments/checkin-responses.service', () => ({
+  findPendingMenteeCheckin: jest.fn().mockResolvedValue(null)
 }))
 
 jest.mock('@/lib/email/brevo', () => ({
@@ -51,6 +56,25 @@ describe('POST /api/appointments/schedule', () => {
       const data = await response.json()
       expect(data.code).toBe('UNAUTHORIZED')
     })
+  })
+
+  it('should return 409 pending_checkin when the last session has no check-in answer', async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'mentee-1' } }, error: null })
+    ;(findPendingMenteeCheckin as jest.Mock).mockResolvedValueOnce({
+      appointmentId: 'appt-1',
+      scheduledAt: '2026-10-10T13:00:00Z',
+      mentorName: 'Marta Mentora'
+    })
+
+    const response = await POST(
+      createMockRequest({ mentor_id: 'mentor-123', scheduled_at: '2026-11-01T10:00:00Z', notes_mentee: VALID_REASON })
+    )
+
+    expect(response.status).toBe(409)
+    const data = await response.json()
+    expect(data.details).toMatchObject({ reason: 'pending_checkin', appointmentId: 'appt-1' })
+    expect(mockSupabase.from).not.toHaveBeenCalled()
+    expect(sendAppointmentRequest).not.toHaveBeenCalled()
   })
 
   it('should return 400 when required fields are missing', async () => {

@@ -2,7 +2,7 @@
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect } from "react"
-import {  X, Calendar, Clock, Star, Plus, CheckCircle, AlertCircle, Check , Loader2 } from "lucide-react"
+import {  X, Calendar, Clock, Plus, CheckCircle, AlertCircle, Check , Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -11,12 +11,14 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog"
-import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { useAuth } from "@/lib/auth"
 import { useLocale, useTranslations } from "next-intl"
 import { Link } from "@/i18n/routing"
 import { trackBookingConfirmed } from "@/lib/utils/google-analytics/events"
 import { AvailabilityAlertButton } from "./AvailabilityAlertButton"
+import { PendingCheckinPrompt } from "./PendingCheckinPrompt"
+import { getMyPendingCheckinAction } from "@/app/actions/session-checkin"
+import type { PendingCheckin } from "@/lib/services/appointments/checkin-responses.service"
 
 interface TimeSlot {
   day_of_week: number
@@ -51,7 +53,7 @@ export function BookMentorshipModal({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
-  const [pendingEvaluation, setPendingEvaluation] = useState(false)
+  const [pendingCheckin, setPendingCheckin] = useState<PendingCheckin | null>(null)
 
   useEffect(() => {
     if (isOpen) {
@@ -63,13 +65,15 @@ export function BookMentorshipModal({
     try {
       setLoading(true)
       setError("")
-      setPendingEvaluation(false)
+      setPendingCheckin(null)
       setAvailableSlots([])
 
+      // Antes de agendar de novo, o mentorado diz se a última sessão
+      // aconteceu (1 clique; avaliar é opcional). Ver docs/domains/session-checkin.md §4.
       if (user?.id) {
-        const pending = await mentorshipService.hasPendingEvaluations(user.id)
+        const pending = await getMyPendingCheckinAction()
         if (pending) {
-          setPendingEvaluation(true)
+          setPendingCheckin(pending)
           setLoading(false)
           return
         }
@@ -172,6 +176,10 @@ export function BookMentorshipModal({
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}))
+        if (response.status === 409 && data.details?.reason === "pending_checkin") {
+          loadAvailability()
+          return
+        }
         if (response.status === 409) {
           throw new Error(
             data.message ||
@@ -234,21 +242,8 @@ export function BookMentorshipModal({
                   Buscando horários disponíveis...
                 </p>
               </div>
-            ) : pendingEvaluation ? (
-              <div className="py-12 text-center space-y-4">
-                <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto text-yellow-600 shadow-sm">
-                  <Star className="w-10 h-10 fill-current" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground">
-                  {t("pendingEvaluationsTitle")}
-                </h3>
-                <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
-                  {t("pendingEvaluationsDesc")}
-                </p>
-                <Button asChild className="mt-4 rounded-xl font-semibold shadow-sm">
-                  <Link href="/mentorship/mentee#action">{t("evaluateNow")}</Link>
-                </Button>
-              </div>
+            ) : pendingCheckin ? (
+              <PendingCheckinPrompt pending={pendingCheckin} onAnswered={loadAvailability} />
             ) : error && !selectedSlot ? (
               <div className="py-12 text-center space-y-4">
                 <div className="bg-red-50 text-red-700 p-4 rounded-xl inline-block text-sm">

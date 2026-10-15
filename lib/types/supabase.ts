@@ -528,6 +528,69 @@ export type Database = {
           },
         ]
       }
+      appointment_checkins: {
+        Row: {
+          answered_at: string | null
+          appointment_id: string
+          created_at: string
+          details_submitted_at: string | null
+          expires_at: string | null
+          id: string
+          next_step: string | null
+          outcome: string | null
+          participant_id: string
+          reminded_at: string | null
+          role: string
+          sent_at: string | null
+          token_hash: string | null
+        }
+        Insert: {
+          answered_at?: string | null
+          appointment_id: string
+          created_at?: string
+          details_submitted_at?: string | null
+          expires_at?: string | null
+          id?: string
+          next_step?: string | null
+          outcome?: string | null
+          participant_id: string
+          reminded_at?: string | null
+          role: string
+          sent_at?: string | null
+          token_hash?: string | null
+        }
+        Update: {
+          answered_at?: string | null
+          appointment_id?: string
+          created_at?: string
+          details_submitted_at?: string | null
+          expires_at?: string | null
+          id?: string
+          next_step?: string | null
+          outcome?: string | null
+          participant_id?: string
+          reminded_at?: string | null
+          role?: string
+          sent_at?: string | null
+          token_hash?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_checkins_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_checkins_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointment_feedbacks: {
         Row: {
           admin_notes: string | null
@@ -629,6 +692,7 @@ export type Database = {
           cancellation_reason: string | null
           cancelled_at: string | null
           cancelled_by: string | null
+          checkin_conflict: boolean
           completed_at: string | null
           created_at: string
           description: string | null
@@ -666,6 +730,7 @@ export type Database = {
           cancellation_reason?: string | null
           cancelled_at?: string | null
           cancelled_by?: string | null
+          checkin_conflict?: boolean
           completed_at?: string | null
           created_at?: string
           description?: string | null
@@ -703,6 +768,7 @@ export type Database = {
           cancellation_reason?: string | null
           cancelled_at?: string | null
           cancelled_by?: string | null
+          checkin_conflict?: boolean
           completed_at?: string | null
           created_at?: string
           description?: string | null
@@ -2423,6 +2489,14 @@ export type Database = {
         }[]
       }
       ai_user_roles: { Args: { p_user_id: string }; Returns: string[] }
+      answer_my_session_checkin: {
+        Args: { p_appointment_id: string; p_outcome: string }
+        Returns: Json
+      }
+      answer_session_checkin: {
+        Args: { p_outcome: string; p_token: string }
+        Returns: Json
+      }
       assign_user_role: {
         Args: { p_role_name: string; p_user_id: string }
         Returns: boolean
@@ -2490,6 +2564,7 @@ export type Database = {
           processed_at: string
         }[]
       }
+      get_session_checkin: { Args: { p_token: string }; Returns: Json }
       get_shared_diagnostics_for_mentor: {
         Args: { p_share_id?: string }
         Returns: {
@@ -2601,6 +2676,16 @@ export type Database = {
       shares_mentorship_with: {
         Args: { p_profile_id: string }
         Returns: boolean
+      }
+      submit_session_checkin_details: {
+        Args: {
+          p_next_step: string
+          p_private_note: string
+          p_public_feedback: string
+          p_rating: number
+          p_token: string
+        }
+        Returns: Json
       }
       withdraw_mentor_verification: { Args: never; Returns: undefined }
     }

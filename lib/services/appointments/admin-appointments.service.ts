@@ -67,9 +67,19 @@ interface AppointmentRow {
   google_calendar_link: string | null
   token_expires_at: string | null
   pending_reminder_sent_at: string | null
+  checkin_conflict?: boolean | null
+  appointment_checkins?: CheckinRow[] | null
   mentor: PersonRow | PersonRow[] | null
   mentee: PersonRow | PersonRow[] | null
 }
+
+type CheckinRow = { role: string; outcome: string | null; sent_at: string | null }
+
+/**
+ * Situação do check-in pós-sessão de um lado (docs/domains/session-checkin.md):
+ * `not_sent` = e-mail ainda não saiu, `waiting` = enviado sem resposta, ou a resposta.
+ */
+export type AdminCheckinState = "not_sent" | "waiting" | "happened" | "not_happened" | "rescheduled"
 
 /** Linha de uso interno: traz o token de confirmação, que NUNCA vai para o navegador. */
 interface AppointmentRowWithToken extends AppointmentRow {
@@ -105,6 +115,12 @@ export interface AdminAppointment {
   googleCalendarLink: string | null
   hasCalendarEvent: boolean
   pendingReminderSentAt: string | null
+  checkin: {
+    mentor: AdminCheckinState
+    mentee: AdminCheckinState
+    /** Um lado disse que aconteceu e o outro que não: a equipe resolve. */
+    conflict: boolean
+  }
   flags: {
     /** Pendente e o horário ainda não passou. */
     awaitingMentor: boolean
@@ -116,6 +132,8 @@ export interface AdminAppointment {
     /** O link de confirmação enviado ao mentor já expirou. */
     tokenExpired: boolean
     missingReason: boolean
+    /** Confirmada, horário passado e ninguém respondeu o check-in ainda. */
+    awaitingCheckin: boolean
   }
   actions: {
     resendMentorRequest: boolean
@@ -165,6 +183,13 @@ function resolveReason(row: Pick<AppointmentRow, "notes_mentee" | "message">): s
   return row.notes_mentee?.trim() || row.message?.trim() || null
 }
 
+function checkinState(rows: CheckinRow[] | null | undefined, role: "mentor" | "mentee"): AdminCheckinState {
+  const row = rows?.find(r => r.role === role)
+  if (!row) return "not_sent"
+  if (row.outcome === "happened" || row.outcome === "not_happened" || row.outcome === "rescheduled") return row.outcome
+  return "waiting"
+}
+
 function isSystemExpired(row: Pick<AppointmentRow, "status" | "cancelled_by" | "cancellation_reason">) {
   return (
     row.status === "cancelled" &&
@@ -203,6 +228,11 @@ export function toAdminAppointment(row: AppointmentRow, now: Date = new Date()):
     googleCalendarLink: row.google_calendar_link,
     hasCalendarEvent: Boolean(row.google_event_id),
     pendingReminderSentAt: row.pending_reminder_sent_at,
+    checkin: {
+      mentor: checkinState(row.appointment_checkins, "mentor"),
+      mentee: checkinState(row.appointment_checkins, "mentee"),
+      conflict: Boolean(row.checkin_conflict)
+    },
     flags: {
       awaitingMentor: isPending && !sessionPassed,
       waitingHours,
@@ -212,7 +242,8 @@ export function toAdminAppointment(row: AppointmentRow, now: Date = new Date()):
         isPending &&
         Boolean(row.token_expires_at) &&
         new Date(row.token_expires_at as string).getTime() <= now.getTime(),
-      missingReason: !reason
+      missingReason: !reason,
+      awaitingCheckin: row.status === "confirmed" && sessionPassed
     },
     actions: {
       resendMentorRequest: isPending && !sessionPassed,
@@ -258,7 +289,8 @@ const LIST_SELECT = `
   id, status, scheduled_at, duration_minutes, created_at, updated_at, topic,
   notes_mentee, message, notes_mentor, cancellation_reason, cancelled_at,
   cancelled_by, google_event_id, google_meet_link, google_calendar_link,
-  token_expires_at, pending_reminder_sent_at,
+  token_expires_at, pending_reminder_sent_at, checkin_conflict,
+  appointment_checkins(role, outcome, sent_at),
   mentor:profiles!mentor_id(${PERSON_EMBED}),
   mentee:profiles!mentee_id(${PERSON_EMBED})
 `
@@ -294,9 +326,15 @@ export async function listAdminAppointments(
   // As contagens vêm de todas as linhas, antes dos filtros, para as abas não "sumirem".
   const counts: Record<string, number> = { all: rows.length }
   for (const row of rows) counts[row.status] = (counts[row.status] ?? 0) + 1
+  counts.awaiting_checkin = rows.filter(row => row.flags.awaitingCheckin).length
+  counts.checkin_conflict = rows.filter(row => row.checkin.conflict).length
 
   const filtered = rows.filter(row => {
-    if (status && status !== "all" && row.status !== status) return false
+    if (status === "awaiting_checkin") {
+      if (!row.flags.awaitingCheckin) return false
+    } else if (status === "checkin_conflict") {
+      if (!row.checkin.conflict) return false
+    } else if (status && status !== "all" && row.status !== status) return false
     return q ? matchesSearch(row, q) : true
   })
 

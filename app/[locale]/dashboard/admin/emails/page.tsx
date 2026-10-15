@@ -38,10 +38,10 @@ const TEMPLATES: EmailTemplateMeta[] = [
     description: "Boas-vindas ao mentor após validação do perfil pela moderação."
   },
   {
-    key: "feedback",
-    label: "Pedido de Avaliação",
+    key: "session_checkin",
+    label: "Check-in Pós-Sessão",
     signature: "personal",
-    description: "Enviado ao mentorado logo após o término da mentoria solicitando depoimento."
+    description: "Enviado ao mentor e ao mentorado na manhã seguinte à sessão: \"a mentoria aconteceu?\". Lembrete 3 dias depois."
   },
   {
     key: "cancellation",

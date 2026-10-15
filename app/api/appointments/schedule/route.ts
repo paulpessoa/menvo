@@ -12,6 +12,7 @@ import {
 } from "@/lib/schemas/appointment"
 import { randomUUID } from "crypto"
 import { withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
+import { findPendingMenteeCheckin } from "@/lib/services/appointments/checkin-responses.service"
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,6 +26,19 @@ export async function POST(request: NextRequest) {
 
     if (authError || !user) {
       return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
+    }
+
+    // Antes de agendar de novo, a sessão anterior precisa ter o "aconteceu?"
+    // respondido (docs/domains/session-checkin.md §4). O modal pergunta antes;
+    // isto garante a regra para qualquer cliente da API.
+    const pendingCheckin = await findPendingMenteeCheckin(supabase, user.id)
+    if (pendingCheckin) {
+      return errorResponse(
+        "Conte se a sua última mentoria aconteceu antes de agendar outra.",
+        "CONFLICT",
+        409,
+        { reason: "pending_checkin", ...pendingCheckin }
+      )
     }
 
     const body = await request.json()

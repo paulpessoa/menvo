@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { sendAppointmentReminder, sendFeedbackRequest, sendPendingRequestReminder, sendPendingRequestExpired } from '@/lib/email/brevo';
+import { sendAppointmentReminder, sendPendingRequestReminder, sendPendingRequestExpired } from '@/lib/email/brevo';
+import { runSessionCheckins } from '@/lib/services/appointments/session-checkin.service';
 
 /**
  * Retorna o cliente administrativo do Supabase com service_role para operações agendadas
@@ -33,7 +34,7 @@ export async function GET(request: Request) {
 
         const supabase = getAdminClient();
         const now = new Date();
-        const results = { reminders: 0, feedbacks: 0, expired: 0, pendingReminders: 0, errors: [] as string[] };
+        const results = { reminders: 0, checkins: 0, checkinReminders: 0, expired: 0, pendingReminders: 0, errors: [] as string[] };
 
         // --- 0a. EXPIRAR PEDIDOS PENDENTES ---
         const { data: toExpire, error: expireError } = await supabase
@@ -191,52 +192,13 @@ export async function GET(request: Request) {
             }
         }
 
-        // --- 2. PROCESSAR PEDIDOS DE FEEDBACK ---
-        // Buscar mentorias finalizadas há pelo menos 1 hora sem pedido de feedback enviado
-        const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-
-        const { data: toFeedback, error: feedbackError } = await supabase
-            .from('appointments')
-            .select(`
-                *,
-                mentor:profiles!mentor_id(full_name),
-                mentee:profiles!mentee_id(full_name, email)
-            `)
-            .eq('status', 'confirmed')
-            .is('feedback_requested_at', null);
-
-        if (feedbackError) {
-            console.error('❌ [CRON] Erro ao buscar mentorias para feedback:', feedbackError);
-            results.errors.push(`Erro busca feedback: ${feedbackError.message}`);
-        } else if (toFeedback && toFeedback.length > 0) {
-            for (const app of toFeedback) {
-                const durationMinutes = app.duration_minutes || 45;
-                const endTime = new Date(new Date(app.scheduled_at).getTime() + durationMinutes * 60000);
-
-                if (endTime < oneHourAgo) {
-                    try {
-                        if (app.mentee?.email) {
-                            await sendFeedbackRequest({
-                                userEmail: app.mentee.email,
-                                userName: app.mentee.full_name || 'Mentorado',
-                                mentorName: app.mentor?.full_name || 'Mentor',
-                                appointmentId: app.id
-                            });
-                        }
-
-                        // Marcar como solicitado
-                        await supabase
-                            .from('appointments')
-                            .update({ feedback_requested_at: new Date().toISOString() })
-                            .eq('id', app.id);
-
-                        results.feedbacks++;
-                    } catch (e: any) {
-                        results.errors.push(`Erro feedback ${app.id}: ${e.message}`);
-                    }
-                }
-            }
-        }
+        // --- 2. CHECK-IN PÓS-SESSÃO ---
+        // "A mentoria aconteceu?" para mentor e mentorado (substitui o antigo
+        // pedido de feedback). Ver docs/domains/session-checkin.md.
+        const checkinReport = await runSessionCheckins(now);
+        results.checkins = checkinReport.sent;
+        results.checkinReminders = checkinReport.reminded;
+        results.errors.push(...checkinReport.errors);
 
         return NextResponse.json({
             success: true,

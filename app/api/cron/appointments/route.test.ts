@@ -4,16 +4,18 @@
 import { GET } from './route';
 import { 
   sendAppointmentReminder, 
-  sendFeedbackRequest,
   sendPendingRequestReminder,
   sendPendingRequestExpired
 } from '@/lib/email/brevo';
 
 jest.mock('@/lib/email/brevo', () => ({
   sendAppointmentReminder: jest.fn().mockResolvedValue(undefined),
-  sendFeedbackRequest: jest.fn().mockResolvedValue(undefined),
   sendPendingRequestReminder: jest.fn().mockResolvedValue(undefined),
   sendPendingRequestExpired: jest.fn().mockResolvedValue(undefined)
+}));
+
+jest.mock('@/lib/services/appointments/session-checkin.service', () => ({
+  runSessionCheckins: jest.fn().mockResolvedValue({ sent: 2, reminded: 1, errors: [] })
 }));
 
 // Setup encadeável para o Supabase
@@ -80,7 +82,7 @@ describe('GET /api/cron/appointments', () => {
     expect(data.error).toContain('Unauthorized');
   });
 
-  it('should process reminders and feedbacks when authorization is valid', async () => {
+  it('should process reminders and post-session check-ins when authorization is valid', async () => {
     const mockAppointmentsToRemind = [
       {
         id: 'app-1',
@@ -100,8 +102,6 @@ describe('GET /api/cron/appointments', () => {
     mockResults.push({ data: mockAppointmentsToRemind, error: null });
     // 4. Update reminder do app-1 -> retorna sucesso
     mockResults.push({ data: null, error: null });
-    // 5. Feedbacks -> retorna vazio
-    mockResults.push({ data: [], error: null });
 
     const req = new Request('http://localhost:3000/api/cron/appointments', {
       headers: {
@@ -115,6 +115,8 @@ describe('GET /api/cron/appointments', () => {
     const json = await res.json();
     expect(json.success).toBe(true);
     expect(json.results.reminders).toBe(1);
+    expect(json.results.checkins).toBe(2);
+    expect(json.results.checkinReminders).toBe(1);
 
     expect(sendAppointmentReminder).toHaveBeenCalledTimes(2);
     expect(sendAppointmentReminder).toHaveBeenCalledWith(
@@ -158,8 +160,6 @@ describe('GET /api/cron/appointments', () => {
     mockResults.push({ data: [], error: null });
     // 3. Reminders do dia -> vazio
     mockResults.push({ data: [], error: null });
-    // 4. Feedbacks -> vazio
-    mockResults.push({ data: [], error: null });
 
     const req = new Request('http://localhost:3000/api/cron/appointments', {
       headers: { authorization: 'Bearer super-secret-cron-token' }
@@ -200,8 +200,6 @@ describe('GET /api/cron/appointments', () => {
     // 3. Update pending reminder -> sucesso
     mockResults.push({ data: null, error: null });
     // 4. Reminders do dia -> vazio
-    mockResults.push({ data: [], error: null });
-    // 5. Feedbacks -> vazio
     mockResults.push({ data: [], error: null });
 
     const req = new Request('http://localhost:3000/api/cron/appointments', {

@@ -3,6 +3,7 @@ import { createClient } from "@/lib/utils/supabase/server"
 import { sendAppointmentRequest, sendAdminNewAppointmentNotification } from "@/lib/email/brevo"
 import { createAppointmentSchema } from "@/lib/schemas/appointment"
 import crypto from "crypto"
+import { findPendingMenteeCheckin } from "@/lib/services/appointments/checkin-responses.service"
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +16,19 @@ export async function POST(request: NextRequest) {
 
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    // Mesma regra de /api/appointments/schedule (docs/domains/session-checkin.md §4).
+    const pendingCheckin = await findPendingMenteeCheckin(supabase, user.id)
+    if (pendingCheckin) {
+      return NextResponse.json(
+        {
+          error: "Conte se a sua última mentoria aconteceu antes de agendar outra.",
+          code: "CONFLICT",
+          details: { reason: "pending_checkin", ...pendingCheckin }
+        },
+        { status: 409 }
+      )
     }
 
     const body = await request.json()

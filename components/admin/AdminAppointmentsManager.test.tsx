@@ -51,7 +51,8 @@ function appointment(overrides: Record<string, any> = {}) {
     googleCalendarLink: null,
     hasCalendarEvent: false,
     pendingReminderSentAt: null,
-    flags: { awaitingMentor: true, waitingHours: 72, stale: true, sessionPassed: false, tokenExpired: false, missingReason: false },
+    checkin: { mentor: "not_sent", mentee: "not_sent", conflict: false },
+    flags: { awaitingMentor: true, waitingHours: 72, stale: true, sessionPassed: false, tokenExpired: false, missingReason: false, awaitingCheckin: false },
     actions: { resendMentorRequest: true, resendConfirmation: false, cancel: true },
     ...overrides
   }
@@ -86,7 +87,7 @@ describe("AdminAppointmentsManager", () => {
           appointment({
             id: "22222222-2222-4222-8222-222222222222",
             reason: null,
-            flags: { awaitingMentor: true, waitingHours: 3, stale: false, sessionPassed: false, tokenExpired: true, missingReason: true }
+            flags: { awaitingMentor: true, waitingHours: 3, stale: false, sessionPassed: false, tokenExpired: true, missingReason: true, awaitingCheckin: false }
           })
         ])
       )

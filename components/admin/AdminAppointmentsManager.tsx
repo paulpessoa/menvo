@@ -64,7 +64,9 @@ const TABS: { value: string; label: string }[] = [
   { value: "pending", label: "Aguardando mentor" },
   { value: "confirmed", label: "Confirmadas" },
   { value: "completed", label: "Concluídas" },
-  { value: "cancelled", label: "Canceladas" }
+  { value: "cancelled", label: "Canceladas" },
+  { value: "awaiting_checkin", label: "Sem check-in" },
+  { value: "checkin_conflict", label: "Check-in em conflito" }
 ]
 
 const STATUS_STYLES: Record<string, string> = {
@@ -483,6 +485,14 @@ function PersonCell({ person }: { person: AdminAppointment["mentor"] }) {
   )
 }
 
+const CHECKIN_LABELS: Record<AdminAppointment["checkin"]["mentor"], string> = {
+  not_sent: "não enviado",
+  waiting: "sem resposta",
+  happened: "aconteceu",
+  not_happened: "não rolou",
+  rescheduled: "remarcou"
+}
+
 function FlagChips({ appointment }: { appointment: AdminAppointment }) {
   const { flags } = appointment
   const chips: { key: string; text: string; tone: string }[] = []
@@ -496,6 +506,15 @@ function FlagChips({ appointment }: { appointment: AdminAppointment }) {
     if (flags.tokenExpired) chips.push({ key: "token", text: "Link do e-mail expirado", tone: "text-amber-700" })
   }
   if (flags.missingReason) chips.push({ key: "reason", text: "Sem motivo", tone: "text-muted-foreground" })
+  if (appointment.checkin.conflict) {
+    chips.push({ key: "checkin-conflict", text: "Check-in: mentor e mentorado discordam", tone: "text-red-700" })
+  } else if (flags.awaitingCheckin || appointment.checkin.mentor !== "not_sent" || appointment.checkin.mentee !== "not_sent") {
+    chips.push({
+      key: "checkin",
+      text: `Check-in: mentor ${CHECKIN_LABELS[appointment.checkin.mentor]} · mentorado ${CHECKIN_LABELS[appointment.checkin.mentee]}`,
+      tone: flags.awaitingCheckin ? "text-amber-700" : "text-muted-foreground"
+    })
+  }
 
   if (chips.length === 0) return null
   return (
