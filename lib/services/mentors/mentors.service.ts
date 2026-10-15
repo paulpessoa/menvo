@@ -509,7 +509,7 @@ class MentorService {
     } | null
   }[]> {
     const { data, error } = await this.supabase
-      .from("appointment_feedbacks")
+      .from("appointment_feedbacks_public")
       .select(`
         id,
         rating,
@@ -518,7 +518,6 @@ class MentorService {
         mentee:profiles!reviewer_id(first_name, last_name, avatar_url)
       `)
       .eq("reviewed_id", mentorId)
-      .eq("status", "approved")
       .order("created_at", { ascending: false })
 
     if (error) throw error
