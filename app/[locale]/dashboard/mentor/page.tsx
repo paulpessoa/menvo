@@ -21,7 +21,8 @@ import {
   LayoutDashboard,
   Sparkles,
   Shield,
-  CheckCircle
+  CheckCircle,
+  Award
 } from "lucide-react"
 import { Link } from "@/i18n/routing"
 import { RequireRole } from "@/lib/auth/auth-guard"
@@ -235,6 +236,17 @@ function MentorDashboardTabs({ stats, profile, upcomingAppointments, loading, lo
                   <span className="text-foreground">{stats.averageRating > 0 ? stats.averageRating.toFixed(1) : "-"}</span>
                   <span className="text-muted-foreground text-xs font-normal">({stats.totalReviews} avaliações)</span>
                 </div>
+                {stats.completedSessions > 0 && (
+                  <>
+                    <div className="w-1 h-1 rounded-full bg-border hidden sm:block" />
+                    <Button variant="ghost" size="sm" asChild className="h-7 px-2.5 text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10 rounded-lg gap-1.5 ml-auto">
+                      <Link href={`/certificate/${profile?.slug || profile?.id}`}>
+                        <Award className="h-3.5 w-3.5" />
+                        Certificado de Horas
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
 
               {/* Conteúdo Principal */}
