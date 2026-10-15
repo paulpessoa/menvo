@@ -39,6 +39,8 @@ Cada item é um pedido para o agente. Revise e faça commit entre um e outro.
 
 ## 2. Sugestões fora do blueprint (backlog)
 
+> Plano de robustez de out/2026, com tarefas prontas para agente: [`hardening-plan.md`](hardening-plan.md).
+
 Achados desta revisão que não cabem num domínio específico.
 
 | Prioridade | Achado | Sugestão |
