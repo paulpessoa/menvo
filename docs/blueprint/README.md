@@ -43,12 +43,12 @@ Achados desta revisão que não cabem num domínio específico.
 
 | Prioridade | Achado | Sugestão |
 |---|---|---|
-| Alta | `package.json` tem 46 dependências como `"latest"` | Fixar versões (`npm pkg set` ou trocar por `^x.y.z` da versão instalada). Hoje cada `npm install` pode trazer uma versão maior diferente, o que já quebrou o lint (ESLint 10) |
-| Alta | Tools de agente com `service_role` silencioso | Item 1 da fila |
-| Média | URL inexistente responde 200 (soft 404) | Fazer o `[...rest]` chamar `notFound()` para responder 404. Afeta SEO |
+| Alta | `package.json` com dependências soltas | ✅ Todas as dependências agora utilizam versões fixadas/pinned (`^x.y.z`) |
+| Alta | Tools de agente com `service_role` silencioso | ✅ Item 1 da fila concluído em `lib/agents` |
+| Média | URL inexistente responde 200 (soft 404) | ✅ `app/[locale]/[...rest]` chama `notFound()` com `robots: noindex` |
 | Média | Rate limit em memória (`lib/rate-limit.ts`) | Em serverless cada instância tem o seu contador. Mover para Upstash/Vercel KV ou para o Postgres quando o abuso aparecer |
-| Média | `@supabase/auth-helpers-react` (descontinuado) junto com `@supabase/ssr` | Remover o auth-helpers e ficar só com `@supabase/ssr` |
-| Média | `axios` e `fetch` convivendo | Padronizar em `fetch` (Next estende o `fetch` com cache) |
+| Média | `@supabase/auth-helpers-react` (descontinuado) | ✅ Removido do repositório em 2026-10-14 (mantido apenas `@supabase/ssr`) |
+| Média | `axios` e `fetch` convivendo | ✅ `axios` desinstalado em 2026-10-14; padronizado exclusivamente em `fetch` nativo |
 | Baixa | Arquivos soltos na raiz: `schema_dump.sql`, `test-org.ts`, previews HTML | ✅ Apagados do repositório em 2026-10-14 |
 | Baixa | `next.config.mjs` com `eslint.ignoreDuringBuilds` | Ok agora que o CI roda o lint separado; manter |
 | Baixa | Dois templates de PR | ✅ Apenas `.github/PULL_REQUEST_TEMPLATE.md` mantido |
