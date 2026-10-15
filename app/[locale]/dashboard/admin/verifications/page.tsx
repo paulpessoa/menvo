@@ -129,6 +129,18 @@ export default function AdminVerificationsPage() {
     }
   }
 
+  const handleRequestChanges = async (verificationId: string, message?: string) => {
+    try {
+      await submitVerification(verificationId, "changes_requested", "Ajustes solicitados via assistente de IA", message)
+      toast.success("Pedido de ajustes enviado com sucesso!")
+      loadVerifications(activeTab)
+    } catch (error) {
+      console.error("Error requesting changes:", error)
+      toast.error("Erro ao solicitar ajustes")
+      throw error
+    }
+  }
+
   const expertiseAreas = Array.from(
     new Set(verifications.flatMap((v) => v.mentor_expertise_areas || []))
   ).sort()
@@ -219,7 +231,14 @@ export default function AdminVerificationsPage() {
                       <p className="text-sm text-muted-foreground">{verification.mentor_company || "Empresa não informada"}</p>
                     </div>
                   </div>
-                  <Badge variant="outline" className="w-fit">{verification.verification_type}</Badge>
+                  <div className="flex items-center gap-2">
+                    {verification.status === "changes_requested" && (
+                      <Badge variant="outline" className="border-amber-400 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-700">
+                        Ajustes solicitados
+                      </Badge>
+                    )}
+                    <Badge variant="outline" className="w-fit">{verification.verification_type}</Badge>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
@@ -271,7 +290,8 @@ export default function AdminVerificationsPage() {
                       <MentorReviewAssistant
                         userId={verification.id}
                         onApprove={(message) => handleApprove(verification.id, message)}
-                        onReject={(message) => handleReject(verification.id, "Ajustes solicitados via assistente de IA", message)}
+                        onRequestChanges={(message) => handleRequestChanges(verification.id, message)}
+                        onReject={(message) => handleReject(verification.id, "Recusado pelo administrador", message)}
                       />
 
                       <Dialog>
@@ -291,8 +311,25 @@ export default function AdminVerificationsPage() {
                     </>
                   )}
                   {activeTab === "completed" && (
-                    <Badge variant={verification.status === "approved" ? "default" : "destructive"}>
-                      {verification.status === "approved" ? "Aprovado" : "Rejeitado"}
+                    <Badge
+                      variant={
+                        verification.status === "approved"
+                          ? "default"
+                          : verification.status === "changes_requested"
+                            ? "outline"
+                            : "destructive"
+                      }
+                      className={
+                        verification.status === "changes_requested"
+                          ? "border-amber-400 bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-700"
+                          : undefined
+                      }
+                    >
+                      {verification.status === "approved"
+                        ? "Aprovado"
+                        : verification.status === "changes_requested"
+                          ? "Ajustes solicitados"
+                          : "Rejeitado"}
                     </Badge>
                   )}
                 </div>

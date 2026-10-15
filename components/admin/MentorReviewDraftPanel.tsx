@@ -88,8 +88,12 @@ export function MentorReviewDraftPanel({
         ) : (
           <Button
             size="sm"
-            variant={tab === "reject" ? "destructive" : "default"}
-            className={tab === "approve" ? "bg-primary hover:bg-primary/90 text-white" : undefined}
+            variant="default"
+            className={
+              tab === "approve"
+                ? "bg-primary hover:bg-primary/90 text-white"
+                : "bg-amber-600 hover:bg-amber-700 text-white"
+            }
             onClick={onSend}
             disabled={submitting}
           >

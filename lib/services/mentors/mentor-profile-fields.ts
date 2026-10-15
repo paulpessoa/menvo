@@ -1,7 +1,7 @@
 import type { Database } from "@/lib/types/supabase"
 
 type MentorProfileRow = Database["public"]["Tables"]["mentor_profiles"]["Row"]
-type VerificationStatus = "pending" | "approved" | "rejected"
+type VerificationStatus = "pending" | "approved" | "rejected" | "changes_requested"
 
 /**
  * Campos de mentor que o próprio mentor edita. Moraram em `profiles` até a
@@ -94,6 +94,6 @@ export function withMentorFields<T extends { mentor_profiles?: unknown }>(
     verification_status: status,
     verified_at: mentor.verified_at ?? null,
     verified: status === "approved",
-    is_pending_mentor: status === "pending",
+    is_pending_mentor: status === "pending" || status === "changes_requested",
   }
 }

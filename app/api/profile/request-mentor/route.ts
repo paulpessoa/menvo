@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     const data = {
       id: mentor.user_id,
-      is_pending_mentor: mentor.verification_status === "pending",
+      is_pending_mentor: mentor.verification_status === "pending" || mentor.verification_status === "changes_requested",
       verification_status: mentor.verification_status,
     }
 

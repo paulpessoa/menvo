@@ -33,11 +33,13 @@ const TAB_LABEL: Record<ReviewKind, string> = {
 export function MentorReviewAssistant({
   userId,
   onApprove,
-  onReject
+  onReject,
+  onRequestChanges
 }: {
   userId: string
   onApprove: (message: string) => Promise<void>
   onReject: (message: string) => Promise<void>
+  onRequestChanges?: (message: string) => Promise<void>
 }) {
   const [open, setOpen] = useState(false)
   const [kind, setKind] = useState<ReviewKind>("approve")
@@ -74,7 +76,11 @@ export function MentorReviewAssistant({
     if (!draft) return
     setSubmitting(true)
     try {
-      await (tab === "approve" ? onApprove(draft.message) : onReject(draft.message))
+      if (tab === "approve") {
+        await onApprove(draft.message)
+      } else {
+        await (onRequestChanges ? onRequestChanges(draft.message) : onReject(draft.message))
+      }
       setOpen(false)
     } catch {
       // O toast de erro já é exibido pelo handler do pai.

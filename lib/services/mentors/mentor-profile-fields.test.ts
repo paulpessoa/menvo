@@ -56,6 +56,11 @@ describe("withMentorFields", () => {
     expect(row).toMatchObject({ verified: false, is_pending_mentor: true, verification_status: "pending" })
   })
 
+  it("marks applicants with changes_requested as is_pending_mentor = true", () => {
+    const row = withMentorFields({ id: "2b", mentor_profiles: [{ verification_status: "changes_requested" }] })
+    expect(row).toMatchObject({ verified: false, is_pending_mentor: true, verification_status: "changes_requested" })
+  })
+
   it("treats a missing mentor row as not a mentor", () => {
     const row = withMentorFields({ id: "3", mentor_profiles: null })
     expect(row).toMatchObject({

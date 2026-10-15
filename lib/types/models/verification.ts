@@ -2,7 +2,7 @@
  * User Verification Types
  */
 
-export type VerificationStatus = 'pending' | 'approved' | 'rejected' | 'reviewing';
+export type VerificationStatus = 'pending' | 'approved' | 'rejected' | 'changes_requested' | 'reviewing';
 
 export interface Verification {
   id: string;

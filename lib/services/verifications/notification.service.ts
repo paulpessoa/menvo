@@ -3,7 +3,7 @@ import { createServiceRoleClient } from '@/lib/utils/supabase/service-role'
 import { getOrCreateConversation, sendMessage } from '@/lib/chat/chat-service'
 import { sendVerificationNotification } from '@/lib/email/brevo'
 
-export type VerificationStatus = 'approved' | 'rejected' | 'pending'
+export type VerificationStatus = 'approved' | 'rejected' | 'pending' | 'changes_requested'
 
 export interface VerificationOptions {
   userId: string
@@ -124,9 +124,13 @@ export async function processVerification({
 
     let messageContent = message
     if (!messageContent) {
-      messageContent = status === 'approved'
-        ? '🎉 Parabéns! Seu perfil foi verificado e aprovado. Agora você já pode ser encontrado na plataforma Menvo.'
-        : '📢 Olá! Analisamos seu perfil e precisamos de alguns ajustes antes da aprovação definitiva.'
+      if (status === 'approved') {
+        messageContent = '🎉 Parabéns! Seu perfil foi verificado e aprovado. Agora você já pode ser encontrado na plataforma Menvo.'
+      } else if (status === 'changes_requested') {
+        messageContent = '📢 Olá! Analisamos seu perfil e precisamos de alguns ajustes antes da aprovação definitiva.'
+      } else {
+        messageContent = 'Olá. Agradecemos seu interesse em mentorar na Menvo, mas no momento sua solicitação não foi aprovada.'
+      }
       if (notes) messageContent += `\n\nNotas do administrador:\n${notes}`
     }
 

@@ -3,7 +3,7 @@ import type { Database } from "@/lib/types/supabase"
 import type { Verification } from "@/lib/types/models/verification"
 import { fetchCvUrls } from "@/lib/services/mentees/mentee-cv.service"
 
-type MentorStatus = "pending" | "approved" | "rejected"
+type MentorStatus = "pending" | "approved" | "rejected" | "changes_requested"
 
 const SELECT = `
   user_id, verification_status, mentorship_approach, what_to_expect, created_at, updated_at,

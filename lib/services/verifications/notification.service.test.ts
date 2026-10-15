@@ -201,6 +201,17 @@ describe('processVerification', () => {
     )
   })
 
+  it('records changes_requested with admin notes, keeps profile hidden, and does not touch user_roles', async () => {
+    await processVerification({ userId: 'mentor-1', adminId: 'admin-1', status: 'changes_requested', notes: 'ajustar bio' })
+
+    expect(profilesUpdate.mock.calls[0][0]).not.toHaveProperty('is_public')
+    expect(mentorProfilesUpsert).toHaveBeenCalledWith(
+      { user_id: 'mentor-1', verification_status: 'changes_requested', verification_notes: 'ajustar bio', verified_at: null },
+      { onConflict: 'user_id' }
+    )
+    expect(mockServiceSupabase.from).not.toHaveBeenCalledWith('user_roles')
+  })
+
   it('throws when no profile row was updated', async () => {
     profileRow = null
     await expect(

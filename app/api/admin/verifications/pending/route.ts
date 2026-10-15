@@ -14,7 +14,7 @@ export async function GET() {
 
   try {
     const supabase = await createClient()
-    const verifications = await listMentorVerifications(supabase, ["pending"])
+    const verifications = await listMentorVerifications(supabase, ["pending", "changes_requested"])
     return NextResponse.json({ verifications })
   } catch (error) {
     console.error("[GET /api/admin/verifications/pending] Erro:", error instanceof Error ? error.message : error)

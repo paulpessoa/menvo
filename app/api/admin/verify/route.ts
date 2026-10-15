@@ -5,7 +5,7 @@ import { requireAdmin } from '@/lib/auth/require-admin'
 
 const bodySchema = z.object({
   userId: z.string().min(1),
-  status: z.enum(['approved', 'rejected', 'pending']),
+  status: z.enum(['approved', 'rejected', 'pending', 'changes_requested']),
   notes: z.string().max(2000).optional(),
   message: z.string().trim().min(1).max(4000).optional(),
   notifyEmail: z.boolean().optional()

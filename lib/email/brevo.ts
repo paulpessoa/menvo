@@ -182,7 +182,7 @@ export interface AppointmentCancellationData {
 interface VerificationData {
   userEmail: string;
   userName: string;
-  status: 'approved' | 'rejected';
+  status: 'approved' | 'rejected' | 'changes_requested';
   notes?: string;
 }
 
@@ -298,23 +298,43 @@ export async function sendSessionCheckin(data: SessionCheckinEmailData): Promise
 export async function sendVerificationNotification(data: VerificationData): Promise<void> {
   const { userEmail, userName, status, notes } = data;
   const isApproved = status === 'approved';
+  const isChangesRequested = status === 'changes_requested';
+
+  const statusLabel = isApproved
+    ? 'Aprovado'
+    : isChangesRequested
+      ? 'Ajustes Necessários'
+      : 'Não Aprovado';
+
+  const subject = isApproved
+    ? "Seu perfil no Menvo foi aprovado"
+    : isChangesRequested
+      ? "Ajustes necessários no seu perfil Menvo"
+      : "Atualização sobre sua candidatura a mentor no Menvo";
+
+  const headerTitle = isApproved
+    ? "Perfil Aprovado"
+    : isChangesRequested
+      ? "Ajustes no Perfil"
+      : "Candidatura a Mentor";
 
   const content = `
     <h2>Olá, ${escapeHtml(userName)}!</h2>
     <p>Analisamos com atenção o seu perfil de mentor na Menvo.</p>
     <div class="info-box">
-        <p style="margin-bottom: 5px;"><strong>Status:</strong> ${isApproved ? 'Aprovado' : 'Ajustes Necessários'}</p>
+        <p style="margin-bottom: 5px;"><strong>Status:</strong> ${statusLabel}</p>
         ${notes ? `<p><strong>Observações:</strong> ${escapeHtml(notes)}</p>` : ''}
     </div>
     <div class="button-container">
         <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://www.menvo.com.br'}/dashboard" class="button">Acessar meu Dashboard</a>
     </div>
     ${isApproved ? '<p>Seja muito bem-vindo(a) à nossa rede de mentores voluntários. Sua experiência fará a diferença na carreira de muitos talentos!</p>' : ''}
+    ${isChangesRequested ? '<p>Por favor, acesse seu dashboard para revisar os pontos indicados e reenviar seu perfil para análise.</p>' : ''}
   `;
   await sendEmail(
     userEmail,
-    isApproved ? "Seu perfil no Menvo foi aprovado" : "Ajustes necessários no seu perfil Menvo",
-    getEmailLayout(isApproved ? "Perfil Aprovado" : "Ajustes no Perfil", content, { signatureType: "personal" })
+    subject,
+    getEmailLayout(headerTitle, content, { signatureType: "personal" })
   );
 }
 
