@@ -431,7 +431,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                   </div>
                 ) : (
                   // Mobile uses the sticky action bar below instead.
-                  <div className="hidden md:flex gap-2 items-center">
+                  <div data-tour="schedule" className="hidden md:flex gap-2 items-center">
                     {isFullyBooked ? (
                       <AvailabilityAlertButton
                         mentorId={mentor.id}
@@ -440,7 +440,6 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                       />
                     ) : (
                       <Button
-                        id="tour-schedule-button"
                         className="flex-1 min-w-0 rounded-2xl h-14 font-bold bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all text-sm sm:text-base px-3"
                         onClick={() => {
                           if (!user) {
@@ -526,7 +525,7 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
         {/* Mobile Sticky Action Bar */}
         {!isOwner && (
           <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-50 animate-in slide-in-from-bottom duration-500 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
-            <div className="flex gap-2 max-w-[600px] mx-auto items-center">
+            <div data-tour="schedule" className="flex gap-2 max-w-[600px] mx-auto items-center">
               {isFullyBooked ? (
                 <AvailabilityAlertButton
                   mentorId={mentor.id}
@@ -585,7 +584,7 @@ function MentorProfileTour() {
     { popover: { title: "Perfil do Mentor", description: "Aqui você encontra todas as informações sobre o mentor para decidir se ele é a pessoa certa para te ajudar." } },
     { element: "#tour-mentor-topics", popover: { title: "Especialidades", description: "Verifique as áreas de especialidade, tópicos de mentoria e tags de inclusão." } },
     { element: "#tour-mentor-availability", popover: { title: "Formato da Mentoria", description: "Aqui estão os detalhes como duração, formato e as regras de agendamento." } },
-    { element: "#tour-schedule-button", popover: { title: "Agende sua sessão", description: "Quando estiver pronto, clique aqui para escolher um horário na agenda do mentor." } }
+    { element: "[data-tour='schedule']", popover: { title: "Agende sua sessão", description: "Quando estiver pronto, escolha aqui um horário na agenda do mentor. Se ele estiver sem horários livres, peça para ser avisado(a) quando abrir agenda." } }
   ]
 
   useOnboarding("ob_m3", steps)

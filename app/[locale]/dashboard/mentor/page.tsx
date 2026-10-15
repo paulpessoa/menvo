@@ -127,9 +127,11 @@ export default function MentorDashboard() {
               <p className="text-muted-foreground text-base md:text-lg mt-1">{t("mentor.welcome")}</p>
             </div>
             <div className="flex items-center gap-3">
-              <MentorPauseToggle isPublic={profile?.is_public} />
+              <div id="tour-mentor-pause">
+                <MentorPauseToggle isPublic={profile?.is_public} />
+              </div>
               <Button asChild size="sm" className="rounded-xl font-bold h-10 px-5 bg-primary hover:bg-primary/90 text-white shadow-xs">
-                <Link href="/dashboard/mentor/availability">
+                <Link id="tour-mentor-availability" href="/dashboard/mentor/availability">
                   <Clock className="h-4 w-4 mr-2" /> {t("mentor.actions.availability")}
                 </Link>
               </Button>
@@ -302,6 +304,9 @@ function MentorDashboardTour() {
   const steps = [
     { popover: { title: "👋 Bem-vindo(a) à sua central!", description: "Vamos fazer um tour rápido para você aproveitar todas as ferramentas como Mentor." } },
     { element: "#tour-mentor-checklist", popover: { title: "Sua Jornada de Impacto", description: "Siga estas etapas para maximizar seu impacto e ajudar mais pessoas." } },
+    { element: "#tour-mentor-availability", popover: { title: "Abra seus horários", description: "Sem horários, ninguém consegue agendar com você. Quem encontrar sua agenda vazia pode pedir para ser avisado(a), e recebe um e-mail assim que você salvar novos horários." } },
+    { element: "#tour-mentor-pause", popover: { title: "Precisa de uma pausa?", description: "Se ficar sem tempo, pause as mentorias: seu perfil sai do catálogo e ninguém consegue agendar. Seus dados e horários continuam salvos para quando você reativar." } },
+    { popover: { title: "Depois de cada sessão", description: "Na manhã seguinte perguntamos por e-mail se a mentoria aconteceu. Sua resposta conta as suas horas voluntárias, que viram um certificado verificável aqui no painel." } },
     { element: "#tour-nav-community", popover: { title: "Comunidade de Mentores", description: "Um espaço exclusivo para você. Interaja com outros mentores, responda dúvidas e participe de discussões na nossa comunidade." } },
     { element: "#tour-nav-assistant", popover: { title: "Assistente de Carreira", description: "Sim, você também pode usar a nossa IA! Tire dúvidas, peça ideias de dinâmicas para suas mentorias ou explore novos conceitos." } },
     { element: "#tour-nav-profile-menu", popover: { title: "Gerencie seu perfil", description: "Mantenha seu perfil atualizado. Um perfil completo atrai mentorados mais alinhados aos seus conhecimentos." } },

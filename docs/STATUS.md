@@ -107,6 +107,9 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-15 - Tours de onboarding revisados
+`useOnboarding` recomeçava o tour do zero sempre que a página re-renderizava (o array de passos entrava nas dependências do efeito) e apontava para alvos escondidos: menu do topo no celular, botão "Agendar" do desktop no perfil do mentor, ou o botão trocado por "Me avise". Agora os passos ficam numa ref e cada passo usa o primeiro alvo visível; sem alvo visível, vira popover centralizado (`resolveTourSteps`, testado). Textos atualizados com o que entrou de 13 a 15/10: mentorado (pedir aviso quando o mentor não tem horário, check-in pós-sessão que libera o próximo agendamento), mentor (abrir horários e alerta de agenda, pausar mentorias, check-in que conta horas e vira certificado) e benefícios de mentor em `/onboarding`. Quem já concluiu um tour não o vê de novo.
+
 ### 2026-10-15 - Check-in pós-sessão ("a mentoria aconteceu?")
 Sessões `confirmed` nunca viravam `completed` e o pedido de feedback (só para o mentorado, exigindo login) não tinha resposta, então não dava para saber se as mentorias aconteciam. Agora o cron das 07h manda a mentor e mentorado, na manhã seguinte à sessão, a pergunta com "Sim / Não rolou / Remarcamos" (página `/checkin/[token]`, sem login, lembrete único 3 dias depois); a resposta muda o status no banco (funções security definer, sem `service_role`), discordância vai para a aba "Check-in em conflito" do admin, e o "Sim" do mentorado abre nota + próximo passo. Agendar de novo exige responder a última sessão (1 clique, avaliar é opcional), no modal e nas APIs; isso substitui o bloqueio antigo por avaliação completa. Spec e desvios em [`domains/session-checkin.md`](domains/session-checkin.md). Migration `20261015010000_appointment_checkins.sql` pendente de aplicação.
 

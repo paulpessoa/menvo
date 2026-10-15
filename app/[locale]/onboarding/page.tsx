@@ -359,11 +359,11 @@ function OnboardingContent() {
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                      <span>Total flexibilidade de horários e agendamento pelo Google Meet</span>
+                      <span>Você define seus horários e pode pausar as mentorias quando precisar</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                      <span>Perfil público verificado e reconhecimento na comunidade</span>
+                      <span>Perfil público verificado e certificado das suas horas voluntárias</span>
                     </li>
                   </ul>
                 </CardContent>
