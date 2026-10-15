@@ -51,6 +51,10 @@ export interface HomeMentor {
   total_sessions: number | null
   experience_years: number | null
   slug: string | null
+  organization?: {
+    name: string
+    slug: string
+  } | null
 }
 
 const FEATURED_LIMIT = 4
@@ -78,7 +82,14 @@ async function fetchFeaturedMentors(): Promise<HomeMentor[]> {
       return []
     }
 
-    return data as HomeMentor[]
+    const { orgPublicService } = await import("@/lib/services/organizations/org-public.service")
+    const mentorIds = (data as any[]).map((m) => m.id).filter(Boolean)
+    const orgMap = await orgPublicService.getOpenOrganizationsForMentors(mentorIds, supabase)
+
+    return (data as any[]).map((m) => ({
+      ...m,
+      organization: orgMap.get(m.id) ?? null,
+    })) as HomeMentor[]
   } catch (error) {
     // A home sem destaques ainda funciona; nunca derrubar a página por isso.
     console.error("[home] Failed to load featured mentors:", error)

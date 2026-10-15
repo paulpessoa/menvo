@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Link } from '@/i18n/routing'
 import { useTranslations } from 'next-intl'
-import { Heart, MapPin, Briefcase, ChevronRight, Award, Sparkles, Star, User } from 'lucide-react'
+import { Heart, MapPin, Briefcase, ChevronRight, Award, Sparkles, Star, User, Building2 } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
 import { useFavorites } from '@/hooks/useFavorites'
 
@@ -35,6 +35,11 @@ interface MentorCardMentor {
   slug: string | null
   /** Legacy field - some callers may still provide photo_url instead of avatar_url */
   photo_url?: string | null
+  /** Organização parceira aberta à qual o mentor está vinculado (C-O4) */
+  organization?: {
+    name: string
+    slug: string
+  } | null
 }
 
 interface MentorCardProps {
@@ -203,6 +208,16 @@ export const MentorCard: React.FC<MentorCardProps> = ({
           <Briefcase className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <span>{mentor.job_title || t('mentorCard.mentor')}</span>
         </p>
+
+        {/* Organização parceira vinculada (C-O4) */}
+        {mentor.organization && (
+          <div className="mt-1.5 flex items-center">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-300 border border-primary/20">
+              <Building2 className="w-3 h-3 text-primary-600 dark:text-primary-400 shrink-0" />
+              <span className="truncate max-w-[200px]">Mentor da {mentor.organization.name}</span>
+            </span>
+          </div>
+        )}
 
         {/* Motivo da IA */}
         {aiReason && (

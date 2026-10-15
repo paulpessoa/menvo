@@ -3,11 +3,21 @@ import { notFound } from "next/navigation"
 import MentorProfileClient, { type MentorProfile } from "./MentorProfileClient"
 import { createClient } from "@/lib/utils/supabase/server"
 import { buildMentorProfileService } from "@/lib/services/mentors/mentor-profile.composition"
+import { orgPublicService } from "@/lib/services/organizations/org-public.service"
 
 /** Perfil público + agenda, ou null se o diretório não mostra este mentor. */
 async function loadMentor(slug: string) {
-  const result = await buildMentorProfileService(await createClient()).getPublicProfile(slug)
-  return result.kind === "ok" ? { mentor: result.mentor, availability: result.availability } : null
+  const supabase = await createClient()
+  const result = await buildMentorProfileService(supabase).getPublicProfile(slug)
+  if (result.kind !== "ok" || !result.mentor?.id) return null
+
+  const orgMap = await orgPublicService.getOpenOrganizationsForMentors([result.mentor.id], supabase)
+  const organization = orgMap.get(result.mentor.id) ?? null
+
+  return {
+    mentor: { ...result.mentor, organization },
+    availability: result.availability
+  }
 }
 
 interface PageProps {
@@ -162,7 +172,8 @@ export default async function MentorProfilePage({ params }: PageProps) {
     website_url: mentor.website_url,
     timezone: mentor.timezone,
     slug: mentor.slug,
-    created_at: mentor.created_at || undefined
+    created_at: mentor.created_at || undefined,
+    organization: mentor.organization
   }
 
   return (

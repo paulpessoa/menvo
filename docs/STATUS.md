@@ -107,6 +107,9 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-14 - Migration `mentor_availability_alerts` aplicada (C-M3)
+`20261014000000_mentor_availability_alerts.sql` aplicada pelo Paul em 2026-10-14. Tabela `mentor_availability_alerts` com RLS: leitura pelo mentorado, mentor ou admin; inserção por visitante anônimo (sem `mentee_id`) ou logado; o mentor marca `notified_at`. Índice único impede dois alertas pendentes do mesmo e-mail para o mesmo mentor. Local e remoto ficam alinhados (165 migrations). `lib/types/supabase.ts` já tinha a tabela.
+
 ### 2026-10-03 - Quiz: query layer, hooks e página de resultado dividida (grupo 4)
 `lib/query` (`keys.ts`, `effects.ts`, `http.ts`), hooks em `hooks/quiz/` (`useSubmitQuiz`, `useLatestQuiz`, `useQuizResult` com o polling, `useAccountLink`, `useMentorSlugs`) e `hooks/usePersistentDraft.ts`. Enviar o quiz invalida `qk.quiz.all`, então o card do dashboard do mentorado atualiza sem recarregar. O formulário salva respostas e etapa em `localStorage` (sem nome, e-mail nem LinkedIn; descartado se a versão mudar; limpo no envio). A página de resultado (474 linhas) virou ~125 linhas mais componentes em `components/quiz/results/`. `quiz.service.ts` (wrapper de fetch) foi removido. **Achado:** o redesign de 2026-09-30 (`7c1d7fa0`) tinha removido da página o `SaveAnalysisBanner` (criar conta pelo link `?k=` do e-mail) e o botão de reenviar; o banner foi restaurado aqui porque o e-mail ainda aponta para ele. O botão de reenviar não voltou: a rota `send-email` ficou sem uso (ver ADR 0007 §3).
 

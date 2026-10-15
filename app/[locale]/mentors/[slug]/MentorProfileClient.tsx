@@ -31,7 +31,8 @@ import {
   Info,
   User,
   Github,
-  Linkedin
+  Linkedin,
+  Building2
 } from "lucide-react"
 import { toast } from "sonner"
 import { Link, useRouter } from "@/i18n/routing"
@@ -78,6 +79,10 @@ export interface MentorProfile {
   timezone: string | null
   slug: string | null
   created_at?: string
+  organization?: {
+    name: string
+    slug: string
+  } | null
 }
 
 /** Fetched separately, only for logged-in users - see /api/mentors/[slug]/approach. */
@@ -227,6 +232,15 @@ export default function MentorProfileClient({ mentor, availability }: Props) {
                     </div>
 
                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 pt-1">
+                      {mentor.organization && (
+                        <Link
+                          href={`/o/${mentor.organization.slug}`}
+                          className="flex items-center gap-1.5 bg-primary-50 hover:bg-primary-100 text-primary-700 px-3 py-1.5 rounded-full text-xs font-bold border border-primary/20 transition-colors"
+                        >
+                          <Building2 className="h-3.5 w-3.5 text-primary shrink-0" />
+                          <span>Mentor da {mentor.organization.name}</span>
+                        </Link>
+                      )}
                       {(mentor.city || mentor.country) && (
                         <div className="flex items-center gap-1.5 bg-muted/60 text-gray-600 px-3 py-1.5 rounded-full text-xs font-bold">
                           <MapPin className="h-3.5 w-3.5 text-primary" />

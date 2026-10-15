@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/utils/supabase/server"
 import { buildMentorProfileService } from "@/lib/services/mentors/mentor-profile.composition"
+import { orgPublicService } from "@/lib/services/organizations/org-public.service"
 
 export async function searchCatalogAction(params: {
   filters: {
@@ -115,7 +116,16 @@ export async function searchCatalogAction(params: {
   const { data, error, count } = await query
   if (error) throw error
 
-  return { data: data || [], count: count || 0 }
+  // Buscar organizações parceiras abertas para os mentores da página atual (C-O4)
+  const mentorIds = (data || []).map((m: any) => m.id).filter(Boolean)
+  const orgMap = await orgPublicService.getOpenOrganizationsForMentors(mentorIds, supabase)
+
+  const mentorsWithOrg = (data || []).map((m: any) => ({
+    ...m,
+    organization: orgMap.get(m.id) ?? null
+  }))
+
+  return { data: mentorsWithOrg, count: count || 0 }
 }
 
 export async function getCatalogFilterOptionsAction() {
