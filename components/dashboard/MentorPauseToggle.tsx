@@ -49,7 +49,7 @@ export function MentorPauseToggle({ isPublic = true, className }: MentorPauseTog
       await refreshProfile()
 
       if (newStatus) {
-        toast.success("Mentorias reativadas! Seu perfil já está visível novamente no catálogo.")
+        toast.success("Pronto! Seu perfil já aparece no catálogo de mentores.")
       } else {
         toast.success("Mentorias pausadas. Seu perfil foi temporariamente ocultado do catálogo.")
       }
@@ -70,7 +70,7 @@ export function MentorPauseToggle({ isPublic = true, className }: MentorPauseTog
         disabled={loading}
         className="rounded-xl font-bold h-10 px-4 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs active:scale-[0.98]"
       >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reativar mentorias"}
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Aparecer no catálogo"}
       </Button>
     )
   }

@@ -11,8 +11,10 @@ interface MentorPausedBannerProps {
 }
 
 /**
- * Banner informativo exibido no topo da visão geral do mentor quando
- * suas mentorias estão pausadas (is_public: false).
+ * Banner exibido no topo da visão geral do mentor quando o perfil está fora
+ * do catálogo (is_public: false). O texto é neutro de propósito: o mesmo
+ * estado vem tanto de "Pausar mentorias" quanto de um mentor que nunca ligou
+ * o perfil público, e dizer "pausadas" para quem não pausou confundia.
  */
 export function MentorPausedBanner({ isPublic }: MentorPausedBannerProps) {
   const { refreshProfile } = useAuth()
@@ -35,7 +37,7 @@ export function MentorPausedBanner({ isPublic }: MentorPausedBannerProps) {
       }
 
       await refreshProfile()
-      toast.success("Mentorias reativadas! Seu perfil já está visível novamente no catálogo.")
+      toast.success("Pronto! Seu perfil já aparece no catálogo de mentores.")
     } catch (err) {
       console.error("[MentorPausedBanner] Erro:", err)
       toast.error(err instanceof Error ? err.message : "Erro ao reativar mentorias")
@@ -52,10 +54,10 @@ export function MentorPausedBanner({ isPublic }: MentorPausedBannerProps) {
         </div>
         <div>
           <h4 className="text-sm font-bold text-foreground">
-            Suas mentorias estão temporariamente pausadas
+            Seu perfil não aparece no catálogo
           </h4>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Seu perfil está oculto no catálogo público para novos mentorados, mas todos os seus horários e configurações continuam salvos.
+            Mentorados não conseguem te encontrar nem agendar com você. Seus horários e configurações continuam salvos.
           </p>
         </div>
       </div>
@@ -65,7 +67,7 @@ export function MentorPausedBanner({ isPublic }: MentorPausedBannerProps) {
         size="sm"
         className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shrink-0 shadow-xs active:scale-[0.98]"
       >
-        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reativar mentorias"}
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Aparecer no catálogo"}
       </Button>
     </div>
   )

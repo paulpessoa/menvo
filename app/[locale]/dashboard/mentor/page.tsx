@@ -121,7 +121,7 @@ export default function MentorDashboard() {
                   )}
                 >
                   <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", profile?.is_public ? "bg-emerald-500" : "bg-amber-500")} />
-                  {profile?.is_public ? "Mentorias ativas" : "Mentorias pausadas"}
+                  {profile?.is_public ? "Mentorias ativas" : "Fora do catálogo"}
                 </Badge>
               </div>
               <p className="text-muted-foreground text-base md:text-lg mt-1">{t("mentor.welcome")}</p>
@@ -183,7 +183,7 @@ function MentorDashboardTabs({ stats, profile, upcomingAppointments, loading, lo
             {/* TAB: VISÃO GERAL */}
             <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
 
-              {/* Alerta de Mentorias Pausadas */}
+              {/* Alerta de perfil fora do catálogo (pausado ou nunca publicado) */}
               <MentorPausedBanner isPublic={profile?.is_public} />
 
               {/* Checklist de ativação: some sozinho quando tudo estiver pronto */}

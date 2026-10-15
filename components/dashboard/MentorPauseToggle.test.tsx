@@ -30,9 +30,9 @@ describe("MentorPauseToggle", () => {
     expect(screen.getByRole("button", { name: /pausar mentorias/i })).toBeInTheDocument()
   })
 
-  it("renders 'Reativar mentorias' button when mentor is currently paused", () => {
+  it("renders 'Aparecer no catálogo' button when the profile is out of the catalog", () => {
     render(<MentorPauseToggle isPublic={false} />)
-    expect(screen.getByRole("button", { name: /reativar mentorias/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /aparecer no catálogo/i })).toBeInTheDocument()
   })
 
   it("reactivates mentorship on click when paused", async () => {
@@ -44,7 +44,7 @@ describe("MentorPauseToggle", () => {
 
     render(<MentorPauseToggle isPublic={false} />)
 
-    await user.click(screen.getByRole("button", { name: /reativar mentorias/i }))
+    await user.click(screen.getByRole("button", { name: /aparecer no catálogo/i }))
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
@@ -79,9 +79,9 @@ describe("MentorPausedBanner", () => {
 
     render(<MentorPausedBanner isPublic={false} />)
 
-    expect(screen.getByText(/suas mentorias estão temporariamente pausadas/i)).toBeInTheDocument()
+    expect(screen.getByText(/seu perfil não aparece no catálogo/i)).toBeInTheDocument()
 
-    await user.click(screen.getByRole("button", { name: /reativar mentorias/i }))
+    await user.click(screen.getByRole("button", { name: /aparecer no catálogo/i }))
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
