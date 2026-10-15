@@ -20,6 +20,7 @@ interface ProfileMentorshipSectionProps {
   onChange: ProfileFormPatch
   isMentor: boolean
   isPendingMentor: boolean
+  verificationStatus?: string | null
   /** Re-fetches profile + role after a status change so the card flips state immediately. */
   onStatusChange: () => Promise<void>
 }
@@ -29,7 +30,7 @@ interface ProfileMentorshipSectionProps {
  * mentor's approach texts. The approach fields are edited inline for mentors
  * and inside the request dialog for everyone else, so there is one place to fill them.
  */
-export function ProfileMentorshipSection({ form, onChange, isMentor, isPendingMentor, onStatusChange }: ProfileMentorshipSectionProps) {
+export function ProfileMentorshipSection({ form, onChange, isMentor, isPendingMentor, verificationStatus, onStatusChange }: ProfileMentorshipSectionProps) {
   const t = useTranslations("profile")
   const tCommon = useTranslations("common")
 
@@ -92,13 +93,25 @@ export function ProfileMentorshipSection({ form, onChange, isMentor, isPendingMe
               </AlertDialog>
             </div>
           ) : isPendingMentor ? (
-            <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-3">
-              <AlertCircle className="h-4 w-4 text-blue-600 shrink-0" />
-              <div className="space-y-1">
-                <p className="text-sm text-blue-700 font-medium">{t("form.pendingAnalysis")}</p>
-                <p className="text-xs text-blue-600">{t("form.pendingAnalysisSubtitle")}</p>
+            verificationStatus === "changes_requested" ? (
+              <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-sm text-amber-800 dark:text-amber-300 font-semibold">Ajustes solicitados pelo administrador</p>
+                  <p className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+                    Nossa equipe revisou sua candidatura e solicitou alguns ajustes. Por favor, confira as orientações enviadas no seu e-mail, atualize suas informações e clique em <strong>Salvar perfil</strong>.
+                  </p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg flex items-center gap-3">
+                <AlertCircle className="h-4 w-4 text-blue-600 shrink-0" />
+                <div className="space-y-1">
+                  <p className="text-sm text-blue-700 font-medium">{t("form.pendingAnalysis")}</p>
+                  <p className="text-xs text-blue-600">{t("form.pendingAnalysisSubtitle")}</p>
+                </div>
+              </div>
+            )
           ) : (
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground flex-1">{t("form.becomeMentorPrompt")}</p>

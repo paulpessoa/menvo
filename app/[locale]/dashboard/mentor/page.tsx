@@ -35,6 +35,7 @@ import { MentorUpcomingSessions, type MentorAppointment } from "@/components/das
 import { MentorActivationChecklist } from "@/components/dashboard/MentorActivationChecklist"
 import { MentorPauseToggle } from "@/components/dashboard/MentorPauseToggle"
 import { MentorPausedBanner } from "@/components/dashboard/MentorPausedBanner"
+import { MentorChangesRequestedBanner } from "@/components/dashboard/MentorChangesRequestedBanner"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
 import { SharedDiagnosticsSection } from "@/components/diagnostic/SharedDiagnosticsSection"
 import { cn } from "@/lib/utils"
@@ -182,6 +183,9 @@ function MentorDashboardTabs({ stats, profile, upcomingAppointments, loading, lo
 
             {/* TAB: VISÃO GERAL */}
             <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
+
+              {/* Alerta de ajustes solicitados na verificação de mentor */}
+              <MentorChangesRequestedBanner verificationStatus={profile?.verification_status} />
 
               {/* Alerta de perfil fora do catálogo (pausado ou nunca publicado) */}
               <MentorPausedBanner isPublic={profile?.is_public} />

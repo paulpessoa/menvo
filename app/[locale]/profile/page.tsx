@@ -143,6 +143,7 @@ function ProfilePageContent() {
                 onChange={patchForm}
                 isMentor={isMentor}
                 isPendingMentor={isPendingMentor}
+                verificationStatus={profile.verification_status}
                 onStatusChange={handleStatusChange}
               />
             </TabsContent>
@@ -151,7 +152,7 @@ function ProfilePageContent() {
             </TabsContent>
 
             {/* One save for every tab - edits made on other tabs are kept in state and saved together. */}
-            {activeTab !== "organizations" && !(activeTab === "mentorship" && !isMentor) && (
+            {activeTab !== "organizations" && !(activeTab === "mentorship" && !isMentor && !isPendingMentor) && (
               <div className="sticky bottom-0 flex justify-end gap-4 py-4 border-t bg-canvas/95 backdrop-blur">
                 <Button id="tour-profile-save" type="submit" disabled={isUpdating} className="min-w-[150px] shadow-lg shadow-primary/20">
                   {isUpdating && <Loader2 className="mr-2 animate-spin h-4 w-4" />}

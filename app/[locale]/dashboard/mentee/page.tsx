@@ -18,6 +18,7 @@ import { FeedbackManagement } from "@/components/FeedbackManagement"
 import { MenteeQuizCTA } from "@/components/MenteeQuizCTA"
 import { MenteeNextStepCard } from "@/components/dashboard/MenteeNextStepCard"
 import { MenteeActivationChecklist } from "@/components/dashboard/MenteeActivationChecklist"
+import { MentorChangesRequestedBanner } from "@/components/dashboard/MentorChangesRequestedBanner"
 import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 import { useLatestQuiz } from "@/hooks/quiz/useLatestQuiz"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
@@ -202,6 +203,8 @@ function MenteeDashboardTabs({
 
       {/* TAB: OVERVIEW */}
       <TabsContent value="overview" className="space-y-8 animate-in fade-in duration-500">
+        <MentorChangesRequestedBanner verificationStatus={profile?.verification_status} />
+
         {!(loading || loadingQuiz) && (
           <MenteeNextStepCard
             hasPendingReview={hasPendingReview}
