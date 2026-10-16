@@ -18,7 +18,7 @@
 <p align="center">
   <a href="https://www.menvo.com.br/">Website</a> •
   <a href="https://www.menvo.com.br/about">About</a> •
-  <a href="https://www.menvo.com.br/mentors">Find Mentors</a> •
+  <a href="https://www.menvo.com.br/mentors">Mentors</a> •
   <a href="https://www.menvo.com.br/contact">Contact</a>
 </p>
 

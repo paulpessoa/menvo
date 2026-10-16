@@ -2,7 +2,7 @@
   "common": {
     "welcome": "Bienvenido",
     "home": "Inicio",
-    "findMentors": "Encontrar Mentores",
+    "mentors": "Mentores",
     "community": "Mentorizados",
     "events": "Eventos",
     "howItWorks": "Cómo Funciona",
@@ -562,7 +562,6 @@
   "footer": {
     "description": "Conectando jóvenes talentos con mentores experimentados para transformar carreras y vidas.",
     "platform": "Plataforma",
-    "findMentors": "Encontrar Mentores",
     "howItWorks": "Cómo Funciona",
     "mentors": "Mentores",
     "mentees": "Mentorados",
@@ -1241,7 +1240,7 @@
         "completedDesc": "Total de sesiones"
       },
       "actions": {
-        "find": "Encontrar Mentores",
+        "find": "Mentores",
         "findDesc": "Encuentra expertos para acelerar tu carrera",
         "myMentorships": "Mis Mentorías",
         "myMentorshipsDesc": "Mira tus citas y evalúa las sesiones completadas",

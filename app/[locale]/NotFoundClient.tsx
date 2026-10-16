@@ -78,7 +78,7 @@ export default function NotFoundClient() {
           >
             <Link href="/mentors" id="not-found-mentors-btn">
               <Compass className="w-4 h-4" />
-              {t("findMentors")}
+              {t("mentors")}
             </Link>
           </Button>
 

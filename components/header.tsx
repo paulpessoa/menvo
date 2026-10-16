@@ -26,7 +26,7 @@ export default function Header() {
 
   const navigation = [
     { name: t("common.home"), href: "/" },
-    { name: t("common.findMentors"), href: "/mentors" }
+    { name: t("common.mentors"), href: "/mentors" }
   ]
 
   if (isAuthenticated) {

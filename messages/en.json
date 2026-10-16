@@ -2,7 +2,7 @@
   "common": {
     "welcome": "Welcome",
     "home": "Home",
-    "findMentors": "Find Mentors",
+    "mentors": "Mentors",
     "community": "Mentees",
     "events": "Events",
     "howItWorks": "How It Works",
@@ -562,7 +562,6 @@
   "footer": {
     "description": "Connecting young talent with experienced mentors to transform careers and lives.",
     "platform": "Platform",
-    "findMentors": "Find Mentors",
     "howItWorks": "How it Works",
     "mentors": "Mentors",
     "mentees": "Mentees",
@@ -1241,7 +1240,7 @@
       },
       "defaultName": "Mentee",
       "actions": {
-        "find": "Find Mentors",
+        "find": "Mentors",
         "findDesc": "Find experts to accelerate your career",
         "myMentorships": "My Mentorships",
         "myMentorshipsDesc": "View your appointments and evaluate completed sessions",

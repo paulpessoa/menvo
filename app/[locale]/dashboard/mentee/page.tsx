@@ -315,7 +315,7 @@ function MenteeDashboardTour() {
   const steps = [
     { popover: { title: "👋 Bem-vindo(a) à Menvo!", description: "Você acabou de dar o primeiro passo. Vamos fazer um tour rápido para você aproveitar tudo que a plataforma oferece." } },
     { element: "#tour-next-session, #tour-quiz-cta", popover: { title: "Seu próximo passo", description: "Aqui a Menvo sempre vai destacar a sua prioridade do momento. Siga o fluxo para avançar na sua jornada." } },
-    { element: "#tour-nav-mentors", popover: { title: "Encontre seu mentor", description: "No menu \"Encontrar Mentores\" estão todos os mentores verificados, com filtros por área, skills e idioma. Se o mentor que você quer estiver sem horário, peça para ser avisado(a) quando ele abrir agenda." } },
+    { element: "#tour-nav-mentors", popover: { title: "Encontre seu mentor", description: "No menu \"Mentores\" estão todos os mentores verificados, com filtros por área, skills e idioma. Se o mentor que você quer estiver sem horário, peça para ser avisado(a) quando ele abrir agenda." } },
     { element: "#tour-nav-assistant", popover: { title: "Seu copiloto de carreira", description: "Converse com a IA da Menvo para tirar dúvidas, receber recomendações de mentores ou fazer o diagnóstico interativo." } },
     { element: "#tour-nav-profile-menu", popover: { title: "Complete seu perfil", description: "Quanto mais completo seu perfil, mais chances os mentores têm de aceitar seu pedido. Adicione foto, bio, LinkedIn e seus objetivos." } },
     { popover: { title: "Depois de cada mentoria", description: "Na manhã seguinte você recebe um e-mail perguntando se a mentoria aconteceu. Responder leva um clique e libera o seu próximo agendamento." } },

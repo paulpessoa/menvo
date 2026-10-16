@@ -24,7 +24,7 @@ export default function MenteeAppointmentsPage() {
 
                 <Button onClick={() => router.push('/mentors')}>
                     <Search className="h-4 w-4 mr-2" />
-                    Encontrar Mentores
+                    Mentores
                 </Button>
             </div>
 

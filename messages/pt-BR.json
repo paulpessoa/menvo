@@ -2,7 +2,7 @@
   "common": {
     "welcome": "Bem-vindo",
     "home": "Início",
-    "findMentors": "Encontrar Mentores",
+    "mentors": "Mentores",
     "community": "Mentorados",
     "events": "Eventos",
     "howItWorks": "Como Funciona",
@@ -562,7 +562,6 @@
   "footer": {
     "description": "Conectando jovens talentos a mentores experientes para transformar carreiras e vidas.",
     "platform": "Plataforma",
-    "findMentors": "Encontrar Mentores",
     "howItWorks": "Como Funciona",
     "mentors": "Mentores",
     "mentees": "Mentorados",
