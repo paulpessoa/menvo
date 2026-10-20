@@ -9,8 +9,11 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Database } from "@/lib/types/supabase"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { logAdminAction } from "@/lib/audit-logger"
+import { createOrganizationsRepository } from "@/lib/repositories/organizations.repository"
 import {
   createAdminFeatureFlagsRepository,
+  createAdminOrganizationsRepository,
+  createAdminOrgLeadsRepository,
   createAdminRetentionReadRepository,
   createAdminRetentionWriteRepository
 } from "@/lib/repositories/admin-ops.repository"
@@ -20,6 +23,7 @@ import type { AdminAppointmentsDeps } from "@/lib/services/appointments/admin-ap
 import { getAdminOverview } from "./overview.service"
 import { createAdminRetentionService } from "./retention.service"
 import { createAdminFeatureFlagsService } from "./feature-flags.service"
+import { createAdminOrganizationsService } from "./organizations.service"
 
 function lazyPrivilegedClient() {
   let client: SupabaseClient<Database> | null = null
@@ -61,6 +65,19 @@ export function buildAdminAppointmentsDeps(
     mailer: brevoAppointmentMailer,
     calendar: googleAppointmentCalendar
   }
+}
+
+/**
+ * Service de organizações e pedidos de org do painel (L2-6): tudo pela sessão
+ * do admin (policies de admin existem), então não nasce client `service_role`.
+ */
+export function buildAdminOrganizationsService(sessionDb: SupabaseClient<Database>) {
+  return createAdminOrganizationsService({
+    sessionDb,
+    repo: createAdminOrganizationsRepository(sessionDb),
+    orgs: createOrganizationsRepository(sessionDb),
+    leads: createAdminOrgLeadsRepository(sessionDb)
+  })
 }
 
 /** Service de feature flags (E7 por ora): escreve pelo client privilegiado lazy. */

@@ -31,4 +31,13 @@ export const featureFlagDeleteQuerySchema = z.object({
   id: z.coerce.number().int().positive()
 })
 
+/** Status de um pedido de organização (`organization_leads.status`). */
+export const orgLeadStatusSchema = z.enum(["new", "contacted", "closed"])
+
+/** Body de `PATCH /api/admin/org-leads`. */
+export const orgLeadPatchBodySchema = z.object({
+  id: z.string().uuid(),
+  status: orgLeadStatusSchema
+})
+
 export type FeatureFlagCreateBody = z.infer<typeof featureFlagCreateBodySchema>
