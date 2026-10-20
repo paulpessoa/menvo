@@ -144,6 +144,124 @@ export function createAdminFeatureFlagsRepository(db: Db) {
   }
 }
 
+/** Organização com os vínculos embutidos (uma consulta, sem N+1). */
+export type OrganizationWithMembers = Tables<"organizations"> & {
+  organization_members: Pick<Tables<"organization_members">, "user_id" | "status">[]
+}
+
+/**
+ * Organizações vistas pelo admin da plataforma (L2-6). Recebe o client da
+ * SESSÃO: as policies de admin de `organizations`/`organization_members` já
+ * existem, então não há `service_role` aqui.
+ */
+export function createAdminOrganizationsRepository(db: Db) {
+  return {
+    /** Todas as orgs, a mais nova primeiro, com os vínculos para contar no service. */
+    async listWithMembers(): Promise<OrganizationWithMembers[]> {
+      const { data, error } = await db
+        .from("organizations")
+        .select("*, organization_members(user_id, status)")
+        .order("created_at", { ascending: false })
+        .returns<OrganizationWithMembers[]>()
+      if (error) throw new RepositoryError("admin.organizations.list", error)
+      return data ?? []
+    },
+
+    /** Se já existe org com o slug. */
+    async slugExists(slug: string): Promise<boolean> {
+      const { data, error } = await db
+        .from("organizations")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle()
+      if (error) throw new RepositoryError("admin.organizations.slugExists", error)
+      return data !== null
+    },
+
+    /** Cria a org e devolve a linha. */
+    async create(input: TablesInsert<"organizations">): Promise<Tables<"organizations">> {
+      const { data, error } = await db.from("organizations").insert(input).select().single()
+      if (error) throw new RepositoryError("admin.organizations.create", error)
+      return data
+    },
+
+    /** Suspende/reativa. Devolve a linha, ou `null` se o id não existe. */
+    async setStatus(
+      id: string,
+      status: "active" | "suspended"
+    ): Promise<Tables<"organizations"> | null> {
+      const { data, error } = await db
+        .from("organizations")
+        .update({ status })
+        .eq("id", id)
+        .select()
+        .maybeSingle()
+      if (error) throw new RepositoryError("admin.organizations.setStatus", error)
+      return data
+    },
+
+    /** Id da conta pelo e-mail, ou `null`. */
+    async findProfileIdByEmail(email: string): Promise<string | null> {
+      const { data, error } = await db
+        .from("profiles")
+        .select("id")
+        .eq("email", email)
+        .maybeSingle()
+      if (error) throw new RepositoryError("admin.organizations.findProfile", error)
+      return data?.id ?? null
+    },
+
+    /** Promove um vínculo que já existe para `admin`. */
+    async promoteMemberToAdmin(organizationId: string, userId: string): Promise<void> {
+      const { error } = await db
+        .from("organization_members")
+        .update({ role: "admin" })
+        .eq("organization_id", organizationId)
+        .eq("user_id", userId)
+      if (error) throw new RepositoryError("admin.organizations.promote", error)
+    },
+
+    /** Cria o vínculo já como `admin`. */
+    async addAdminMember(organizationId: string, userId: string): Promise<void> {
+      const { error } = await db
+        .from("organization_members")
+        .insert({ organization_id: organizationId, user_id: userId, role: "admin" })
+      if (error) throw new RepositoryError("admin.organizations.addAdmin", error)
+    }
+  }
+}
+
+/** Pedidos de organização (`organization_leads`) vistos pelo admin, pela sessão (L2-6). */
+export function createAdminOrgLeadsRepository(db: Db) {
+  return {
+    /** Leads, do mais novo ao mais antigo; `status` filtra quando vem. */
+    async list(status?: string): Promise<Tables<"organization_leads">[]> {
+      let query = db
+        .from("organization_leads")
+        .select("*")
+        .order("created_at", { ascending: false })
+      if (status) query = query.eq("status", status)
+      const { data, error } = await query
+      if (error) throw new RepositoryError("admin.orgLeads.list", error)
+      return data ?? []
+    },
+
+    /** Muda o status. Devolve a linha, ou `null` se o id não existe. */
+    async setStatus(id: string, status: string): Promise<Tables<"organization_leads"> | null> {
+      const { data, error } = await db
+        .from("organization_leads")
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq("id", id)
+        .select()
+        .maybeSingle()
+      if (error) throw new RepositoryError("admin.orgLeads.setStatus", error)
+      return data
+    }
+  }
+}
+
+export type AdminOrganizationsRepository = ReturnType<typeof createAdminOrganizationsRepository>
+export type AdminOrgLeadsRepository = ReturnType<typeof createAdminOrgLeadsRepository>
 export type AdminFeatureFlagsRepository = ReturnType<typeof createAdminFeatureFlagsRepository>
 export type AdminRetentionReadRepository = ReturnType<typeof createAdminRetentionReadRepository>
 export type AdminRetentionWriteRepository = ReturnType<typeof createAdminRetentionWriteRepository>
