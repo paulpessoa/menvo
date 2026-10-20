@@ -11,6 +11,7 @@ import {
   mentorshipReasonSchema
 } from "@/lib/schemas/appointment"
 import { randomUUID } from "crypto"
+import { actionTokenExpiry } from "@/lib/domain/appointments/appointment.entity"
 import { withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
 import { findPendingMenteeCheckin } from "@/lib/services/appointments/checkin-responses.service"
 
@@ -147,7 +148,7 @@ export async function POST(request: NextRequest) {
     // 3. Criar agendamento com token de confirmação por email
     // Colunas reais validadas via: supabase gen types (lib/types/supabase.ts)
     const actionToken = randomUUID()
-    const tokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 dias
+    const tokenExpiresAt = actionTokenExpiry() // 7 dias
 
     const { data: appointment, error: insertError } = await (supabase
       .from("appointments")
@@ -200,35 +201,6 @@ export async function POST(request: NextRequest) {
     return successResponse(appointment, "Mentorship scheduled successfully")
   } catch (error) {
     console.error("[schedule] Unexpected error:", error)
-    return handleApiError(error)
-  }
-}
-
-export async function GET(request: NextRequest) {
-  try {
-    const supabase = await createClient()
-    const { searchParams } = new URL(request.url)
-    const mentorId = searchParams.get("mentorId")
-    const menteeId = searchParams.get("menteeId")
-
-    let query = supabase
-      .from("appointments" as any)
-      .select(`
-        *,
-        mentor:profiles!mentor_id(full_name, avatar_url),
-        mentee:profiles!mentee_id(full_name, avatar_url)
-      `)
-
-    if (mentorId) query = (query as any).eq("mentor_id", mentorId)
-    if (menteeId) query = (query as any).eq("mentee_id", menteeId)
-
-    const { data, error } = await (query as any)
-      .order("scheduled_at", { ascending: false })
-
-    if (error) throw error
-
-    return successResponse(data)
-  } catch (error) {
     return handleApiError(error)
   }
 }

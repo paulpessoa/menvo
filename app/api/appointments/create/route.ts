@@ -3,6 +3,7 @@ import { createClient } from "@/lib/utils/supabase/server"
 import { sendAppointmentRequest, sendAdminNewAppointmentNotification } from "@/lib/email/brevo"
 import { createAppointmentSchema } from "@/lib/schemas/appointment"
 import crypto from "crypto"
+import { actionTokenExpiry } from "@/lib/domain/appointments/appointment.entity"
 import { findPendingMenteeCheckin } from "@/lib/services/appointments/checkin-responses.service"
 
 export async function POST(request: NextRequest) {
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
         topic: (mentorship_topics || []).join(", "),
         notes_mentee: notes_mentee || "",
         action_token: actionToken,
+        token_expires_at: actionTokenExpiry(),
         status: "pending"
       } as any)
       .select(`

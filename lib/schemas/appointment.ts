@@ -35,15 +35,6 @@ export const availabilityQuerySchema = z.object({
 
 export type AvailabilityQuery = z.infer<typeof availabilityQuerySchema>
 
-/** Corpo de `POST /api/appointments/action` (link do e-mail do mentor). */
-export const actionAppointmentSchema = z.object({
-  token: z.string().min(1, "Token e ação são obrigatórios"),
-  action: z.enum(["confirm", "cancel"], { errorMap: () => ({ message: "Ação inválida" }) }),
-  reason: z.string().max(1000).optional()
-})
-
-export type ActionAppointmentInput = z.infer<typeof actionAppointmentSchema>
-
 /** Corpo de `POST /api/appointments/mark-completed` (o mentor conclui a sessão). */
 export const markCompletedAppointmentSchema = z.object({
   appointmentId: z.union([z.string(), z.number()]).transform(val => String(val))

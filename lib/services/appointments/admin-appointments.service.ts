@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto"
 import type { SupabaseClient } from "@supabase/supabase-js"
+import { ACTION_TOKEN_TTL_MS } from "@/lib/domain/appointments/appointment.entity"
 import { isPlaceholderName } from "@/lib/utils/person-name"
 import {
   sendAppointmentCancellation,
@@ -23,7 +24,7 @@ import {
 /** Acima disso um pedido pendente é destacado como "sem resposta". */
 export const PENDING_STALE_AFTER_HOURS = 48
 /** Validade do link de confirmação enviado ao mentor (igual ao do pedido original). */
-export const ACTION_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000
+export { ACTION_TOKEN_TTL_MS }
 /** Teto de linhas por consulta; acima disso a lista avisa que está truncada. */
 export const ADMIN_LIST_LIMIT = 1000
 export const ADMIN_CANCELLER_NAME = "Equipe MENVO"

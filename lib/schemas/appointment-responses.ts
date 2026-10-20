@@ -78,13 +78,6 @@ export const confirmResponseSchema = z.union([
   z.object({ success: z.literal(true), message: z.string(), alreadyConfirmed: z.literal(true) }),
 ])
 
-/** `POST /api/appointments/action` (link do e-mail, rota sem sessão). */
-export const actionResponseSchema = z.object({
-  success: z.literal(true),
-  status: z.enum(["confirmed", "cancelled"]),
-  message: z.string(),
-})
-
 /** Avaliação como `GET /api/appointments/feedback` devolve. Nunca traz `private_notes`. */
 export const feedbackItemSchema = z.object({
   id: z.string(),
@@ -101,7 +94,7 @@ export const listFeedbacksQuerySchema = z.object({ type: z.enum(["sent", "receiv
 
 export const listFeedbacksResponseSchema = z.object({ feedbacks: z.array(feedbackItemSchema) })
 
-/** Formato `{ data, message }` de `schedule` e `[id]`. */
+/** Formato `{ data, message }` de `schedule`. */
 export const appointmentDataResponseSchema = z.object({ data: z.unknown(), message: z.string().optional() })
 
 /**
@@ -127,13 +120,3 @@ export const scheduleRequestSchema = z.object({
   message: mentorshipReasonSchema.optional(),
 })
 
-/** `GET /api/appointments/schedule` (sem chamador no app). */
-export const scheduleListQuerySchema = z.object({
-  mentorId: z.string().optional(),
-  menteeId: z.string().optional(),
-})
-
-/** `PATCH /api/appointments/{id}` (sem chamador no app; aceita qualquer status válido). */
-export const patchAppointmentBodySchema = z.object({ status: appointmentStatusSchema })
-
-export const appointmentIdPathSchema = z.object({ id: z.string().uuid() })

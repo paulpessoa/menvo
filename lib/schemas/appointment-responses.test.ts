@@ -2,7 +2,6 @@ import type { z } from "zod"
 import type { AppointmentListItem } from "@/lib/domain/appointments/appointment.entity"
 import type { FeedbackListItem } from "@/lib/repositories/appointment-feedbacks.repository"
 import {
-  actionResponseSchema,
   appointmentListItemSchema,
   availabilityResponseSchema,
   cancelResponseSchema,
@@ -73,10 +72,8 @@ describe("appointment response schemas", () => {
     expect(parsed).not.toHaveProperty("private_notes")
   })
 
-  it("covers cancel, action, availability and the feedback query", () => {
+  it("covers cancel, availability and the feedback query", () => {
     expect(cancelResponseSchema.safeParse({ success: true, message: "Agendamento cancelado com sucesso" }).success).toBe(true)
-    expect(actionResponseSchema.safeParse({ success: true, status: "confirmed", message: "ok" }).success).toBe(true)
-    expect(actionResponseSchema.safeParse({ success: true, status: "completed", message: "ok" }).success).toBe(false)
     expect(
       availabilityResponseSchema.safeParse({
         success: true,

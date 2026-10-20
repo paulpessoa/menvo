@@ -20,7 +20,7 @@ import type {
   AppointmentListItem,
   AppointmentWithParties,
 } from "@/lib/domain/appointments/appointment.entity"
-import { participantRole } from "@/lib/domain/appointments/appointment.entity"
+import { isActionTokenExpired, participantRole } from "@/lib/domain/appointments/appointment.entity"
 import {
   assertTransition,
   canTransition,
@@ -118,6 +118,8 @@ export type ConfirmResult =
   | { kind: "forbidden" }
   | { kind: "already_confirmed" }
   | { kind: "wrong_status"; status: AppointmentStatus }
+  /** O link do e-mail passou da validade (7 dias). O botão do painel continua valendo. */
+  | { kind: "token_expired" }
   | TransitionBlock
 
 export type UpdateFeedbackResult = { kind: "ok" } | { kind: "not_found" } | { kind: "forbidden" }
@@ -364,7 +366,9 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
      * era criado antes do update e ficava órfão se o update falhasse. Calendário e
      * e-mail são `best effort`: a sessão fica confirmada mesmo sem eles, e o aviso
      * `calendarError` diz ao mentor o que faltou.
-     * Pendente (D4): `token_expires_at` ainda não é conferido aqui.
+     * O token vence em `token_expires_at` (D4): link vencido é `token_expired`,
+     * só para quem veio pelo link e só enquanto o pedido está `pending`; quem
+     * já confirmou ou foi cancelado recebe a resposta de sempre. Nulo = não vence.
      */
     async confirm(input: ConfirmInput): Promise<ConfirmResult> {
       const { token, appointmentId, mentorNotes, sessionUserId } = input
@@ -383,6 +387,7 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
 
       if (appointment.status === "confirmed") return { kind: "already_confirmed" }
       if (appointment.status !== "pending") return { kind: "wrong_status", status: appointment.status }
+      if (token && isActionTokenExpired(appointment, now())) return { kind: "token_expired" }
 
       const result = await transition(repo, {
         appointment,

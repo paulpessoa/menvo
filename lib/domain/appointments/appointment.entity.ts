@@ -63,6 +63,27 @@ export interface BusyInterval {
   duration_minutes: number
 }
 
+/** Validade do link de confirmação enviado ao mentor. */
+export const ACTION_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000
+
+/** Instante em que um link emitido agora deixa de valer (ISO, pronto para a coluna). */
+export function actionTokenExpiry(now: Date = new Date()): string {
+  return new Date(now.getTime() + ACTION_TOKEN_TTL_MS).toISOString()
+}
+
+/**
+ * O link do e-mail venceu? `token_expires_at` nulo vale como "não vence": são as
+ * linhas criadas antes de a coluna ser gravada, e quebrar o link delas seria
+ * um aviso de "expirou" falso para um pedido que o mentor ainda não viu.
+ */
+export function isActionTokenExpired(
+  appointment: Pick<Appointment, "token_expires_at">,
+  now: Date = new Date()
+): boolean {
+  if (!appointment.token_expires_at) return false
+  return new Date(appointment.token_expires_at).getTime() <= now.getTime()
+}
+
 /**
  * Papel do usuário no agendamento, ou `null` se não participa. É daqui que o
  * service tira o ator (`mentor`/`mentee`) para `assertTransition`.

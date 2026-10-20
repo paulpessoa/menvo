@@ -131,14 +131,6 @@ describe("appointment status and query schemas", () => {
     expect(availabilityQuerySchema.safeParse({ mentor_id: "m1", start_date: "20/10/2026" }).success).toBe(false)
   })
 
-  it("actionAppointmentSchema accepts confirm and cancel, rejects the rest", async () => {
-    const { actionAppointmentSchema } = await import("./appointment")
-    expect(actionAppointmentSchema.safeParse({ token: "t", action: "confirm" }).success).toBe(true)
-    expect(actionAppointmentSchema.safeParse({ token: "t", action: "cancel", reason: "x" }).success).toBe(true)
-    expect(actionAppointmentSchema.safeParse({ token: "t", action: "delete" }).success).toBe(false)
-    expect(actionAppointmentSchema.safeParse({ action: "confirm" }).success).toBe(false)
-  })
-
   it("markCompletedAppointmentSchema converts a numeric id to string", async () => {
     const { markCompletedAppointmentSchema } = await import("./appointment")
     expect(markCompletedAppointmentSchema.parse({ appointmentId: 7 }).appointmentId).toBe("7")
