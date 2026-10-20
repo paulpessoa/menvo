@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient as createServerClient } from "@/lib/utils/supabase/server"
-import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
-import { markCompletedAppointmentSchema as markCompletedSchema } from "@/lib/schemas/appointment"
+import { markCompletedAppointmentSchema } from "@/lib/schemas/appointment"
+import { buildAppointmentsService } from "@/lib/services/appointments/appointments.composition"
+import { RepositoryError } from "@/lib/repositories/repository-error"
+import { transitionBlockedResponse } from "../transition-response"
 
 /**
  * Endpoint para o MENTOR marcar explicitamente uma mentoria como concluída.
  * Isso não requer avaliação (o mentor não avalia o mentorado no fluxo atual).
  * Marcar como concluída sinaliza para o mentorado que a sessão terminou e libera o botão de avaliação para ele.
+ *
+ * Fino de propósito: auth -> Zod -> `appointments.service` -> status HTTP. A
+ * regra (só o mentor, só `confirmed -> completed`) está no service.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -17,54 +22,32 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json().catch(() => ({}))
-    const parsed = markCompletedSchema.safeParse(body)
+    const parsed = markCompletedAppointmentSchema.safeParse(body)
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: "ID do agendamento inválido" },
-        { status: 400 }
-      )
-    }
-    const { appointmentId } = parsed.data
-
-    const supabase = createServiceRoleClient()
-
-    const { data: appointment, error: fetchError } = await supabase
-      .from("appointments")
-      .select("id, mentor_id, mentee_id, status")
-      .eq("id", appointmentId)
-      .single()
-
-    if (fetchError || !appointment) {
-      return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 })
+      return NextResponse.json({ error: "ID do agendamento inválido" }, { status: 400 })
     }
 
-    if (appointment.mentor_id !== user.id) {
-      return NextResponse.json(
-        { error: "Apenas o mentor pode marcar esta sessão como concluída" },
-        { status: 403 }
-      )
+    const result = await buildAppointmentsService().markCompleted(parsed.data.appointmentId, user.id)
+    switch (result.kind) {
+      case "ok":
+        return NextResponse.json({ success: true })
+      case "not_found":
+        return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 })
+      case "forbidden":
+        return NextResponse.json(
+          { error: "Apenas o mentor pode marcar esta sessão como concluída" },
+          { status: 403 }
+        )
+      case "wrong_status":
+        return NextResponse.json({ error: "Só é possível concluir sessões confirmadas" }, { status: 400 })
+      default:
+        return transitionBlockedResponse(result)
     }
-
-    if (appointment.status !== "confirmed") {
-      return NextResponse.json(
-        { error: "Só é possível concluir sessões confirmadas" },
-        { status: 400 }
-      )
-    }
-
-    const { error: updateError } = await supabase
-      .from("appointments")
-      .update({ status: "completed", updated_at: new Date().toISOString() })
-      .eq("id", appointmentId)
-
-    if (updateError) {
-      console.error("[MARK COMPLETED] Erro ao concluir agendamento:", updateError)
-      return NextResponse.json({ error: "Erro ao concluir agendamento" }, { status: 500 })
-    }
-
-    return NextResponse.json({ success: true })
   } catch (error) {
     console.error("[MARK COMPLETED] Erro inesperado:", error)
+    if (error instanceof RepositoryError) {
+      return NextResponse.json({ error: "Erro ao concluir agendamento" }, { status: 500 })
+    }
     return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
