@@ -3,19 +3,20 @@
 import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
-import {  Eye, Settings , Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/lib/auth"
 import { useOwnProfile } from "@/hooks/profile/useOwnProfile"
 import { useUpdateProfile } from "@/hooks/profile/useUpdateProfile"
-import { useOnboarding } from "@/hooks/useOnboarding"
-import { Link, useRouter } from "@/i18n/routing"
+import { useRouter } from "@/i18n/routing"
 import { OrganizationsTab } from "@/components/profile/OrganizationsTab"
 import { ProfileAboutSection } from "@/components/profile/ProfileAboutSection"
 import { ProfileCareerSection } from "@/components/profile/ProfileCareerSection"
+import { ProfileHeader } from "@/components/profile/ProfileHeader"
 import { ProfileMentorshipSection } from "@/components/profile/ProfileMentorshipSection"
+import { ProfileTour } from "@/components/profile/ProfileTour"
 import { profileToForm, type ProfileFormData } from "@/components/profile/profile-form"
 
 type ProfileTab = "basic" | "career" | "mentorship" | "organizations"
@@ -103,26 +104,7 @@ function ProfilePageContent() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">Meu Perfil</h1>
-            <p className="text-muted-foreground">Complete seu perfil para ser encontrado e ajudar/receber ajuda.</p>
-          </div>
-          <div className="flex gap-2">
-            {profile.slug && (
-              <Button variant="outline" asChild size="sm">
-                <Link href={isMentor ? `/mentors/${profile.slug}` : `/mentee/${profile.slug}`}>
-                  <Eye className="h-4 w-4 mr-2" /> Ver perfil público
-                </Link>
-              </Button>
-            )}
-            <Button variant="outline" asChild size="sm">
-              <Link href="/settings">
-                <Settings className="h-4 w-4 mr-2" /> Configurações
-              </Link>
-            </Button>
-          </div>
-        </div>
+        <ProfileHeader slug={profile.slug} isMentor={isMentor} />
 
         <form onSubmit={handleSubmit}>
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ProfileTab)} className="space-y-6">
@@ -168,42 +150,4 @@ function ProfilePageContent() {
       <ProfileTour />
     </div>
   )
-}
-
-function ProfileTour() {
-  const steps = [
-    { popover: { title: "Boas-vindas ao seu Perfil!", description: "Aqui é onde a comunidade vai te conhecer. Um perfil completo abre muitas portas." } },
-    { 
-      element: "#tour-tab-basic", 
-      onHighlightStarted: () => { document.getElementById("tour-tab-basic")?.click() },
-      popover: { title: "Perfil Básico", description: "Sua foto, nome e resumo (bio) são o seu cartão de visitas. Perfis bem preenchidos têm muito mais chances de receber pedidos e aceites na comunidade!" } 
-    },
-    {
-      element: "#tour-profile-public",
-      popover: { title: "Perfil Público", description: "Ative para ser visível na rede! Mentores precisam disso para aparecerem no catálogo. Mentorados precisam para que os mentores possam ler o perfil antes de aceitar." }
-    },
-    { 
-      element: "#tour-tab-career", 
-      onHighlightStarted: () => { document.getElementById("tour-tab-career")?.click() },
-      popover: { title: "O que você busca?", description: "Na aba Carreira e Interesses, deixe claro sua experiência e o que você espera das mentorias. Isso ajuda nossa IA a te recomendar para as pessoas certas." } 
-    },
-    { 
-      element: "#tour-tab-mentorship", 
-      onHighlightStarted: () => { document.getElementById("tour-tab-mentorship")?.click() },
-      popover: { title: "Seja um Mentor(a)!", description: "Compartilhar conhecimento é transformador! Se você tem experiência, ative seu perfil de mentor aqui. Retribuir à comunidade ensinando os outros é incrível." } 
-    },
-    { 
-      element: "#tour-tab-basic", 
-      onHighlightStarted: () => { document.getElementById("tour-tab-basic")?.click() },
-      popover: { title: "Tudo pronto?", description: "Volte para a primeira aba e comece a preencher seus dados. (Dica: A localização pode ser preenchida automaticamente usando o botão 'Detectar'!)" } 
-    },
-    { 
-      element: "#tour-profile-save", 
-      popover: { title: "Não esqueça de salvar", description: "Lembre-se sempre de clicar em 'Salvar perfil' no final para não perder suas alterações!" } 
-    }
-  ]
-
-  useOnboarding("ob_m4", steps)
-
-  return null
 }

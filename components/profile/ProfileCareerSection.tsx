@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useSimplePDFUpload } from "@/hooks/useSimpleUpload"
 import { MultiSelectAutocomplete } from "./MultiSelectAutocomplete"
-import { Field } from "./ProfileAboutSection"
+import { Field } from "./ProfileField"
 import type { ProfileFormData, ProfileFormPatch } from "./profile-form"
 
 interface ProfileCareerSectionProps {
