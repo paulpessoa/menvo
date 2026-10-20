@@ -245,3 +245,8 @@ PATCH antes de mexer). O resto é baixo.
 - L1-6: `admin-mentor-verification.repository.ts` (filas e `mentors_view` pela sessao), `verification-list.service.ts` (`assertAdmin`; CV via `AdminUserCvReader`), `verification.composition.ts` (unico `service_role`, lazy). `pending`, `completed` e `mentors` finas, com teste de rota.
 - L1-7: `notification.service.ts` virou `createMentorVerificationService` (ports de papeis/perfil/chat/e-mail, `assertAdmin`, auditoria `user_status_changed` com `details.reason = "mentor_verification"`). `verify`: 403 do service, 404 perfil inexistente, 500 com mensagem fixa; erro de escrita em papel agora falha (antes ignorado).
 - `fetchCvUrls` segue vivo so para `ai-menvo/mentor-review/draft` (rota de rascunho da IA, fora de L1-6/7). Pedido ao orquestrador: nenhum arquivo compartilhado editado; falta `AuditAction` proprio (ex.: `mentor_verification_decided`) em `audit-logger`.
+
+**L2-6 e L2-7 (feitos, sem migration).**
+- L2-6: `organizations`, `[id]`, `[id]/admins` e `org-leads` pela SESSAO (sem service_role) via `organizations.service.ts` (`assertAdmin`) e `createAdminOrganizationsRepository`/`createAdminOrgLeadsRepository`; id inexistente agora 404 e `[id]` invalido 400; `org-leads.service.ts` ficou so com `createOrganizationLead` (E8). Erro de banco: texto fixo.
+- L2-7: `invites/*` e `emails/*` com `invites.service.ts`/`emails.service.ts` (`assertAdmin`), port `lib/ports/admin-email.ts` + adapter Brevo; client privilegiado so em `ops.composition.ts`; `resolveAudience(params, db)` e `createInviteToken(params, db?)` recebem o client (cron de retencao segue com o default).
+- Pedido ao orquestrador: nenhum arquivo compartilhado editado; `AuditAction` ainda sem `invite_batch_sent` (usa `bulk_action`).

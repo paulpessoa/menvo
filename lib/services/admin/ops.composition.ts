@@ -10,8 +10,12 @@ import type { Database } from "@/lib/types/supabase"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { logAdminAction } from "@/lib/audit-logger"
 import { createOrganizationsRepository } from "@/lib/repositories/organizations.repository"
+import { brevoAdminEmail } from "@/lib/ports/adapters/admin-email.brevo"
+import { resolveAudience } from "@/lib/services/invites/audience.service"
+import { createInviteToken } from "@/lib/services/invites/invite-token.service"
 import {
   createAdminFeatureFlagsRepository,
+  createAdminInvitesRepository,
   createAdminOrganizationsRepository,
   createAdminOrgLeadsRepository,
   createAdminRetentionReadRepository,
@@ -24,6 +28,8 @@ import { getAdminOverview } from "./overview.service"
 import { createAdminRetentionService } from "./retention.service"
 import { createAdminFeatureFlagsService } from "./feature-flags.service"
 import { createAdminOrganizationsService } from "./organizations.service"
+import { createAdminInvitesService } from "./invites.service"
+import { createAdminEmailsService } from "./emails.service"
 
 function lazyPrivilegedClient() {
   let client: SupabaseClient<Database> | null = null
@@ -78,6 +84,33 @@ export function buildAdminOrganizationsService(sessionDb: SupabaseClient<Databas
     orgs: createOrganizationsRepository(sessionDb),
     leads: createAdminOrgLeadsRepository(sessionDb)
   })
+}
+
+/**
+ * Service de convites de reengajamento (L2-7, E7): audiência, token e escrita
+ * em `import_records` pelo client privilegiado lazy; e-mail pelo port Brevo.
+ * `request` (se vier) entra na trilha com IP e user agent.
+ */
+export function buildAdminInvitesService(
+  sessionDb: SupabaseClient<Database>,
+  request?: Request
+) {
+  const privileged = lazyPrivilegedClient()
+  return createAdminInvitesService({
+    sessionDb,
+    repo: () => createAdminInvitesRepository(privileged()),
+    audience: params => resolveAudience(params, privileged()),
+    createToken: params => createInviteToken(params, privileged()),
+    mailer: brevoAdminEmail,
+    audit: (adminId, details) =>
+      logAdminAction(adminId, "bulk_action", details, undefined, undefined, request),
+    appUrl: process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br"
+  })
+}
+
+/** Service dos modelos de e-mail do painel (L2-7): só sessão e port, sem banco. */
+export function buildAdminEmailsService(sessionDb: SupabaseClient<Database>) {
+  return createAdminEmailsService({ sessionDb, mailer: brevoAdminEmail })
 }
 
 /** Service de feature flags (E7 por ora): escreve pelo client privilegiado lazy. */

@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { z } from "zod"
+import { createClient } from "@/lib/utils/supabase/server"
 import { requireAdmin } from "@/lib/auth/require-admin"
-import { resolveAudience } from "@/lib/services/invites/audience.service"
-
-const bodySchema = z.object({
-  audience: z.enum(["selected", "jotform_not_invited", "never_signed_in", "all", "unresponsive_invitees"]),
-  campaign: z.string().trim().min(1).max(100),
-  userIds: z.array(z.string().uuid()).max(5000).optional(),
-  resend: z.boolean().optional()
-})
+import { inviteAudienceBodySchema } from "@/lib/schemas/admin"
+import { adminForbiddenResponse } from "@/lib/services/admin/assert-admin"
+import { buildAdminInvitesService } from "@/lib/services/admin/ops.composition"
 
 /**
  * Counts who a reengagement campaign would actually reach for a given
@@ -17,16 +12,17 @@ const bodySchema = z.object({
  * true number, never a guess.
  */
 export async function POST(request: NextRequest) {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard.response
+
+  const parsed = inviteAudienceBodySchema.safeParse(await request.json().catch(() => null))
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Parâmetros inválidos", details: parsed.error.flatten() }, { status: 400 })
+  }
+
   try {
-    const guard = await requireAdmin()
-    if (!guard.ok) return guard.response
-
-    const parsed = bodySchema.safeParse(await request.json().catch(() => null))
-    if (!parsed.success) {
-      return NextResponse.json({ error: "Parâmetros inválidos", details: parsed.error.flatten() }, { status: 400 })
-    }
-
-    const { eligible, skipped } = await resolveAudience(parsed.data)
+    const service = buildAdminInvitesService(await createClient(), request)
+    const { eligible, skipped } = await service.resolveAudience(parsed.data)
 
     // Returns the actual id list (not just a count): the admin modal
     // drives the send loop client-side in batches of 25
@@ -38,8 +34,9 @@ export async function POST(request: NextRequest) {
       skipped
     })
   } catch (error) {
+    const forbidden = adminForbiddenResponse(error)
+    if (forbidden) return forbidden
     console.error("[API INVITES AUDIENCE] Erro:", error)
-    const message = error instanceof Error ? error.message : "Erro interno do servidor"
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

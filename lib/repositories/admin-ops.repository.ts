@@ -260,6 +260,38 @@ export function createAdminOrgLeadsRepository(db: Db) {
   }
 }
 
+/** Dados do perfil que o convite de reengajamento usa. */
+export type InviteProfileRow = Pick<Tables<"profiles">, "id" | "email" | "full_name">
+
+/**
+ * Escritas e leituras do envio de convites (L2-7). Pede client privilegiado:
+ * lê `profiles` de quem não é o admin e escreve `import_records`, que só
+ * aceita `service_role` por desenho (exceção E7 do ADR 0008/0009).
+ */
+export function createAdminInvitesRepository(db: Db) {
+  return {
+    /** Perfis dos ids dados, numa consulta só (sem N+1). */
+    async findProfilesByIds(ids: string[]): Promise<InviteProfileRow[]> {
+      const { data, error } = await db.from("profiles").select("id, email, full_name").in("id", ids)
+      if (error) throw new RepositoryError("admin.invites.findProfiles", error)
+      return data ?? []
+    },
+
+    /**
+     * Marca o convite enviado. Upsert só do campo do convite: o merge preserva
+     * `origin_platform` e os dados importados se o registro já existir (e cria
+     * com origem `menvo` se não).
+     */
+    async markInviteSent(userId: string): Promise<void> {
+      const { error } = await db
+        .from("import_records")
+        .upsert({ user_id: userId, invite_sent_at: new Date().toISOString() }, { onConflict: "user_id" })
+      if (error) throw new RepositoryError("admin.invites.markSent", error)
+    }
+  }
+}
+
+export type AdminInvitesRepository = ReturnType<typeof createAdminInvitesRepository>
 export type AdminOrganizationsRepository = ReturnType<typeof createAdminOrganizationsRepository>
 export type AdminOrgLeadsRepository = ReturnType<typeof createAdminOrgLeadsRepository>
 export type AdminFeatureFlagsRepository = ReturnType<typeof createAdminFeatureFlagsRepository>
