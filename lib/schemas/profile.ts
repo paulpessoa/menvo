@@ -69,7 +69,9 @@ export type UpdateProfileInput = z.infer<typeof updateProfileSchema>
  * `job_title: null` quando o campo está vazio, e isso não pode apagar nada nem
  * dar 400.
  */
-const ignoreIfInvalid = <T extends z.ZodTypeAny>(schema: T) => schema.optional().catch(undefined)
+const ignoreIfInvalid = <T extends z.ZodTypeAny>(schema: T) =>
+  // preprocess em vez de `.catch()`: o gerador de OpenAPI não entende ZodCatch.
+  z.preprocess((value) => (schema.safeParse(value).success ? value : undefined), schema.optional())
 
 /** Dados de perfil que o onboarding envia junto com o papel escolhido. */
 export const roleProfileDataSchema = z.object({
@@ -118,3 +120,104 @@ export const requestMentorSchema = z.object({
   what_to_expect: z.preprocess(trimmedOrEmpty, z.string()),
 })
 export type RequestMentorInput = z.infer<typeof requestMentorSchema>
+
+// ---------------------------------------------------------------------------
+// Saída (camada 4 → contrato OpenAPI, camada 9)
+// Usados SÓ para documentar e testar o contrato. Não validam a resposta em
+// runtime: uma linha antiga com valor fora do esperado não pode virar 500.
+// ---------------------------------------------------------------------------
+
+const nullableText = z.string().nullable()
+const nullableTextList = z.array(z.string()).nullable()
+
+/**
+ * Perfil do próprio usuário como `/api/profile` devolve: colunas de `profiles`
+ * (OWN_PROFILE_COLUMNS) + mentor e mentorado achatados + `cv_url` já como link
+ * da Menvo. `profile.contract.test.ts` garante que as chaves batem com as listas
+ * do código, para o contrato não divergir como `is_public` divergiu em 2026-10-15.
+ */
+export const ownProfileSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string(),
+  first_name: nullableText,
+  last_name: nullableText,
+  full_name: nullableText,
+  avatar_url: nullableText,
+  slug: nullableText,
+  bio: nullableText,
+  expertise_areas: nullableTextList,
+  linkedin_url: nullableText,
+  created_at: z.string(),
+  updated_at: z.string(),
+  city: nullableText,
+  state: nullableText,
+  country: nullableText,
+  timezone: nullableText,
+  languages: nullableTextList,
+  job_title: nullableText,
+  company: nullableText,
+  mentorship_topics: nullableTextList,
+  github_url: nullableText,
+  website_url: nullableText,
+  phone: nullableText,
+  portfolio_url: nullableText,
+  onboarding_flags: z.record(z.unknown()),
+  is_public: z.boolean().nullable(),
+  // mentor_profiles, achatado
+  experience_years: z.number().nullable(),
+  free_topics: nullableTextList,
+  inclusive_tags: nullableTextList,
+  mentorship_approach: nullableText,
+  what_to_expect: nullableText,
+  ideal_mentee: nullableText,
+  is_volunteer: z.boolean(),
+  chat_enabled: z.boolean(),
+  availability_status: z.string(),
+  verification_status: z.enum(["pending", "approved", "rejected", "changes_requested"]).nullable(),
+  verified_at: nullableText,
+  verified: z.boolean(),
+  is_pending_mentor: z.boolean(),
+  // mentee_profiles, achatado
+  institution: nullableText,
+  course: nullableText,
+  academic_level: nullableText,
+  expected_graduation: nullableText,
+  learning_goals: nullableText,
+  cv_url: nullableText,
+})
+export type OwnProfileOutput = z.infer<typeof ownProfileSchema>
+
+export const getProfileResponseSchema = z.object({ profile: ownProfileSchema })
+export const updateProfileResponseSchema = z.object({ message: z.string(), profile: ownProfileSchema })
+
+export const onboardingFlagsResponseSchema = z.object({
+  success: z.literal(true),
+  onboarding_flags: z.record(z.unknown()),
+})
+
+export const roleResponseSchema = z.object({
+  success: z.literal(true),
+  message: z.string(),
+  role: z.enum(["mentor", "mentee"]),
+  /** `pending` para quem pediu mentoria (aguarda o admin), `approved` para mentorado. */
+  status: z.enum(["pending", "approved"]),
+})
+
+export const requestMentorResponseSchema = z.object({
+  data: z.object({
+    id: z.string().uuid(),
+    is_pending_mentor: z.boolean(),
+    verification_status: z.string().nullable(),
+  }),
+  message: z.string().optional(),
+})
+
+export const stopMentorResponseSchema = z.object({
+  data: z.object({ id: z.string().uuid(), is_public: z.boolean().nullable(), verified: z.literal(false) }),
+  message: z.string().optional(),
+})
+
+export const deleteAccountResponseSchema = z.object({ success: z.literal(true), filesRemoved: z.number() })
+
+/** Erro de `/api/profile`: `details` traz a mensagem crua do banco (decisão D4 pendente). */
+export const profileErrorSchema = z.object({ error: z.string(), details: z.string().optional() })

@@ -4,16 +4,18 @@
  * duas rotas: o formulário abria com "Perfil público" desligado e cada "Salvar"
  * tirava o mentor do catálogo. Nenhum teste ligava as listas. Estes ligam.
  */
-import { updateProfileSchema } from "@/lib/schemas/profile"
+import { ownProfileSchema, updateProfileSchema } from "@/lib/schemas/profile"
 import { OWN_PROFILE_COLUMNS } from "@/lib/services/auth/own-profile-columns"
 import {
   MENTOR_EDITABLE_FIELDS,
   MENTOR_PROFILE_EMBED,
+  withMentorFields,
 } from "@/lib/services/mentors/mentor-profile-fields"
 import {
   MENTEE_EDITABLE_FIELDS,
   MENTEE_PROFILE_EMBED,
   MENTEE_PROFILE_EMBED_WITH_CV,
+  withMenteeFields,
 } from "@/lib/services/mentees/mentee-profile-fields"
 
 const ownColumns = OWN_PROFILE_COLUMNS.split(",").map(c => c.trim())
@@ -54,5 +56,16 @@ describe("campos editáveis x embeds", () => {
 
   it("o embed completo de mentorado é o simples mais cv_url", () => {
     expect(embedColumns(MENTEE_PROFILE_EMBED_WITH_CV)).toEqual([...embedColumns(MENTEE_PROFILE_EMBED), "cv_url"])
+  })
+})
+
+describe("contrato OpenAPI do perfil", () => {
+  it("ownProfileSchema tem exatamente as chaves que a API devolve", () => {
+    const returned = new Set([
+      ...ownColumns,
+      ...Object.keys(withMentorFields({})),
+      ...Object.keys(withMenteeFields({})),
+    ])
+    expect(Object.keys(ownProfileSchema.shape).sort()).toEqual([...returned].sort())
   })
 })
