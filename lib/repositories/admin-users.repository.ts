@@ -8,6 +8,10 @@
  *  - `AdminUserCvReader` lê `mentee_profiles.cv_url` e roda com o client
  *    privilegiado (ADR 0009): a coluna não tem grant para `authenticated`. O
  *    client chega como função e só nasce quando alguém pede.
+ * A ESCRITA segue a mesma divisão: `profiles` não tem policy de escrita para
+ * admin (E7), então `AdminProfileWriter` é privilegiado; `mentee_profiles` e
+ * `user_roles` têm policy `is_admin()`, então `AdminUserAccessWriter` roda com
+ * a SESSÃO e o banco ainda recusa quem não for admin.
  * Não faz: conferir se quem chama é admin (`assertAdmin` no service) nem
  * montar o formato da resposta (o service achata).
  * Tradeoff: o select é montado por filtro (`!inner` muda o nível do filtro no
@@ -15,7 +19,8 @@
  * por `AdminProfileRow`, a mesma forma que a rota já assumia.
  */
 import type { SupabaseClient } from "@supabase/supabase-js"
-import type { Database } from "@/lib/types/supabase"
+import type { Database, Tables, TablesUpdate } from "@/lib/types/supabase"
+import type { MenteeEditableFields } from "@/lib/services/mentees/mentee-profile-fields"
 import type { AdminUsersQuery } from "@/lib/schemas/admin-users"
 import { MENTOR_PROFILE_EMBED } from "@/lib/services/mentors/mentor-profile-fields"
 import { RepositoryError } from "./repository-error"
@@ -157,6 +162,62 @@ export function createAdminUserCvReader(getDb: () => SupabaseClient<Database>): 
         .not("cv_url", "is", null)
       if (error) throw new RepositoryError("adminUsers.findStoredCvUrls", error)
       return (data ?? []).flatMap((row) => (row.cv_url ? [{ user_id: row.user_id, cv_url: row.cv_url }] : []))
+    },
+  }
+}
+
+export interface AdminProfileWriter {
+  /** Atualiza `profiles` e devolve a linha gravada. Lança se o perfil não existe. */
+  update(userId: string, patch: TablesUpdate<"profiles">): Promise<Tables<"profiles">>
+}
+
+export interface AdminUserAccessWriter {
+  /** Cria ou atualiza a linha de `mentee_profiles` do usuário. */
+  upsertMentee(userId: string, fields: MenteeEditableFields): Promise<void>
+  /** Nomes dos papéis atuais do usuário. */
+  findRoleNames(userId: string): Promise<string[]>
+  /** Apaga todos os papéis e grava os dados (não é atômico: M-A1, D4). */
+  replaceRoles(userId: string, roleIds: readonly number[]): Promise<void>
+}
+
+/**
+ * Privilegiado (ADR 0009). O service já conferiu `assertAdmin`; o client só
+ * nasce aqui dentro, na hora da escrita.
+ */
+export function createAdminProfileWriter(getDb: () => SupabaseClient<Database>): AdminProfileWriter {
+  return {
+    async update(userId, patch) {
+      const { data, error } = await getDb().from("profiles").update(patch).eq("id", userId).select().single()
+      if (error) throw new RepositoryError("adminUsers.updateProfile", error)
+      return data
+    },
+  }
+}
+
+/** Pela sessão do admin: as policies `is_admin()` de `mentee_profiles` e `user_roles` liberam. */
+export function createAdminUserAccessWriter(db: SupabaseClient<Database>): AdminUserAccessWriter {
+  return {
+    async upsertMentee(userId, fields) {
+      const { error } = await db
+        .from("mentee_profiles")
+        .upsert({ user_id: userId, ...fields }, { onConflict: "user_id" })
+      if (error) throw new RepositoryError("adminUsers.upsertMentee", error)
+    },
+
+    async findRoleNames(userId) {
+      const { data, error } = await db.from("user_roles").select("roles(name)").eq("user_id", userId)
+      if (error) throw new RepositoryError("adminUsers.findRoleNames", error)
+      return (data ?? []).flatMap((row) => (row.roles?.name ? [row.roles.name] : []))
+    },
+
+    async replaceRoles(userId, roleIds) {
+      const removed = await db.from("user_roles").delete().eq("user_id", userId)
+      if (removed.error) throw new RepositoryError("adminUsers.replaceRoles", removed.error)
+      if (roleIds.length === 0) return
+      const inserted = await db
+        .from("user_roles")
+        .insert(roleIds.map((role_id) => ({ user_id: userId, role_id })))
+      if (inserted.error) throw new RepositoryError("adminUsers.replaceRoles", inserted.error)
     },
   }
 }
