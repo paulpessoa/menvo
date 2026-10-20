@@ -14,7 +14,7 @@ const API_DIR = path.join(process.cwd(), "app", "api")
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const
 
 /** Domínios já no padrão: toda rota deles precisa estar no documento. */
-const documentedDomains = ["quiz", "mentors", "legal"]
+const documentedDomains = ["quiz", "mentors", "legal", "profile"]
 
 /** Rotas de infraestrutura da própria documentação. */
 const ignoredDomains = ["openapi"]
@@ -27,7 +27,7 @@ const pendingDomains = [
   "admin", "ai", "appointments", "assistant", "auth", "calendar", "chat",
   "community", "contact", "cron", "cv", "dashboard", "diagnostic",
   "feature-flags", "feedback", "invites", "mcp", "me", "org",
-  "profile", "reports", "suggestions", "upload",
+  "reports", "suggestions", "upload",
 ]
 
 function routeFiles(dir: string): string[] {
