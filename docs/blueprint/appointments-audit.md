@@ -350,6 +350,12 @@ select tgname, pg_get_triggerdef(oid) from pg_trigger where tgrelid='public.appo
 | 9 | 8 · `availability` | 5–8 | opcional `20261020000200` | idem |
 | 10 | 9 · remoções e demais escritores | 5, 7 | não | só apaga o que não tem chamador |
 | 11–14 | 10–13 · OpenAPI, query layer, componentes, agentes | 9–11, 14 | não | um PR por camada |
+## Handoff (Grupo 8 · availability, PR 9)
+
+- `computeAvailableSlots(deps, mentorId, de, ate)` recebe `{ availability, appointments }` (só `listByMentor` do repository de mentor_availability e `listBusyIntervals`); sem `.from()` no service e sem `any`. Retorno, timeout de 3s do Google e fallback silencioso intactos.
+- A rota `GET /api/appointments/availability` não cria client: chama `buildPublicAvailabilityDeps()` em `appointments.composition.ts`, o único lugar onde nasce o `service_role` dessa exceção (E6, ADR 0008), por chamada e nunca no import. A tool `getMentorAvailability` do assistente usa `buildAvailabilityDeps(sessão)`: mesma visão de antes (RLS do chamador).
+- Sem migration. A RPC `mentor_busy_slots` e a leitura de `mentor_availability` com `anon` ficam para uma onda futura; só então o `service_role` sai. Teste novo: `availability.service.test.ts`.
+
 ## Handoff (Grupo 9 remoções + D4 validade do token)
 
 - Apagados (D3): `PATCH/DELETE /api/appointments/[id]`, `GET /api/appointments/schedule` (o POST ficou), `POST /api/appointments/action` e a página `app/[locale]/appointments/action`. Nenhum e-mail apontava para eles (`brevo.ts:346` usa `/appointments/confirm`).
