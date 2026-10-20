@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 import { requireAdmin } from "@/lib/auth/require-admin"
-import { deleteUserCompletely } from "@/lib/services/admin/delete-user.service"
+import { buildAdminDeleteUser } from "@/lib/services/admin/delete-user.composition"
 import { adminUserPatchBodySchema } from "@/lib/schemas/admin-users"
 import { adminForbiddenResponse } from "@/lib/services/admin/assert-admin"
 import { adminSelfActionResponse } from "@/lib/services/admin/self-action.error"
@@ -44,8 +44,13 @@ export async function PATCH(
   }
 }
 
+/**
+ * Remove a conta de um usuário. A rota autentica e delega: `assertAdmin` e a
+ * regra de não apagar a própria conta ficam no service; o client privilegiado
+ * vem da composition.
+ */
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -54,23 +59,18 @@ export async function DELETE(
 
     const { id } = await params
 
-    if (id === guard.admin.userId) {
-      return NextResponse.json(
-        { error: "Você não pode remover a própria conta de administrador" },
-        { status: 400 }
-      )
-    }
-
-    const result = await deleteUserCompletely(id, { source: "admin" })
+    const supabase = await createClient()
+    const result = await buildAdminDeleteUser(supabase)(guard.admin.userId, id)
 
     return NextResponse.json({
       success: true,
       message: "Usuário removido permanentemente",
       filesRemoved: result.filesRemoved
     })
-
-  } catch (error: any) {
+  } catch (error) {
+    const known = adminForbiddenResponse(error) ?? adminSelfActionResponse(error)
+    if (known) return known
     console.error("Erro ao deletar usuário:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: "Erro ao remover usuário" }, { status: 500 })
   }
 }
