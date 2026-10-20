@@ -87,6 +87,46 @@ export function isActiveAdmin(member: Pick<OrgDashboardMember, "role" | "status"
   return member.role === "admin" && member.status === "active"
 }
 
+/** Uma sessão de um membro da org, só com o que o relatório de impacto usa. */
+export interface OrgAppointment {
+  id: string
+  mentee_id: string
+  mentor_id: string
+  status: string
+  /** `null` em sessões antigas; o relatório assume 45 min. */
+  duration_minutes: number | null
+  /** Notas de feedback (1-5) já sem os `null`. */
+  ratings: number[]
+}
+
+const DEFAULT_SESSION_MINUTES = 45
+
+/**
+ * Impacto das sessões concluídas. Uma sessão entre dois membros da mesma org
+ * aparece nas duas listas (como mentorado de um e mentor do outro) e conta
+ * UMA vez (por id). Duração ausente vale 45 min; a nota média arredonda a 1
+ * casa e é `null` sem nenhuma nota.
+ */
+export function computeSessionImpact(
+  booked: readonly OrgAppointment[],
+  given: readonly OrgAppointment[]
+): Pick<OrgDashboardImpact, "totalSessionsCompleted" | "totalHoursCompleted" | "averageRating"> {
+  const completed = new Map<string, OrgAppointment>()
+  for (const appointment of [...booked, ...given]) {
+    if (appointment.status === "completed" && appointment.id) completed.set(appointment.id, appointment)
+  }
+
+  const sessions = Array.from(completed.values())
+  const minutes = sessions.reduce((sum, a) => sum + (a.duration_minutes || DEFAULT_SESSION_MINUTES), 0)
+  const ratings = sessions.flatMap(a => a.ratings)
+
+  return {
+    totalSessionsCompleted: sessions.length,
+    totalHoursCompleted: Number((minutes / 60).toFixed(1)),
+    averageRating: ratings.length > 0 ? Number((ratings.reduce((a, r) => a + r, 0) / ratings.length).toFixed(1)) : null,
+  }
+}
+
 /**
  * Cartões do topo do dashboard. Beneficiário é todo membro ativo que não é
  * mentor; sessões só contam membros ativos (convite pendente não soma).
