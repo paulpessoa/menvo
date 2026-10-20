@@ -3,22 +3,17 @@
 import { MenvoDots } from "@/components/ui/menvo-loader"
 import { useCallback, useEffect, useState } from "react"
 import { PageContainer } from "@/components/layout/PageContainer"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table"
-import { Building2, Check, X, UserPlus, Trash2, Users, GraduationCap, CalendarCheck, Loader2, Download, Clock, Sparkles, Star } from "lucide-react"
+import { Building2, Check, X, UserPlus, Users, GraduationCap, CalendarCheck, Loader2, Download, Clock, Sparkles, Star } from "lucide-react"
 import { toast } from "sonner"
+import type { OrgDashboardMember, OrgDashboardSummary } from "@/lib/domain/organizations/organization.entity"
+import { buildOrgImpactCsv, orgImpactCsvFilename } from "@/lib/domain/organizations/org-report.csv"
+import { MembersCard } from "@/components/organizations/dashboard/MembersCard"
+import { downloadCsv } from "@/components/organizations/dashboard/downloadCsv"
 
 interface OrgOption {
   id: string
@@ -26,83 +21,8 @@ interface OrgOption {
   name: string
 }
 
-interface Member {
-  userId: string
-  role: "admin" | "member"
-  status: "invited" | "requested" | "active"
-  platformRole: "mentor" | "mentee" | null
-  joinedAt: string
-  fullName: string | null
-  email: string | null
-  sessionsBooked: number
-  sessionsGiven: number
-  quizDone: boolean
-}
-
-interface Summary {
-  beneficiaries: number
-  mentors: number
-  pendingRequests: number
-  pendingInvites: number
-  sessionsBookedByBeneficiaries: number
-  sessionsGivenByOrgMentors: number
-  impact?: {
-    period: "all" | "30d" | "90d" | "1y"
-    totalSessionsCompleted: number
-    totalHoursCompleted: number
-    totalDiagnosticsDone: number
-    averageRating: number | null
-  }
-}
-
-function MemberRow({
-  m,
-  showSessions,
-  onRemove,
-  busy
-}: {
-  m: Member
-  showSessions: "booked" | "given"
-  onRemove: (userId: string, label: string) => void
-  busy: boolean
-}) {
-  return (
-    <TableRow className={m.status === "invited" ? "opacity-60" : undefined}>
-      <TableCell className="font-medium">{m.fullName ?? "-"}</TableCell>
-      <TableCell className="text-muted-foreground">{m.email ?? "-"}</TableCell>
-      <TableCell>
-        {m.status === "invited" ? (
-          <Badge variant="outline">Convidado</Badge>
-        ) : (
-          <Badge variant={m.role === "admin" ? "default" : "secondary"}>
-            {m.role === "admin" ? "Admin" : "Membro"}
-          </Badge>
-        )}
-      </TableCell>
-      {showSessions === "booked" ? (
-        <>
-          <TableCell>{m.quizDone ? "Sim" : "Não"}</TableCell>
-          <TableCell>{m.sessionsBooked}</TableCell>
-        </>
-      ) : (
-        <TableCell>{m.sessionsGiven}</TableCell>
-      )}
-      <TableCell className="text-right">
-        {m.role !== "admin" && (
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => onRemove(m.userId, m.status === "invited" ? "Convite cancelado" : "Membro removido")}
-            disabled={busy}
-            aria-label="Remover"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        )}
-      </TableCell>
-    </TableRow>
-  )
-}
+type Member = OrgDashboardMember
+type Summary = OrgDashboardSummary
 
 export default function OrgAdminDashboardPage() {
   const [loading, setLoading] = useState(true)
@@ -139,57 +59,14 @@ export default function OrgAdminDashboardPage() {
 
   const exportCsv = () => {
     if (!organization || !summary) return
-    const periodLabels: Record<string, string> = {
-      all: "Todo o período",
-      "30d": "Últimos 30 dias",
-      "90d": "Últimos 90 dias",
-      "1y": "Último ano",
-    }
-    const periodText = periodLabels[selectedPeriod] || selectedPeriod
-
-    const lines: string[] = [
-      `Relatório de Impacto - Organização: "${organization.name}"`,
-      `Período: "${periodText}"`,
-      `Data de Emissão: "${new Date().toLocaleDateString("pt-BR")}"`,
-      `Sessões Concluídas: "${summary.impact?.totalSessionsCompleted ?? 0}"`,
-      `Horas de Mentoria: "${summary.impact?.totalHoursCompleted ?? 0}h"`,
-      `Diagnósticos Realizados: "${summary.impact?.totalDiagnosticsDone ?? 0}"`,
-      `Nota Média: "${summary.impact?.averageRating ? summary.impact.averageRating.toFixed(1) : "N/A"}"`,
-      "",
-      "Nome,E-mail,Papel na Organização,Perfil Plataforma,Status,Sessões Solicitadas,Sessões Ministradas,Diagnóstico Concluído,Data de Entrada",
-    ]
-
-    for (const m of members) {
-      const escape = (val: string | null | undefined) => `"${(val || "").replace(/"/g, '""')}"`
-      const roleLabel = m.role === "admin" ? "Admin" : "Membro"
-      const platformRoleLabel = m.platformRole === "mentor" ? "Mentor" : "Beneficiário"
-      const statusLabel = m.status === "invited" ? "Convidado" : m.status === "requested" ? "Solicitado" : "Ativo"
-      const quizLabel = m.quizDone ? "Sim" : "Não"
-      const dateLabel = m.joinedAt ? new Date(m.joinedAt).toLocaleDateString("pt-BR") : ""
-
-      lines.push([
-        escape(m.fullName),
-        escape(m.email),
-        escape(roleLabel),
-        escape(platformRoleLabel),
-        escape(statusLabel),
-        m.sessionsBooked,
-        m.sessionsGiven,
-        escape(quizLabel),
-        escape(dateLabel),
-      ].join(","))
-    }
-
-    const csvContent = "\uFEFF" + lines.join("\r\n")
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement("a")
-    link.setAttribute("href", url)
-    link.setAttribute("download", `relatorio-impacto-${organization.slug}-${selectedPeriod}.csv`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+    const csv = buildOrgImpactCsv({
+      orgName: organization.name,
+      period: selectedPeriod,
+      summary,
+      members,
+      issuedAt: new Date(),
+    })
+    downloadCsv(orgImpactCsvFilename(organization.slug, selectedPeriod), csv)
     toast.success("Relatório CSV exportado com sucesso!")
   }
 
@@ -546,66 +423,26 @@ export default function OrgAdminDashboardPage() {
       </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Beneficiários ({beneficiaries.filter(m => m.status === "active").length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {beneficiaries.length === 0 ? (
-              <p className="text-muted-foreground text-center py-10 text-sm">
-                Ainda não há beneficiários. Convide por e-mail ou compartilhe <code>/o/{organization?.slug}</code>.
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>E-mail</TableHead>
-                    <TableHead>Papel</TableHead>
-                    <TableHead>Quiz</TableHead>
-                    <TableHead>Sessões</TableHead>
-                    <TableHead />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {beneficiaries.map(m => (
-                    <MemberRow key={m.userId} m={m} showSessions="booked" onRemove={remove} busy={busyUserId === m.userId} />
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Mentores da organização ({orgMentors.filter(m => m.status === "active").length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {orgMentors.length === 0 ? (
-              <p className="text-muted-foreground text-center py-10 text-sm">
-                Nenhum mentor vinculado ainda. Convide um mentor que já tem conta na Menvo.
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>E-mail</TableHead>
-                    <TableHead>Papel</TableHead>
-                    <TableHead>Sessões dadas</TableHead>
-                    <TableHead />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {orgMentors.map(m => (
-                    <MemberRow key={m.userId} m={m} showSessions="given" onRemove={remove} busy={busyUserId === m.userId} />
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        <MembersCard
+          title={`Beneficiários (${beneficiaries.filter(m => m.status === "active").length})`}
+          members={beneficiaries}
+          variant="booked"
+          onRemove={remove}
+          busyUserId={busyUserId}
+          emptyMessage={
+            <>
+              Ainda não há beneficiários. Convide por e-mail ou compartilhe <code>/o/{organization?.slug}</code>.
+            </>
+          }
+        />
+        <MembersCard
+          title={`Mentores da organização (${orgMentors.filter(m => m.status === "active").length})`}
+          members={orgMentors}
+          variant="given"
+          onRemove={remove}
+          busyUserId={busyUserId}
+          emptyMessage="Nenhum mentor vinculado ainda. Convide um mentor que já tem conta na Menvo."
+        />
       </div>
     </PageContainer>
   )
