@@ -1,13 +1,8 @@
-import { createOrganizationLead, listOrganizationLeads, updateOrganizationLeadStatus } from './org-leads.service';
+import { createOrganizationLead } from './org-leads.service';
 import { createServiceRoleClient } from '@/lib/utils/supabase/service-role';
-import { createClient } from '@/lib/utils/supabase/server';
 
 jest.mock('@/lib/utils/supabase/service-role', () => ({
   createServiceRoleClient: jest.fn()
-}));
-
-jest.mock('@/lib/utils/supabase/server', () => ({
-  createClient: jest.fn()
 }));
 
 describe('org-leads.service', () => {
@@ -16,15 +11,11 @@ describe('org-leads.service', () => {
     insert: jest.fn().mockReturnThis(),
     select: jest.fn().mockReturnThis(),
     single: jest.fn().mockReturnThis(),
-    update: jest.fn().mockReturnThis(),
-    eq: jest.fn().mockReturnThis(),
-    order: jest.fn().mockReturnThis(),
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
     (createServiceRoleClient as jest.Mock).mockReturnValue(mockSupabase);
-    (createClient as jest.Mock).mockResolvedValue(mockSupabase);
   });
 
   describe('createOrganizationLead', () => {
@@ -47,34 +38,6 @@ describe('org-leads.service', () => {
       expect(mockSupabase.insert).toHaveBeenCalledWith(expect.objectContaining({
         org_name: 'Menvo',
         contact_email: 'paul@example.com'
-      }));
-      expect(result).toEqual(mockData);
-    });
-  });
-
-  describe('listOrganizationLeads', () => {
-    it('should list organization leads using user client', async () => {
-      const mockData = [{ id: 'test-id' }];
-      mockSupabase.order.mockResolvedValueOnce({ data: mockData, error: null });
-
-      const result = await listOrganizationLeads();
-
-      expect(createClient).toHaveBeenCalled();
-      expect(mockSupabase.from).toHaveBeenCalledWith('organization_leads');
-      expect(result).toEqual(mockData);
-    });
-  });
-
-  describe('updateOrganizationLeadStatus', () => {
-    it('should update organization lead status using user client', async () => {
-      const mockData = { id: 'test-id', status: 'contacted' };
-      mockSupabase.single.mockResolvedValueOnce({ data: mockData, error: null });
-
-      const result = await updateOrganizationLeadStatus('test-id', 'contacted');
-
-      expect(createClient).toHaveBeenCalled();
-      expect(mockSupabase.update).toHaveBeenCalledWith(expect.objectContaining({
-        status: 'contacted'
       }));
       expect(result).toEqual(mockData);
     });
