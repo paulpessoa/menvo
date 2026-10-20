@@ -1,190 +1,30 @@
+import { NextRequest } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
-import { NextRequest, NextResponse } from "next/server"
-import {
-  errorResponse,
-  handleApiError,
-  successResponse
-} from "@/lib/api/error-handler"
+import { handleApiError, successResponse } from "@/lib/api/error-handler"
 import { requireAdmin } from "@/lib/auth/require-admin"
 import { adminUsersQuerySchema } from "@/lib/schemas/admin-users"
-import { MENTOR_PROFILE_EMBED, withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
-import { MENTEE_PROFILE_EMBED, withMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
-import { fetchCvUrls } from "@/lib/services/mentees/mentee-cv.service"
+import { adminForbiddenResponse } from "@/lib/services/admin/assert-admin"
+import { buildAdminUsersService } from "@/lib/services/admin/users.composition"
 
-/** Profile row as returned by the list query: the select string is built dynamically, so supabase-js cannot infer it. */
-type AdminProfileRow = Record<string, unknown> & {
-  import_records: { origin_platform: string; invite_sent_at: string | null } | null
-  mentor_profiles?: unknown
-  mentee_profiles?: unknown
-}
-
+/**
+ * Lista paginada de usuários para o painel admin. A rota só autentica (401/403
+ * pelo `requireAdmin`), valida a query e delega: a regra e o `assertAdmin`
+ * ficam no service.
+ */
 export async function GET(request: NextRequest) {
   try {
     const guard = await requireAdmin()
     if (!guard.ok) return guard.response
 
+    const query = adminUsersQuerySchema.parse(
+      Object.fromEntries(new URL(request.url).searchParams)
+    )
+
     const supabase = await createClient()
+    const result = await buildAdminUsersService(supabase).listUsers(query)
 
-    // 2. Buscar parâmetros de paginação e filtro
-    const { searchParams } = new URL(request.url)
-    const {
-      page,
-      limit,
-      search,
-      origin,
-      role,
-      status,
-      sort_by: sortBy,
-      sort_order: sortOrder
-    } = adminUsersQuerySchema.parse(Object.fromEntries(searchParams))
-
-    const from = (page - 1) * limit
-    const to = from + limit - 1
-
-    // 3. Query base
-    // Dados de importação vivem em import_records (1:1, só admin lê). Com
-    // filtro de origem JotForm usamos !inner para filtrar o nível de profiles.
-    const importEmbed = origin === "jotform" ? "import_records!inner (origin_platform, invite_sent_at)" : "import_records (origin_platform, invite_sent_at)"
-
-    // Verificação mora em mentor_profiles; com filtro de status usamos !inner
-    // para filtrar o nível de profiles (embed nulo + or() não funciona no PostgREST).
-    const filtersByStatus = status === "pending" || status === "verified"
-    const mentorEmbed = filtersByStatus
-      ? MENTOR_PROFILE_EMBED.replace("mentor_profiles(", "mentor_profiles!inner(")
-      : MENTOR_PROFILE_EMBED
-
-    let selectStr = `
-      *,
-      ${importEmbed},
-      ${mentorEmbed},
-      user_roles (
-        roles (
-          name
-        )
-      )
-    `
-
-    // Se houver filtro de role, usamos !inner para filtrar o nível superior (Profiles)
-    if (role === "mentor" || role === "mentee") {
-      selectStr = `
-        *,
-        ${importEmbed},
-        ${mentorEmbed},
-        user_roles!inner (
-          roles!inner (
-            name
-          )
-        )
-      `
-    }
-
-    let query = supabase
-      .from("profiles")
-      .select(selectStr, { count: "exact" })
-
-    // Filtro por papel (role)
-    if (role === "mentor") {
-      query = query.eq("user_roles.roles.name", "mentor")
-    } else if (role === "mentee") {
-      query = query.eq("user_roles.roles.name", "mentee")
-    }
-
-    // Filtro por status
-    if (status === "pending") {
-      query = query.eq("mentor_profiles.verification_status", "pending")
-    } else if (status === "verified") {
-      query = query.eq("mentor_profiles.verification_status", "approved")
-    }
-
-    // Filtro de busca
-    if (search) {
-      query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%`)
-    }
-
-    // Filtro de origem
-    // "jotform" = tem registro de importação com origem jotform;
-    // "menvo" = nunca foi importado (sem registro).
-    if (origin === "jotform") {
-      query = query.eq("import_records.origin_platform", "jotform")
-    } else if (origin === "menvo") {
-      query = query.is("import_records", null)
-    }
-
-    // Ordenação
-    const isAscending = sortOrder === "asc"
-    if (sortBy === "full_name") {
-      query = query.order("full_name", { ascending: isAscending })
-    } else {
-      query = query.order("created_at", { ascending: isAscending })
-    }
-
-    let paginatedQuery = query.range(from, to)
-    
-    let { data: profiles, error: profilesError, count } = await paginatedQuery
-
-    if (profilesError) throw profilesError
-
-    // 4. Buscar contagens para as abas de forma eficiente
-    const { count: totalCount } = await supabase
-      .from("profiles")
-      .select("*", { count: "exact", head: true })
-
-    const { count: pendingCount } = await supabase
-      .from("mentor_profiles")
-      .select("user_id", { count: "exact", head: true })
-      .eq("verification_status", "pending")
-
-    const { count: mentorsCount } = await supabase
-      .from("profiles")
-      .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })
-      .eq("user_roles.roles.name", "mentor")
-
-    const { count: menteesCount } = await supabase
-      .from("profiles")
-      .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })
-      .eq("user_roles.roles.name", "mentee")
-
-
-
-    const { count: menvoOriginCount } = await supabase
-      .from("profiles")
-      .select("id, import_records(user_id)", { count: "exact", head: true })
-      .is("import_records", null)
-
-    const { count: jotformOriginCount } = await supabase
-      .from("import_records")
-      .select("*", { count: "exact", head: true })
-      .eq("origin_platform", "jotform")
-
-    const cvUrls = await fetchCvUrls(((profiles ?? []) as unknown as AdminProfileRow[]).map((p) => p.id as string))
-
-    return successResponse({
-      // Achata import_records para manter o formato que o painel já consome
-      // (origin_platform e invite_sent_at no próprio usuário).
-      // Campos de mentor e verificação também são achatados (withMentorFields).
-      users: ((profiles ?? []) as unknown as AdminProfileRow[]).map(({ import_records, ...profile }) => ({
-        ...withMenteeFields(withMentorFields(profile)),
-        cv_url: cvUrls.get(profile.id as string) ?? null,
-        origin_platform: import_records?.origin_platform ?? "menvo",
-        invite_sent_at: import_records?.invite_sent_at ?? null
-      })),
-      pagination: {
-        page,
-        limit,
-        total: count || 0,
-        totalPages: Math.ceil((count || 0) / limit)
-      },
-      counts: {
-        all: totalCount || 0,
-        pending: pendingCount || 0,
-        mentors: mentorsCount || 0,
-        mentees: menteesCount || 0,
-
-        menvoOrigin: menvoOriginCount || 0,
-        jotformOrigin: jotformOriginCount || 0
-      }
-    })
+    return successResponse(result)
   } catch (error) {
-    return handleApiError(error)
+    return adminForbiddenResponse(error) ?? handleApiError(error)
   }
 }
