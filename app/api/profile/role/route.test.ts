@@ -19,6 +19,13 @@ jest.mock('@supabase/supabase-js', () => {
   }
 })
 
+/** Leitura do status de verificação: ninguém aqui é mentor aprovado. */
+const notApprovedMentorRead = () => ({
+  select: jest.fn().mockReturnValue({
+    eq: jest.fn().mockReturnValue({ maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }) }),
+  }),
+})
+
 describe('POST /api/profile/role', () => {
   let mockSupabase: any
 
@@ -60,6 +67,11 @@ describe('POST /api/profile/role', () => {
         }
         if (table === 'mentor_profiles') {
           return {
+            select: jest.fn().mockReturnValue({
+              eq: jest.fn().mockReturnValue({
+                maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+              }),
+            }),
             update: jest.fn().mockReturnValue({
               eq: jest.fn().mockResolvedValue({ error: null }),
             }),
@@ -191,6 +203,7 @@ describe('POST /api/profile/role', () => {
       eq: jest.fn().mockResolvedValue({ error: null }),
     })
     mockSupabase.from = jest.fn((table: string) => {
+      if (table === 'mentor_profiles') return notApprovedMentorRead()
       if (table === 'profiles') return { update: profilesUpdate }
       if (table === 'roles') {
         return {
@@ -244,6 +257,7 @@ describe('POST /api/profile/role', () => {
     })
 
     mockSupabase.from = jest.fn((table: string) => {
+      if (table === 'mentor_profiles') return notApprovedMentorRead()
       if (table === 'profiles') {
         return { update: jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) }) }
       }
@@ -286,6 +300,7 @@ describe('POST /api/profile/role', () => {
     // when one isn't found, so this must not insert when it already exists.
     const userRolesInsert = jest.fn().mockResolvedValue({ error: null })
     mockSupabase.from = jest.fn((table: string) => {
+      if (table === 'mentor_profiles') return notApprovedMentorRead()
       if (table === 'profiles') {
         return { update: jest.fn().mockReturnValue({ eq: jest.fn().mockResolvedValue({ error: null }) }) }
       }

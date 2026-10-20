@@ -22,6 +22,7 @@ function deps() {
     verification: {
       requestVerification: track("requestVerification", undefined),
       withdrawVerification: track("withdrawVerification", undefined),
+      verificationStatus: track("verificationStatus", null as string | null),
     },
     catalog: {
       findByNames: track("findByNames", [
@@ -41,6 +42,17 @@ function deps() {
 describe("account role service: chooseRole", () => {
   beforeEach(() => {
     jest.spyOn(console, "error").mockImplementation(() => undefined)
+  })
+
+  it("approved mentor asking for mentee: 409 outcome, nothing written", async () => {
+    const d = deps()
+    d.verification.verificationStatus = jest.fn(async () => "approved")
+    const outcome = await createAccountRoleService(d).chooseRole(user, "mentee", { city: "Recife" })
+
+    expect(outcome).toEqual({ kind: "approved_mentor" })
+    expect(d.profile.updateProfileFields).not.toHaveBeenCalled()
+    expect(d.userRoles.remove).not.toHaveBeenCalled()
+    expect(d.userRoles.addIfMissing).not.toHaveBeenCalled()
   })
 
   it("mentee: saves the profile, swaps to mentee, no verification, welcome e-mail", async () => {

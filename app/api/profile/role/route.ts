@@ -31,6 +31,15 @@ export async function POST(request: NextRequest) {
     const { role, profileData } = validation.data
     const outcome = await buildAccountRoleService(supabase).chooseRole(user, role, profileData)
 
+    if (outcome.kind === "approved_mentor") {
+      return NextResponse.json(
+        {
+          error:
+            "Você já é mentor aprovado. Para voltar a ser apenas mentorado, use \"Deixar de ser mentor\" no seu perfil.",
+        },
+        { status: 409 }
+      )
+    }
     if (outcome.kind === "failed") {
       return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
     }

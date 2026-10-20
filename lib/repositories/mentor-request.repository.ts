@@ -20,6 +20,8 @@ export interface MentorRequestRepository {
   requestVerification(): Promise<void>
   /** Sai da verificação (RPC `withdraw_mentor_verification`); o status não tem grant de escrita. */
   withdrawVerification(): Promise<void>
+  /** Status de verificação do próprio usuário; `null` se ele nunca pediu mentoria. */
+  verificationStatus(userId: string): Promise<string | null>
   saveApproach(userId: string, texts: { mentorship_approach: string; what_to_expect: string | null }): Promise<MentorRequestRow>
 }
 
@@ -33,6 +35,16 @@ export function createMentorRequestRepository(db: SupabaseClient<Database>): Men
     async withdrawVerification() {
       const { error } = await db.rpc("withdraw_mentor_verification")
       if (error) throw new ProfileRepositoryError("mentorRequest.withdrawVerification", error)
+    },
+
+    async verificationStatus(userId) {
+      const { data, error } = await db
+        .from("mentor_profiles")
+        .select("verification_status")
+        .eq("user_id", userId)
+        .maybeSingle()
+      if (error) throw new ProfileRepositoryError("mentorRequest.verificationStatus", error)
+      return data?.verification_status ?? null
     },
 
     async saveApproach(userId, texts) {
