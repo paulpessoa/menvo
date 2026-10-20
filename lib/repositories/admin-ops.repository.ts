@@ -297,3 +297,227 @@ export type AdminOrgLeadsRepository = ReturnType<typeof createAdminOrgLeadsRepos
 export type AdminFeatureFlagsRepository = ReturnType<typeof createAdminFeatureFlagsRepository>
 export type AdminRetentionReadRepository = ReturnType<typeof createAdminRetentionReadRepository>
 export type AdminRetentionWriteRepository = ReturnType<typeof createAdminRetentionWriteRepository>
+
+/** Avaliação pendente como a fila de moderação a mostra (autor e mentor embutidos). */
+export interface PendingFeedbackRow {
+  id: string
+  rating: number | null
+  status: string | null
+  created_at: string
+  comment: string | null
+  mentee: { full_name: string | null; avatar_url: string | null } | null
+  mentor: { full_name: string | null; avatar_url: string | null } | null
+}
+
+/** Avaliação já moderada, com os dados que o e-mail ao mentor precisa. */
+export type ModeratedFeedbackRow = Tables<"appointment_feedbacks"> & {
+  mentee: { full_name: string | null } | null
+  mentor: { full_name: string | null; email: string | null } | null
+}
+
+/**
+ * Moderação de avaliações, pela sessão do admin (a policy de
+ * `appointment_feedbacks` já libera `is_admin()`).
+ */
+export function createAdminFeedbacksRepository(db: Db) {
+  return {
+    /** Avaliações aguardando moderação, a mais antiga primeiro. */
+    async listPending(): Promise<PendingFeedbackRow[]> {
+      const { data, error } = await db
+        .from("appointment_feedbacks")
+        .select(
+          `id, rating, status, created_at,
+           comment:public_feedback,
+           mentee:profiles!reviewer_id(full_name, avatar_url),
+           mentor:profiles!reviewed_id(full_name, avatar_url)`
+        )
+        .eq("status", "pending")
+        .order("created_at", { ascending: true })
+        .returns<PendingFeedbackRow[]>()
+      if (error) throw new RepositoryError("admin.feedbacks.listPending", error)
+      return data ?? []
+    },
+
+    /** Grava a decisão e devolve a linha completa; `null` se o id não existe. */
+    async moderate(
+      feedbackId: string,
+      status: "approved" | "rejected",
+      rejectionReason: string | null
+    ): Promise<ModeratedFeedbackRow | null> {
+      const { data, error } = await db
+        .from("appointment_feedbacks")
+        .update({ status, rejection_reason: rejectionReason, updated_at: new Date().toISOString() })
+        .eq("id", feedbackId)
+        .select("*, mentee:profiles!reviewer_id(full_name), mentor:profiles!reviewed_id(full_name, email)")
+        .maybeSingle()
+        .returns<ModeratedFeedbackRow | null>()
+      if (error) throw new RepositoryError("admin.feedbacks.moderate", error)
+      return data
+    }
+  }
+}
+
+/** Contagens e datas de cadastro do relatório, pela sessão (RLS de `profiles`). */
+export function createAdminReportsRepository(db: Db) {
+  return {
+    /** Total de perfis. */
+    async countProfiles(): Promise<number> {
+      const { count, error } = await db.from("profiles").select("*", { count: "exact", head: true })
+      if (error) throw new RepositoryError("admin.reports.countProfiles", error)
+      return count ?? 0
+    },
+
+    /** Perfis que têm o papel dado. */
+    async countByRole(role: "mentor" | "mentee"): Promise<number> {
+      const { count, error } = await db
+        .from("profiles")
+        .select("user_roles!inner(roles!inner(name))", { count: "exact", head: true })
+        .eq("user_roles.roles.name", role)
+      if (error) throw new RepositoryError("admin.reports.countByRole", error)
+      return count ?? 0
+    },
+
+    /** `created_at` dos perfis criados desde `since`, em ordem crescente. */
+    async listSignupDates(since: string): Promise<Array<{ created_at: string | null }>> {
+      const { data, error } = await db
+        .from("profiles")
+        .select("created_at")
+        .gte("created_at", since)
+        .order("created_at", { ascending: true })
+      if (error) throw new RepositoryError("admin.reports.listSignupDates", error)
+      return data ?? []
+    }
+  }
+}
+
+/** Linha crua de `activity_logs` (a trilha dos triggers `log_activity`). */
+export interface ActivityLogRow {
+  id: string
+  created_at: string
+  actor_id: string | null
+  subject_user_id: string | null
+  table_name: string
+  operation: "INSERT" | "UPDATE" | "DELETE"
+  record_id: string | null
+  changes: Record<string, unknown>
+}
+
+/** Pessoa citada na trilha (autor da mudança ou dono do dado). */
+export interface ActivityPersonRow {
+  id: string
+  full_name: string | null
+  email: string | null
+}
+
+/** Trilha de atividade e a busca de pessoas, pela sessão (RLS de `activity_logs`). */
+export function createAdminActivityLogsRepository(db: Db) {
+  /** Ids dos perfis cujo nome ou e-mail contém `term` (até 50). */
+  async function findPersonIds(term: string): Promise<string[]> {
+    const { data, error } = await db
+      .from("profiles")
+      .select("id")
+      .or(`full_name.ilike.%${term}%,email.ilike.%${term}%`)
+      .limit(50)
+    if (error) throw new RepositoryError("admin.activity.findPersonIds", error)
+    return (data ?? []).map(p => p.id)
+  }
+
+  return {
+    findPersonIds,
+
+    /**
+     * Uma página da trilha, mais nova primeiro. `term` já vem sanitizado pelo
+     * service (aqui só entra no filtro `.or()`).
+     */
+    async search(params: {
+      term: string
+      table?: string
+      from: number
+      pageSize: number
+    }): Promise<{ rows: ActivityLogRow[]; total: number }> {
+      let query = db
+        .from("activity_logs")
+        .select("id, created_at, actor_id, subject_user_id, table_name, operation, record_id, changes", {
+          count: "exact"
+        })
+        .order("created_at", { ascending: false })
+        .range(params.from, params.from + params.pageSize - 1)
+
+      if (params.table) query = query.eq("table_name", params.table)
+
+      if (params.term) {
+        const ids = await findPersonIds(params.term)
+        const filters = [`search_text.ilike.%${params.term.toLowerCase()}%`]
+        if (ids.length > 0) {
+          filters.push(`subject_user_id.in.(${ids.join(",")})`, `actor_id.in.(${ids.join(",")})`)
+        }
+        query = query.or(filters.join(","))
+      }
+
+      const { data, count, error } = await query.returns<ActivityLogRow[]>()
+      if (error) throw new RepositoryError("admin.activity.search", error)
+      return { rows: data ?? [], total: count ?? 0 }
+    },
+
+    /** Nome e e-mail de vários perfis numa consulta só (sem N+1). */
+    async listPeople(ids: string[]): Promise<ActivityPersonRow[]> {
+      if (ids.length === 0) return []
+      const { data, error } = await db
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", ids)
+        .returns<ActivityPersonRow[]>()
+      if (error) throw new RepositoryError("admin.activity.listPeople", error)
+      return data ?? []
+    }
+  }
+}
+
+/**
+ * Views de custo de IA (`security_invoker`, então a RLS decide quem vê o quê) e
+ * o teto mensal. Devolve linhas cruas: o service valida com Zod.
+ */
+export function createAdminAiUsageRepository(db: Db) {
+  return {
+    /** Uso do mês agregado por feature/provedor/modelo, o mais caro primeiro. */
+    async listByModel(month: string): Promise<unknown[]> {
+      const { data, error } = await db
+        .from("ai_usage_monthly")
+        .select("*")
+        .eq("month", month)
+        .order("cost_usd", { ascending: false })
+      if (error) throw new RepositoryError("admin.aiUsage.listByModel", error)
+      return data ?? []
+    },
+
+    /** Os 20 usuários que mais gastaram no mês. */
+    async listTopUsers(month: string): Promise<unknown[]> {
+      const { data, error } = await db
+        .from("ai_usage_by_user_monthly")
+        .select("user_id, full_name, calls, cost_usd")
+        .eq("month", month)
+        .order("cost_usd", { ascending: false })
+        .limit(20)
+      if (error) throw new RepositoryError("admin.aiUsage.listTopUsers", error)
+      return data ?? []
+    },
+
+    /** Teto em USD vigente no mês (o último definido até ele), ou `null`. */
+    async getBudgetLimit(month: string): Promise<number | null> {
+      const { data, error } = await db
+        .from("ai_budget")
+        .select("limit_usd")
+        .lte("month", month)
+        .order("month", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (error) throw new RepositoryError("admin.aiUsage.getBudget", error)
+      return data ? Number(data.limit_usd) : null
+    }
+  }
+}
+
+export type AdminFeedbacksRepository = ReturnType<typeof createAdminFeedbacksRepository>
+export type AdminReportsRepository = ReturnType<typeof createAdminReportsRepository>
+export type AdminActivityLogsRepository = ReturnType<typeof createAdminActivityLogsRepository>
+export type AdminAiUsageRepository = ReturnType<typeof createAdminAiUsageRepository>

@@ -15,6 +15,7 @@ import { resolveAudience } from "@/lib/services/invites/audience.service"
 import { createInviteToken } from "@/lib/services/invites/invite-token.service"
 import {
   createAdminFeatureFlagsRepository,
+  createAdminFeedbacksRepository,
   createAdminInvitesRepository,
   createAdminOrganizationsRepository,
   createAdminOrgLeadsRepository,
@@ -27,6 +28,8 @@ import type { AdminAppointmentsDeps } from "@/lib/services/appointments/admin-ap
 import { getAdminOverview } from "./overview.service"
 import { createAdminRetentionService } from "./retention.service"
 import { createAdminFeatureFlagsService } from "./feature-flags.service"
+import { createAdminFeedbacksService } from "./feedbacks.service"
+import { sendMentorNewReviewNotification } from "@/lib/email/brevo"
 import { createAdminOrganizationsService } from "./organizations.service"
 import { createAdminInvitesService } from "./invites.service"
 import { createAdminEmailsService } from "./emails.service"
@@ -119,5 +122,20 @@ export function buildAdminFeatureFlagsService(sessionDb: SupabaseClient<Database
   return createAdminFeatureFlagsService({
     sessionDb,
     repo: () => createAdminFeatureFlagsRepository(privileged())
+  })
+}
+
+/**
+ * Service de moderação de avaliações (L2-8): tudo pela sessão do admin (sem
+ * `service_role`); e-mail ao mentor pelo Brevo e auditoria em `admin_audit_logs`.
+ */
+export function buildAdminFeedbacksService(sessionDb: SupabaseClient<Database>) {
+  return createAdminFeedbacksService({
+    sessionDb,
+    repo: createAdminFeedbacksRepository(sessionDb),
+    notifyMentor: sendMentorNewReviewNotification,
+    // O tipo de ação ainda não tem nome próprio (audit-logger é compartilhado).
+    audit: (adminId, details, mentorId) =>
+      logAdminAction(adminId, "bulk_action", details, mentorId)
   })
 }
