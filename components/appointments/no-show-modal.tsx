@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Loader2, UserX } from "lucide-react"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
-import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
+import { useMarkNoShow } from "@/hooks/appointments/useMarkNoShow"
 
 interface NoShowModalProps {
   open: boolean
@@ -38,19 +38,17 @@ export function NoShowModal({
 }: NoShowModalProps) {
   const t = useTranslations("appointments")
   const [notes, setNotes] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const noShow = useMarkNoShow()
+  const isSubmitting = noShow.isPending
 
   const handleSubmit = async () => {
     try {
-      setIsSubmitting(true)
-      await mentorshipService.markNoShow(String(appointmentId), notes)
+      await noShow.mutateAsync({ appointmentId, notes })
       toast.success(t("noShowSuccess"))
       onOpenChange(false)
       onSuccess?.(notes)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao registrar ausência.")
-    } finally {
-      setIsSubmitting(false)
     }
   }
 

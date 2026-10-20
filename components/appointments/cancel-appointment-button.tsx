@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge'
 import { X, Calendar, Clock, User, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useAuth } from '@/lib/auth'
+import { useCancelAppointment } from '@/hooks/appointments/useCancelAppointment'
 
 interface AppointmentParticipant {
     id?: string
@@ -39,7 +40,7 @@ interface Appointment {
 
 interface CancelAppointmentButtonProps {
     appointment: Appointment
-    onCancelled?: (appointment: any) => void
+    onCancelled?: () => void
     variant?: 'destructive' | 'outline'
     size?: 'sm' | 'default'
 }
@@ -63,7 +64,8 @@ export function CancelAppointmentButton({
     size = 'sm'
 }: CancelAppointmentButtonProps) {
     const { user } = useAuth()
-    const [isCancelling, setIsCancelling] = useState(false)
+    const cancel = useCancelAppointment()
+    const isCancelling = cancel.isPending
     const [reason, setReason] = useState('')
     const [selectedQuickReason, setSelectedQuickReason] = useState<string | null>(null)
     const [isOpen, setIsOpen] = useState(false)
@@ -104,25 +106,11 @@ export function CancelAppointmentButton({
             return
         }
 
-        setIsCancelling(true)
-
         try {
-            const response = await fetch('/api/appointments/cancel', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    appointmentId: appointment.id,
-                    reason: reason.trim(),
-                }),
+            await cancel.mutateAsync({
+                appointmentId: appointment.id,
+                reason: reason.trim(),
             })
-
-            const data = await response.json()
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Erro ao cancelar agendamento')
-            }
 
             toast.success('Agendamento cancelado com sucesso!', {
                 description: 'O evento foi removido do Google Calendar e os envolvidos foram informados.',
@@ -133,7 +121,7 @@ export function CancelAppointmentButton({
             setSelectedQuickReason(null)
 
             if (onCancelled) {
-                onCancelled(data.appointment)
+                onCancelled()
             }
 
         } catch (error) {
@@ -141,8 +129,6 @@ export function CancelAppointmentButton({
             toast.error('Erro ao cancelar agendamento', {
                 description: error instanceof Error ? error.message : 'Tente novamente mais tarde.',
             })
-        } finally {
-            setIsCancelling(false)
         }
     }
 

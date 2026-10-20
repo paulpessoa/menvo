@@ -188,57 +188,6 @@ export const mentorAvailabilityService = {
 // =============================================
 
 export const mentorshipSessionsService = {
-  // Enviar feedback do mentorado e concluir o agendamento (BFF: POST /api/appointments/complete)
-  submitFeedbackAndComplete: async ({
-    appointmentId,
-    rating,
-    privateNotes,
-    publicFeedback
-  }: {
-    appointmentId: string
-    reviewerId: string
-    reviewedId: string
-    rating: number
-    privateNotes?: string | null
-    publicFeedback?: string | null
-  }): Promise<void> => {
-    const res = await fetch("/api/appointments/complete", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ appointmentId, rating, privateNotes, publicFeedback })
-    })
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}))
-      throw new Error(data.error || "Erro ao registrar avaliação")
-    }
-  },
-
-  // Marcar agendamento como concluído pelo mentor (BFF: POST /api/appointments/mark-completed)
-  markCompleted: async (appointmentId: string): Promise<void> => {
-    const res = await fetch("/api/appointments/mark-completed", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ appointmentId })
-    })
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}))
-      throw new Error(data.error || "Erro ao concluir mentoria")
-    }
-  },
-
-  // Registrar falta / ausência do mentorado (BFF: POST /api/appointments/no-show)
-  markNoShow: async (appointmentId: string, notes?: string): Promise<void> => {
-    const res = await fetch("/api/appointments/no-show", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ appointmentId, notes })
-    })
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}))
-      throw new Error(data.error || "Erro ao registrar ausência")
-    }
-  },
-
   // Atualizar feedback público de agendamento (BFF: PATCH /api/feedback)
   updateFeedback: async (feedbackId: string, publicFeedback: string): Promise<void> => {
     const res = await fetch("/api/appointments/feedback", {

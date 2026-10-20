@@ -26,7 +26,7 @@ import { useTranslations, useFormatter } from "next-intl"
 import { useRouter } from "@/i18n/routing"
 import { useFeatureFlag } from "@/lib/feature-flags"
 import { toast } from "sonner"
-import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
+import { useCompleteAppointment } from "@/hooks/appointments/useCompleteAppointment"
 
 interface AppointmentFeedbackItem {
   id: string | number
@@ -81,21 +81,19 @@ export function AppointmentCard({
   const router = useRouter()
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
   const [isNoShowModalOpen, setIsNoShowModalOpen] = useState(false)
-  const [isCompleting, setIsCompleting] = useState(false)
+  const complete = useCompleteAppointment()
+  const isCompleting = complete.isPending
   const isChatEnabled = useFeatureFlag("chat_flag")
 
   const handleMentorComplete = async () => {
     try {
-      setIsCompleting(true)
-      await mentorshipService.markCompleted(String(appointment.id))
+      await complete.mutateAsync({ appointmentId: appointment.id })
       toast.success(t("sessionCompletedSuccess"))
       if (onAppointmentUpdate) {
         onAppointmentUpdate({ ...appointment, status: "completed" })
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao concluir a sessão.")
-    } finally {
-      setIsCompleting(false)
     }
   }
 

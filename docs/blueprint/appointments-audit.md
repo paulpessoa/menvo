@@ -375,4 +375,11 @@ select tgname, pg_get_triggerdef(oid) from pg_trigger where tgrelid='public.appo
 
 - Novos: `lib/query/keys/appointments.ts` (`appointmentsKeys`: `all`, `mine(role, userId)`, `list(userId, filtros)`) e `lib/query/effects/appointments.ts` (`appointments.request|confirm|cancel|complete|evaluate|no-show`, todos invalidam `["appointments"]`). Hooks em `hooks/appointments/`: `useMyAppointments`, `useAppointmentsList`, `useInvalidateAppointments`, `useCancelAppointment`, `useConfirmAppointment`; leitura validada por `listAppointmentsResponseSchema` (mais estrito que o schema antigo: ids uuid, `count`).
 - `hooks/useMyAppointments.ts` removido; `MentorshipBoard`, `MentorPerspectiveSwitch` e `AppointmentsList` (agora sem `fetch`/`any`) usam os hooks. Telas iguais.
-- Falta: os botões (cancelar, confirmar, concluir, avaliar, no-show) e `BookingForm`/`BookMentorshipModal` ainda chamam as rotas sozinhos; migrar para as mutations e remover `useInvalidateAppointments`. Pedido: linha em `keys.ts` (`appointments: appointmentsKeys`) e `effects.ts` (`...appointmentsEffects`).
+
+## Handoff (PR 13 · componentes, camada 11)
+
+- Novos hooks em `hooks/appointments/`: `useCompleteAppointment` (`mark-completed`), `useEvaluateAppointment` (`complete`), `useMarkNoShow`, `useRequestAppointment` (devolve `{ create, schedule }`). Todos via `postJson` + `appointmentsEffects`. Schema novo `createResponseSchema` em `appointment-responses.ts`.
+- Ligados: `cancel-appointment-button`, `confirm-appointment-button`, `complete-appointment-modal`, `no-show-modal`, `appointment-card` (concluir), `BookingForm` (`create`) e `BookMentorshipModal` (`schedule`, com 409 `pending_checkin` e 409 de horário tomado lidos de `ApiClientError.body`). Mesmos toasts e mensagens. Callbacks `onCancelled`/`onConfirmed` não recebem mais o `appointment` (ninguém usava).
+- Removidos `markCompleted`, `markNoShow` e `submitFeedbackAndComplete` de `mentorship.service.ts` (sem chamadores).
+- Falta: `BookingForm`/`BookMentorshipModal` ainda leem `availability` com `fetch` e a página `appointments/confirm` ainda confirma por token com `fetch` (`useConfirmAppointment` já serve); `useInvalidateAppointments` segue em `MentorshipBoard`; `appointment-card` (443) e o modal (421) não foram divididos.
+

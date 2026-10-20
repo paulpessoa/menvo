@@ -17,6 +17,8 @@ import { Link } from "@/i18n/routing"
 import { trackBookingConfirmed } from "@/lib/utils/google-analytics/events"
 import { AvailabilityAlertButton } from "./AvailabilityAlertButton"
 import { PendingCheckinPrompt } from "./PendingCheckinPrompt"
+import { ApiClientError } from "@/lib/query/http"
+import { useRequestAppointment } from "@/hooks/appointments/useRequestAppointment"
 import { getMyPendingCheckinAction } from "@/app/actions/session-checkin"
 import type { PendingCheckin } from "@/lib/services/appointments/checkin-responses.service"
 
@@ -50,7 +52,8 @@ export function BookMentorshipModal({
   const [loading, setLoading] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
   const [message, setMessage] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const schedule = useRequestAppointment().schedule
+  const isSubmitting = schedule.isPending
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const [pendingCheckin, setPendingCheckin] = useState<PendingCheckin | null>(null)
@@ -136,7 +139,6 @@ export function BookMentorshipModal({
   const handleConfirmBooking = async () => {
     if (!selectedSlot) return
 
-    setIsSubmitting(true)
     setError("")
 
     try {
@@ -168,25 +170,29 @@ export function BookMentorshipModal({
         message: message.trim()
       }
 
-      const response = await fetch("/api/appointments/schedule", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}))
-        if (response.status === 409 && data.details?.reason === "pending_checkin") {
-          loadAvailability()
-          return
-        }
-        if (response.status === 409) {
+      try {
+        await schedule.mutateAsync(payload)
+      } catch (err) {
+        if (err instanceof ApiClientError && err.status === 409) {
+          const details = err.body?.details as { reason?: string } | undefined
+          if (details?.reason === "pending_checkin") {
+            loadAvailability()
+            return
+          }
           throw new Error(
-            data.message ||
+            (typeof err.body?.message === "string" && err.body.message) ||
               "Este horário acabou de ser agendado por outro participante. Por favor, escolha outro horário."
           )
         }
-        throw new Error(data.error || data.message || "Erro ao agendar mentoria")
+        if (err instanceof ApiClientError) {
+          const { error, message } = err.body ?? {}
+          throw new Error(
+            (typeof error === "string" && error) ||
+              (typeof message === "string" && message) ||
+              "Erro ao agendar mentoria"
+          )
+        }
+        throw err
       }
 
       trackBookingConfirmed({
@@ -210,8 +216,6 @@ export function BookMentorshipModal({
         loadAvailability()
         setSelectedSlot(null)
       }
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
