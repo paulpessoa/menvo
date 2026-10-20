@@ -10,6 +10,7 @@ import {
   summarizeRatings
 } from "./overview.aggregate"
 import { OVERVIEW_WEEKS, type AdminOverview } from "./overview.types"
+import { assertAdmin } from "./assert-admin"
 
 type Db = SupabaseClient<Database>
 type QueryResult<T> = PromiseLike<{ data: T[] | null; error: { message: string } | null }>
@@ -44,12 +45,19 @@ const daysAgo = (now: Date, days: number) => new Date(now.getTime() - days * 86_
  * the definition used by its own admin page (pending = verification_status,
  * retention stages = /api/admin/retention) so the numbers match after a click.
  *
- * @param db RLS-bound client of the calling admin (`is_admin()` policies).
- * @param serviceDb service-role client, used only for `appointments` and
- *   `inactive_accounts_queue`, which the existing admin routes also read with
- *   it. Callers must run `requireAdmin` first.
+ * @param db RLS-bound client of the calling admin (`is_admin()` policies). Also
+ *   reads `inactive_accounts_queue`, which has an admin policy.
+ * @param getPrivilegedDb lazy service-role client, used only for `appointments`
+ *   (no versioned admin SELECT policy yet, pending the L2-12 pgTAP proof). It
+ *   is requested only after `assertAdmin` passes.
+ * @throws {AdminForbiddenError} when the caller is not an admin.
  */
-export async function getAdminOverview(db: Db, serviceDb: SupabaseClient, now = new Date()): Promise<AdminOverview> {
+export async function getAdminOverview(
+  db: Db,
+  getPrivilegedDb: () => Db,
+  now = new Date()
+): Promise<AdminOverview> {
+  await assertAdmin(db)
   const weeks = buildWeeks(now, OVERVIEW_WEEKS)
   const windowStart = `${weeks[0]}T00:00:00Z`
   const month = now.toISOString().slice(0, 7)
@@ -78,7 +86,7 @@ export async function getAdminOverview(db: Db, serviceDb: SupabaseClient, now = 
       db.from("profiles").select("created_at, user_roles(roles(name))").gte("created_at", windowStart).range(from, to)
     ),
     fetchAll<{ created_at: string; status: string; scheduled_at: string }>((from, to) =>
-      serviceDb.from("appointments").select("created_at, status, scheduled_at").gte("created_at", windowStart).range(from, to)
+      getPrivilegedDb().from("appointments").select("created_at, status, scheduled_at").gte("created_at", windowStart).range(from, to)
     ),
     fetchAll((from, to) =>
       db.from("ai_usage_events").select("created_at, cost_usd").gte("created_at", monthStart).range(from, to)
@@ -108,7 +116,7 @@ export async function getAdminOverview(db: Db, serviceDb: SupabaseClient, now = 
     headCount(leads("new")),
     headCount(leads("contacted")),
     headCount(leads("closed")),
-    headCount(serviceDb.from("inactive_accounts_queue").select("*", { count: "exact", head: true }).not("notice_30d_sent_at", "is", null)),
+    headCount(db.from("inactive_accounts_queue").select("*", { count: "exact", head: true }).not("notice_30d_sent_at", "is", null)),
     db.from("ai_usage_monthly").select("feature, calls, cost_usd").eq("month", monthStart),
     db.from("ai_budget").select("limit_usd").lte("month", monthStart).order("month", { ascending: false }).limit(1).maybeSingle()
   ])

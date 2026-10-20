@@ -222,3 +222,8 @@ PATCH antes de mexer). O resto é baixo.
 - `moderator` saiu de `AdminRole` e de `emails/preview`, `feature-flags` GET e `users` GET. O enum de papéis em `users/[id]` (atribuir `moderator`) não mudou: é da L1-2.
 - Helper: `lib/services/admin/assert-admin.ts` (`assertAdmin(db)` com a sessão, `AdminForbiddenError`, `adminForbiddenResponse` para o 403). Ainda não usado em nenhum service: cada grupo chama no seu (teste modelo: "não-admin recusado").
 - ADR: `docs/governance/adr/0009-admin-service-role.md`. Próximo: L1-2 e L2-2.
+
+**L2-2 e L2-3 (feitos, sem migration).**
+- `retention` GET passou para a sessao (sem service_role); `retention/exempt` valida UUID, usa `assertAdmin`, grava auditoria (acao `user_status_changed` com `details.reason = "retention_exempt"`, falta um `AuditAction` proprio no `audit-logger`).
+- `overview`: fila de inativos pela sessao; `appointments` segue no client privilegiado, lazy, vindo de `lib/services/admin/ops.composition.ts` (agora com `loadAdminOverview` e `buildAdminRetentionService`). `getAdminOverview(db, getPrivilegedDb, now)` chama `assertAdmin`.
+- Novos: `lib/repositories/admin-ops.repository.ts`, `lib/schemas/admin.ts`, `lib/services/admin/retention.service.ts`. Proximos grupos da L2 somam neles e na composition.
