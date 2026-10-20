@@ -1,7 +1,7 @@
 "use client"
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -10,20 +10,13 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog"
-import { useAuth } from "@/lib/auth"
 import { useLocale, useTranslations } from "next-intl"
 import { PendingCheckinPrompt } from "./PendingCheckinPrompt"
 import { BookMentorshipSlotList } from "./BookMentorshipSlotList"
 import { BookMentorshipConfirmStep } from "./BookMentorshipConfirmStep"
 import { useBookMentorshipSubmit } from "./useBookMentorshipSubmit"
-import {
-  toIntlLocale,
-  toTimeSlots,
-  type RawAvailabilitySlot,
-  type TimeSlot
-} from "./book-mentorship-slots"
-import { getMyPendingCheckinAction } from "@/app/actions/session-checkin"
-import type { PendingCheckin } from "@/lib/services/appointments/checkin-responses.service"
+import { useBookMentorshipFlow } from "./useBookMentorshipFlow"
+import { toIntlLocale, type TimeSlot } from "./book-mentorship-slots"
 
 interface BookMentorshipModalProps {
   isOpen: boolean
@@ -45,65 +38,19 @@ export function BookMentorshipModal({
 }: BookMentorshipModalProps) {
   const intlLocale = toIntlLocale(useLocale())
   const t = useTranslations("mentorship.booking")
-  const { user } = useAuth()
-  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([])
-  const [loading, setLoading] = useState(false)
-  const [loadError, setLoadError] = useState("")
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
   const [message, setMessage] = useState("")
-  const [pendingCheckin, setPendingCheckin] = useState<PendingCheckin | null>(null)
-
-  const loadAvailability = async () => {
-    try {
-      setLoading(true)
-      setLoadError("")
-      setPendingCheckin(null)
-      setAvailableSlots([])
-
-      // Antes de agendar de novo, o mentorado diz se a última sessão
-      // aconteceu (1 clique; avaliar é opcional). Ver docs/domains/session-checkin.md §4.
-      if (user?.id) {
-        const pending = await getMyPendingCheckinAction()
-        if (pending) {
-          setPendingCheckin(pending)
-          setLoading(false)
-          return
-        }
-      }
-
-      const startDate = new Date().toISOString().split("T")[0]
-      const endDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0]
-
-      const response = await fetch(
-        `/api/appointments/availability?mentor_id=${mentorId}&start_date=${startDate}&end_date=${endDate}`
-      )
-      if (!response.ok) throw new Error(t("noSlotsDesc"))
-
-      const data = (await response.json()) as { availableSlots?: RawAvailabilitySlot[] }
-      setAvailableSlots(toTimeSlots(data.availableSlots ?? [], intlLocale))
-    } catch (err) {
-      setLoadError((err instanceof Error && err.message) || t("noSlotsDesc"))
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    if (isOpen) {
-      loadAvailability()
-    }
-  }, [isOpen, mentorId])
+  const flow = useBookMentorshipFlow(isOpen, mentorId, intlLocale)
+  const loadError = flow.hasError ? t("noSlotsDesc") : ""
 
   const booking = useBookMentorshipSubmit({
     mentorId,
     selectedSlot,
     message,
     onClose,
-    onPendingCheckin: loadAvailability,
+    onPendingCheckin: flow.restart,
     onSlotTaken: () => {
-      loadAvailability()
+      flow.restart()
       setSelectedSlot(null)
     },
     onReset: () => {
@@ -134,29 +81,29 @@ export function BookMentorshipModal({
           </div>
 
           <div className="p-6 flex-1 overflow-y-auto">
-            {loading ? (
+            {flow.loading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4">
                 <MenvoDots />
                 <p className="text-sm text-muted-foreground animate-pulse text-center">
                   Buscando horários disponíveis...
                 </p>
               </div>
-            ) : pendingCheckin ? (
-              <PendingCheckinPrompt pending={pendingCheckin} onAnswered={loadAvailability} />
+            ) : flow.pendingCheckin ? (
+              <PendingCheckinPrompt pending={flow.pendingCheckin} onAnswered={flow.restart} />
             ) : loadError && !selectedSlot ? (
               <div className="py-12 text-center space-y-4">
                 <div className="bg-red-50 text-red-700 p-4 rounded-xl inline-block text-sm">
                   {loadError}
                 </div>
                 <div>
-                  <Button variant="outline" onClick={loadAvailability} className="rounded-xl">
+                  <Button variant="outline" onClick={flow.restart} className="rounded-xl">
                     Tentar novamente
                   </Button>
                 </div>
               </div>
             ) : !selectedSlot ? (
               <BookMentorshipSlotList
-                slots={availableSlots}
+                slots={flow.slots}
                 intlLocale={intlLocale}
                 mentorId={mentorId}
                 mentorName={mentorName}

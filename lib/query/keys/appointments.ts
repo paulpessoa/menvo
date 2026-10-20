@@ -10,4 +10,7 @@ export const appointmentsKeys = {
   /** Lista filtrada por papel/status/limite (componente de lista simples). */
   list: (userId: string | undefined, filters: { role?: string; status?: string; limit: number }) =>
     ["appointments", "list", userId, filters] as const,
+  /** Horários livres de um mentor na janela pedida (sem datas = janela padrão da rota). */
+  availability: (mentorId: string, range: { startDate?: string; endDate?: string }) =>
+    ["appointments", "availability", mentorId, range] as const,
 } as const

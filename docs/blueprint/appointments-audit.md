@@ -383,3 +383,9 @@ select tgname, pg_get_triggerdef(oid) from pg_trigger where tgrelid='public.appo
 - Removidos `markCompleted`, `markNoShow` e `submitFeedbackAndComplete` de `mentorship.service.ts` (sem chamadores).
 - Falta: `BookingForm`/`BookMentorshipModal` ainda leem `availability` com `fetch` e a página `appointments/confirm` ainda confirma por token com `fetch` (`useConfirmAppointment` já serve); `useInvalidateAppointments` segue em `MentorshipBoard`; `appointment-card` (443) e o modal (421) não foram divididos.
 
+
+## Handoff (PR 14 · fecha a camada 11)
+
+- `appointment-card` (443 -> 123 linhas) virou card + `appointment-card-{header,body,actions}` + `appointment-card-state.ts` (regras derivadas, puro) + `appointment-card.types.ts`; `BookMentorshipModal` (421 -> ~115) virou modal + `BookMentorshipSlotList`, `BookMentorshipConfirmStep`, `useBookMentorshipFlow` (gate do check-in + availability), `useBookMentorshipSubmit` (erros 409) e `book-mentorship-slots.ts`. Sem mudança de texto, id ou comportamento; saiu o `any` do slug e o `(slot as any).datetime` (sempre `undefined`).
+- Novo `useMentorAvailability` (`appointmentsKeys.availability(mentorId, {startDate, endDate})`, `staleTime: 0`, `retry: false`, validado por `availabilityResponseSchema`) em `BookingForm` e no modal. A página `appointments/confirm` usa `useConfirmAppointment` (um POST por token); o 410 "Este link expirou..." continua vindo de `body.error` e aparece na tela.
+- `BookingForm`: a chave/seleção do horário passou de `slot.id` (a rota nunca devolve `id`, então todos os botões ficavam "selecionados") para `slot.datetime`. Sem pedido para arquivos compartilhados.

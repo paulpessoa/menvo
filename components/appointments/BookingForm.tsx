@@ -13,18 +13,20 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import {  Calendar, Clock, CheckCircle , Loader2 } from "lucide-react"
-import {
-  type MentorAvailability as AvailableTimeSlot,
-  mentorshipUtils
-} from "@/lib/services/mentorship/mentorship.service"
+import { mentorshipUtils } from "@/lib/services/mentorship/mentorship.service"
 import { toast } from "sonner"
 import { useRequestAppointment } from "@/hooks/appointments/useRequestAppointment"
+import { useMentorAvailability } from "@/hooks/appointments/useMentorAvailability"
+import type { z } from "zod"
+import type { availabilitySlotSchema } from "@/lib/schemas/appointment-responses"
 import { AvailabilityAlertButton } from "@/components/mentorship/AvailabilityAlertButton"
 import {
   MENTORSHIP_REASON_MAX_LENGTH,
   MENTORSHIP_REASON_MIN_LENGTH,
   MENTORSHIP_REASON_REQUIRED_MESSAGE
 } from "@/lib/schemas/appointment"
+
+type AvailableTimeSlot = z.infer<typeof availabilitySlotSchema>
 
 interface BookingFormProps {
   mentorId: string
@@ -39,7 +41,9 @@ export default function BookingForm({
   onSuccess,
   onCancel
 }: BookingFormProps) {
-  const [availableSlots, setAvailableSlots] = useState<AvailableTimeSlot[]>([])
+  const availability = useMentorAvailability(mentorId)
+  const availableSlots = availability.data ?? []
+  const fetchingSlots = availability.isLoading
   const [selectedSlot, setSelectedSlot] = useState<AvailableTimeSlot | null>(
     null
   )
@@ -48,33 +52,13 @@ export default function BookingForm({
   const loading = request.isPending
   const reasonLength = message.trim().length
   const hasValidReason = reasonLength >= MENTORSHIP_REASON_MIN_LENGTH
-  const [fetchingSlots, setFetchingSlots] = useState(true)
 
-  // Fetch available slots
   useEffect(() => {
-    const fetchAvailability = async () => {
-      try {
-        setFetchingSlots(true)
-        const response = await fetch(
-          `/api/appointments/availability?mentor_id=${mentorId}`
-        )
-        if (!response.ok) {
-          throw new Error("Failed to fetch availability")
-        }
-        const data = await response.json()
-        setAvailableSlots(data.availableSlots || [])
-      } catch (error) {
-        console.error("Error fetching availability:", error)
-        toast.error("Erro ao carregar horários disponíveis")
-      } finally {
-        setFetchingSlots(false)
-      }
+    if (availability.isError) {
+      console.error("Error fetching availability:", availability.error)
+      toast.error("Erro ao carregar horários disponíveis")
     }
-
-    if (mentorId) {
-      fetchAvailability()
-    }
-  }, [mentorId])
+  }, [availability.isError, availability.error])
 
   const handleBooking = async () => {
     if (!selectedSlot) {
@@ -181,9 +165,9 @@ export default function BookingForm({
                     <div className="flex flex-wrap gap-2">
                       {daySlots.map((slot) => (
                         <Button
-                          key={slot.id}
+                          key={slot.datetime}
                           variant={
-                            selectedSlot?.id === slot.id ? "default" : "outline"
+                            selectedSlot?.datetime === slot.datetime ? "default" : "outline"
                           }
                           size="sm"
                           onClick={() => setSelectedSlot(slot)}
