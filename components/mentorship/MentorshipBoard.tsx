@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Link } from "@/i18n/routing"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
-import { useMyAppointments, useInvalidateMyAppointments } from "@/hooks/useMyAppointments"
+import { useMyAppointments } from "@/hooks/appointments/useMyAppointments"
+import { useInvalidateAppointments } from "@/hooks/appointments/useInvalidateAppointments"
 import { groupAppointments, type Perspective } from "@/lib/mentorship/group-appointments"
 import { MentorshipSection } from "./MentorshipSection"
 import { NextSessionCard } from "./NextSessionCard"
@@ -29,7 +30,7 @@ export function MentorshipBoard({ perspective }: MentorshipBoardProps) {
   const t = useTranslations("mentorship.hub")
   const { user } = useAuth()
   const { data, isLoading, isError, refetch } = useMyAppointments(perspective)
-  const invalidate = useInvalidateMyAppointments()
+  const invalidate = useInvalidateAppointments()
   const userId = user?.id ?? ""
 
   const groups = useMemo(
