@@ -57,7 +57,10 @@ export async function POST(request: NextRequest) {
         mentee_id: user.id,
         scheduled_at,
         duration_minutes: duration_minutes || 60,
-        mentorship_topics: mentorship_topics || [],
+        // A tabela não tem `mentorship_topics`: o insert falhava e a página
+        // /appointments/book ("agendar de novo") respondia 500. Mesma coluna
+        // e formato que /api/appointments/schedule usa.
+        topic: (mentorship_topics || []).join(", "),
         notes_mentee: notes_mentee || "",
         action_token: actionToken,
         status: "pending"
