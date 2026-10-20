@@ -1,4 +1,55 @@
 import { z } from "zod"
+import { APPOINTMENT_STATUSES } from "@/lib/domain/appointments/appointment-status.entity"
+
+/**
+ * Status de um agendamento. A lista mora na entity (camada 3) e este enum só a
+ * reusa, então o contrato da API e o CHECK do banco não divergem em silêncio.
+ */
+export const appointmentStatusSchema = z.enum(APPOINTMENT_STATUSES)
+
+/**
+ * UUID de agendamento vindo de URL ou corpo. Ainda NÃO aplicado às rotas: hoje
+ * um id inválido vira 404 (o erro do PostgREST é tratado como "não achei") e
+ * passar a dar 400 é mudança de comportamento, decidida no grupo da rota.
+ */
+export const appointmentIdSchema = z.string().uuid("ID do agendamento inválido")
+
+/**
+ * Query de `GET /api/appointments/list`. `limit` ganha teto (hoje `parseInt` sem
+ * validar: `?limit=abc` vira `NaN` e `?limit=100000` lê tudo).
+ */
+export const listAppointmentsQuerySchema = z.object({
+  role: z.enum(["mentor", "mentee"]).optional(),
+  status: appointmentStatusSchema.optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(10)
+})
+
+export type ListAppointmentsQuery = z.infer<typeof listAppointmentsQuerySchema>
+
+/** Query de `GET /api/appointments/availability` (datas `YYYY-MM-DD`, ambas opcionais). */
+export const availabilityQuerySchema = z.object({
+  mentor_id: z.string().min(1, "mentor_id is required"),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "start_date deve ser YYYY-MM-DD").optional(),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "end_date deve ser YYYY-MM-DD").optional()
+})
+
+export type AvailabilityQuery = z.infer<typeof availabilityQuerySchema>
+
+/** Corpo de `POST /api/appointments/action` (link do e-mail do mentor). */
+export const actionAppointmentSchema = z.object({
+  token: z.string().min(1, "Token e ação são obrigatórios"),
+  action: z.enum(["confirm", "cancel"], { errorMap: () => ({ message: "Ação inválida" }) }),
+  reason: z.string().max(1000).optional()
+})
+
+export type ActionAppointmentInput = z.infer<typeof actionAppointmentSchema>
+
+/** Corpo de `POST /api/appointments/mark-completed` (o mentor conclui a sessão). */
+export const markCompletedAppointmentSchema = z.object({
+  appointmentId: z.union([z.string(), z.number()]).transform(val => String(val))
+})
+
+export type MarkCompletedAppointmentInput = z.infer<typeof markCompletedAppointmentSchema>
 
 /**
  * Motivo do pedido de mentoria: é o que o mentor lê no e-mail de confirmação e

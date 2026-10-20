@@ -92,3 +92,56 @@ describe("noShowAppointmentSchema", () => {
     expect(result.success).toBe(false)
   })
 })
+
+describe("appointment status and query schemas", () => {
+  it("appointmentStatusSchema accepts the four database statuses only", async () => {
+    const { appointmentStatusSchema } = await import("./appointment")
+    for (const s of ["pending", "confirmed", "completed", "cancelled"]) {
+      expect(appointmentStatusSchema.safeParse(s).success).toBe(true)
+    }
+    for (const s of ["rejected", "expired", "Pending", ""]) {
+      expect(appointmentStatusSchema.safeParse(s).success).toBe(false)
+    }
+  })
+
+  it("appointmentIdSchema requires a UUID", async () => {
+    const { appointmentIdSchema } = await import("./appointment")
+    expect(appointmentIdSchema.safeParse("9b2f7f2e-3c4d-4e5f-8a6b-1c2d3e4f5a6b").success).toBe(true)
+    expect(appointmentIdSchema.safeParse("123").success).toBe(false)
+  })
+
+  it("listAppointmentsQuerySchema defaults the limit and caps it", async () => {
+    const { listAppointmentsQuerySchema } = await import("./appointment")
+    expect(listAppointmentsQuerySchema.parse({}).limit).toBe(10)
+    expect(listAppointmentsQuerySchema.parse({ limit: "25", role: "mentor", status: "pending" })).toEqual({
+      limit: 25,
+      role: "mentor",
+      status: "pending"
+    })
+    expect(listAppointmentsQuerySchema.safeParse({ limit: "abc" }).success).toBe(false)
+    expect(listAppointmentsQuerySchema.safeParse({ limit: "100000" }).success).toBe(false)
+    expect(listAppointmentsQuerySchema.safeParse({ role: "admin" }).success).toBe(false)
+  })
+
+  it("availabilityQuerySchema requires mentor_id and YYYY-MM-DD dates", async () => {
+    const { availabilityQuerySchema } = await import("./appointment")
+    expect(availabilityQuerySchema.safeParse({ mentor_id: "m1" }).success).toBe(true)
+    expect(availabilityQuerySchema.safeParse({ mentor_id: "m1", start_date: "2026-10-20", end_date: "2026-11-03" }).success).toBe(true)
+    expect(availabilityQuerySchema.safeParse({}).success).toBe(false)
+    expect(availabilityQuerySchema.safeParse({ mentor_id: "m1", start_date: "20/10/2026" }).success).toBe(false)
+  })
+
+  it("actionAppointmentSchema accepts confirm and cancel, rejects the rest", async () => {
+    const { actionAppointmentSchema } = await import("./appointment")
+    expect(actionAppointmentSchema.safeParse({ token: "t", action: "confirm" }).success).toBe(true)
+    expect(actionAppointmentSchema.safeParse({ token: "t", action: "cancel", reason: "x" }).success).toBe(true)
+    expect(actionAppointmentSchema.safeParse({ token: "t", action: "delete" }).success).toBe(false)
+    expect(actionAppointmentSchema.safeParse({ action: "confirm" }).success).toBe(false)
+  })
+
+  it("markCompletedAppointmentSchema converts a numeric id to string", async () => {
+    const { markCompletedAppointmentSchema } = await import("./appointment")
+    expect(markCompletedAppointmentSchema.parse({ appointmentId: 7 }).appointmentId).toBe("7")
+    expect(markCompletedAppointmentSchema.safeParse({}).success).toBe(false)
+  })
+})

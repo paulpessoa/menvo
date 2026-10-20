@@ -15,6 +15,7 @@ import {
   UserX
 } from "lucide-react"
 import { AppointmentStatusBadge } from "./appointment-status-badge"
+import type { AppointmentStatus } from "@/lib/domain/appointments/appointment-status.entity"
 import { ConfirmAppointmentButton } from "./confirm-appointment-button"
 import { CancelAppointmentButton } from "./cancel-appointment-button"
 import { ChatButton } from "./chat-button"
@@ -36,7 +37,7 @@ interface Appointment {
   id: string | number
   scheduled_at: string
   duration_minutes: number
-  status: "pending" | "confirmed" | "cancelled" | "completed" | "rejected"
+  status: AppointmentStatus
   notes_mentee?: string
   notes_mentor?: string
   google_meet_link?: string

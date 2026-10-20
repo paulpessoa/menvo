@@ -1,9 +1,11 @@
 import { Badge } from '@/components/ui/badge'
 import { Calendar, Clock, X, CheckCircle, Ban, TimerOff } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import type { AppointmentStatus } from '@/lib/domain/appointments/appointment-status.entity'
 
 interface AppointmentStatusBadgeProps {
-    status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'rejected' | 'expired'
+    /** Os 4 estados do banco, mais `expired`: rótulo de tela para pedido pendente cuja data já passou. */
+    status: AppointmentStatus | 'expired'
     className?: string
 }
 

@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient as createServerClient } from "@/lib/utils/supabase/server"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
-import { z } from "zod"
-
-const markCompletedSchema = z.object({
-  appointmentId: z.union([z.string(), z.number()]).transform(val => String(val)),
-})
+import { markCompletedAppointmentSchema as markCompletedSchema } from "@/lib/schemas/appointment"
 
 /**
  * Endpoint para o MENTOR marcar explicitamente uma mentoria como concluída.
