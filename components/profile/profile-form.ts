@@ -1,4 +1,4 @@
-import type { Profile } from "@/hooks/useProfile"
+import type { OwnProfile } from "@/lib/domain/profile/profile.entity"
 import { getBrowserTimezone } from "@/lib/utils/timezone"
 
 /** Editable subset of `profiles` shown on /profile. Every key is a real DB column. */
@@ -37,7 +37,7 @@ export type ProfileFormPatch = (patch: Partial<ProfileFormData>) => void
  * controlled; a missing/UTC timezone falls back to the browser's zone because
  * UTC is the DB default, not a choice the person made.
  */
-export function profileToForm(profile: Profile): ProfileFormData {
+export function profileToForm(profile: OwnProfile): ProfileFormData {
   return {
     first_name: profile.first_name ?? "",
     last_name: profile.last_name ?? "",

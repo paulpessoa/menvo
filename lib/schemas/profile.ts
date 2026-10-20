@@ -62,11 +62,59 @@ export const updateProfileSchema = z.object({
 })
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>
 
+/**
+ * Campo opcional que ignora o que não serve em vez de rejeitar o pedido: tipo
+ * errado ou `null` viram `undefined` ("não mexe"). É o comportamento antigo do
+ * POST /api/profile/role (`typeof x === "string"`): o onboarding envia
+ * `job_title: null` quando o campo está vazio, e isso não pode apagar nada nem
+ * dar 400.
+ */
+const ignoreIfInvalid = <T extends z.ZodTypeAny>(schema: T) => schema.optional().catch(undefined)
+
+/** Dados de perfil que o onboarding envia junto com o papel escolhido. */
+export const roleProfileDataSchema = z.object({
+  bio: ignoreIfInvalid(z.string()),
+  job_title: ignoreIfInvalid(z.string()),
+  company: ignoreIfInvalid(z.string()),
+  linkedin_url: ignoreIfInvalid(z.string()),
+  city: ignoreIfInvalid(z.string()),
+  state: ignoreIfInvalid(z.string()),
+  country: ignoreIfInvalid(z.string()),
+  expertise_areas: ignoreIfInvalid(z.array(z.string())),
+  mentorship_topics: ignoreIfInvalid(z.array(z.string())),
+  learning_goals: ignoreIfInvalid(z.string()),
+  inclusive_tags: ignoreIfInvalid(z.array(z.string())),
+})
+export type RoleProfileData = z.infer<typeof roleProfileDataSchema>
+
 export const updateUserRoleSchema = z.object({
   role: z.enum(["mentor", "mentee"], {
     errorMap: () => ({ message: "Role inválida" })
   }),
-  profileData: z.record(z.any()).optional()
+  profileData: roleProfileDataSchema.optional()
 })
 
 export type UpdateUserRoleInput = z.infer<typeof updateUserRoleSchema>
+
+/**
+ * POST /api/profile/onboarding. A chave é o id de um tour (`ob_m1`,
+ * `tour-assistant-v1`) e o valor, a data em que foi concluído. Sem limite, a
+ * coluna `onboarding_flags` aceitaria qualquer JSON de qualquer tamanho.
+ */
+export const onboardingFlagSchema = z.object({
+  flag: z.string().regex(/^[A-Za-z0-9_-]{1,64}$/),
+  value: z.union([z.string().max(64), z.boolean()]),
+})
+export type OnboardingFlagInput = z.infer<typeof onboardingFlagSchema>
+
+const trimmedOrEmpty = (value: unknown) => (typeof value === "string" ? value.trim() : "")
+
+/** POST /api/profile/request-mentor: a abordagem é obrigatória, o resto é opcional. */
+export const requestMentorSchema = z.object({
+  mentorship_approach: z.preprocess(
+    trimmedOrEmpty,
+    z.string().min(1, "Conte como você pretende conduzir suas mentorias antes de enviar a solicitação")
+  ),
+  what_to_expect: z.preprocess(trimmedOrEmpty, z.string()),
+})
+export type RequestMentorInput = z.infer<typeof requestMentorSchema>
