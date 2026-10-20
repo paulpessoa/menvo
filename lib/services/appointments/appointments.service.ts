@@ -15,15 +15,22 @@
  * não sabe qual usuário está atrás de uma rota `service_role`, então esta
  * checagem é a única que existe para elas.
  */
-import type { Appointment } from "@/lib/domain/appointments/appointment.entity"
+import type { Appointment, AppointmentListItem } from "@/lib/domain/appointments/appointment.entity"
+import { participantRole } from "@/lib/domain/appointments/appointment.entity"
 import {
   assertTransition,
+  canTransition,
   InvalidTransitionError,
   type AppointmentStatus,
   type TransitionActor,
 } from "@/lib/domain/appointments/appointment-status.entity"
+import type { AppointmentCalendar } from "@/lib/ports/appointment-calendar"
 import type { AppointmentMailer } from "@/lib/ports/appointment-mailer"
-import type { AppointmentsRepository, TransitionPatch } from "@/lib/repositories/appointments.repository"
+import type {
+  AppointmentsRepository,
+  ListForUserInput,
+  TransitionPatch,
+} from "@/lib/repositories/appointments.repository"
 import type { AppointmentFeedbacksRepository } from "@/lib/repositories/appointment-feedbacks.repository"
 import { RepositoryError } from "@/lib/repositories/repository-error"
 
@@ -31,7 +38,14 @@ export interface AppointmentsServiceDeps {
   repo: AppointmentsRepository
   feedbacks: AppointmentFeedbacksRepository
   mailer: AppointmentMailer
+  calendar: AppointmentCalendar
   now?: () => Date
+}
+
+export interface EvaluationInput {
+  rating: number
+  privateNotes?: string | null
+  publicFeedback?: string | null
 }
 
 /** A transição não aconteceu por motivo de regra, não de erro técnico. */
@@ -50,6 +64,28 @@ export type NoShowResult =
   | { kind: "forbidden" }
   | { kind: "in_future" }
   | { kind: "wrong_status" }
+  | TransitionBlock
+
+/**
+ * `not_found` também cobre "existe, mas você não participa": responder 403
+ * confirmaria a um desconhecido que o id é de uma sessão real.
+ */
+export type CancelResult =
+  | { kind: "ok" }
+  | { kind: "not_found" }
+  | { kind: "already_cancelled" }
+  /** Ex.: o mentorado tentando desfazer uma sessão que o mentor já concluiu. */
+  | { kind: "forbidden" }
+  | TransitionBlock
+
+export type EvaluateResult =
+  | { kind: "ok" }
+  | { kind: "not_found" }
+  | { kind: "forbidden" }
+  | { kind: "wrong_status" }
+  | { kind: "already_evaluated" }
+  /** A sessão foi concluída, mas gravar a avaliação falhou; repetir o envio funciona. */
+  | { kind: "feedback_failed" }
   | TransitionBlock
 
 /** Mensagens do trigger de `20261020000000_appointments_status_guard.sql`. */
@@ -165,6 +201,103 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
       }
 
       return { kind: "ok" }
+    },
+
+    /**
+     * Mentor ou mentorado cancela, com motivo. Remove o evento do calendário e
+     * avisa a outra parte; as duas coisas são `best effort`.
+     */
+    async cancel(appointmentId: string, userId: string, reason: string): Promise<CancelResult> {
+      const appointment = await deps.repo.findWithParties(appointmentId)
+      if (!appointment) return { kind: "not_found" }
+
+      const role = participantRole(appointment, userId)
+      if (!role) return { kind: "not_found" }
+      if (appointment.status === "cancelled") return { kind: "already_cancelled" }
+      if (!canTransition(appointment.status, "cancelled", role)) return { kind: "forbidden" }
+
+      const result = await transition(deps.repo, {
+        appointment,
+        to: "cancelled",
+        actor: role,
+        patch: { cancellation_reason: reason, cancelled_at: now().toISOString(), cancelled_by: userId },
+      })
+      if (result.kind !== "done") return result
+
+      if (appointment.google_event_id) {
+        try {
+          await deps.calendar.deleteEvent(userId, appointment.google_event_id)
+        } catch (error) {
+          console.warn("[appointments] não foi possível remover o evento do calendário:", (error as Error).message)
+        }
+      }
+
+      const { mentor, mentee } = appointment
+      const isMentor = role === "mentor"
+      const recipient = isMentor ? mentee : mentor
+      if (recipient?.email) {
+        try {
+          await deps.mailer.sendCancellation({
+            recipientEmail: recipient.email,
+            recipientName: recipient.full_name || "Usuário Menvo",
+            otherPersonName: isMentor ? mentor?.full_name || "Mentor" : mentee?.full_name || "Mentorado",
+            scheduledAt: appointment.scheduled_at,
+            reason,
+            cancelledByName: isMentor ? mentor?.full_name || "Seu mentor" : mentee?.full_name || "Seu mentorado",
+          })
+        } catch (error) {
+          console.error("[appointments] erro ao avisar o cancelamento:", (error as Error).message)
+        }
+      }
+
+      return { kind: "ok" }
+    },
+
+    /**
+     * O mentorado avalia o mentor e a sessão fica `completed`. Só o mentorado
+     * avalia (assimetria de propósito, docs/STATUS.md "Mentorship Evaluation Model").
+     * Ordem: primeiro o status, depois a avaliação. Se a avaliação falhar, a
+     * pessoa repete o envio (sessão `completed` ainda é avaliável); na ordem
+     * antiga, uma avaliação gravada com a sessão ainda `confirmed` travava o
+     * reenvio com "já avaliada".
+     */
+    async evaluate(appointmentId: string, userId: string, input: EvaluationInput): Promise<EvaluateResult> {
+      const appointment = await deps.repo.findById(appointmentId)
+      if (!appointment) return { kind: "not_found" }
+      if (appointment.mentee_id !== userId) return { kind: "forbidden" }
+      if (appointment.status !== "confirmed" && appointment.status !== "completed") return { kind: "wrong_status" }
+      if (await deps.feedbacks.findByReviewer(appointmentId, userId)) return { kind: "already_evaluated" }
+
+      if (appointment.status === "confirmed") {
+        const result = await transition(deps.repo, {
+          appointment,
+          to: "completed",
+          actor: "mentee",
+          patch: { completed_at: now().toISOString() },
+        })
+        if (result.kind !== "done") return result
+      }
+
+      try {
+        await deps.feedbacks.insert({
+          appointment_id: appointmentId,
+          reviewer_id: userId,
+          reviewed_id: appointment.mentor_id,
+          rating: input.rating,
+          private_notes: input.privateNotes || null,
+          public_feedback: input.publicFeedback || null,
+        })
+      } catch (error) {
+        console.error("[appointments] erro ao gravar a avaliação:", (error as Error).message)
+        return { kind: "feedback_failed" }
+      }
+
+      return { kind: "ok" }
+    },
+
+    /** Sessões do usuário (como mentor, mentorado ou ambos), com a outra parte e as avaliações. */
+    listMine(input: ListForUserInput): Promise<AppointmentListItem[]> {
+      return deps.repo.listForUser(input)
     },
   }
 }
