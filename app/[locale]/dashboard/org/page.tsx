@@ -8,11 +8,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2, Check, X, UserPlus, Users, GraduationCap, CalendarCheck, Loader2, Download, Clock, Sparkles, Star } from "lucide-react"
+import { Building2, Check, X, UserPlus, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import type { OrgDashboardMember, OrgDashboardSummary } from "@/lib/domain/organizations/organization.entity"
 import { buildOrgImpactCsv, orgImpactCsvFilename } from "@/lib/domain/organizations/org-report.csv"
+import { ImpactCards } from "@/components/organizations/dashboard/ImpactCards"
+import { ImpactToolbar } from "@/components/organizations/dashboard/ImpactToolbar"
 import { MembersCard } from "@/components/organizations/dashboard/MembersCard"
+import { SummaryCards } from "@/components/organizations/dashboard/SummaryCards"
 import { downloadCsv } from "@/components/organizations/dashboard/downloadCsv"
 
 interface OrgOption {
@@ -206,141 +209,16 @@ export default function OrgAdminDashboardPage() {
 
       {/* Relatório de Impacto (C-O3) */}
       <div className="mb-6 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-muted/30 p-4 rounded-2xl border">
-          <div>
-            <h2 className="font-bold text-lg flex items-center gap-2 text-foreground">
-              <Sparkles className="w-5 h-5 text-primary" />
-              Relatório de Impacto
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Métricas consolidadas de voluntariado e impacto social da organização.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex rounded-xl bg-background border p-1 text-xs">
-              {(
-                [
-                  { id: "all", label: "Tudo" },
-                  { id: "30d", label: "30 dias" },
-                  { id: "90d", label: "90 dias" },
-                  { id: "1y", label: "1 ano" },
-                ] as const
-              ).map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => handlePeriodChange(p.id)}
-                  className={`px-3 py-1 rounded-lg font-medium transition-all ${
-                    selectedPeriod === p.id
-                      ? "bg-primary text-white shadow-xs font-semibold"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={exportCsv}
-              disabled={!summary || members.length === 0}
-              className="rounded-xl flex items-center gap-1.5 text-xs font-semibold h-8"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Exportar CSV</span>
-            </Button>
-          </div>
-        </div>
-
-        {summary?.impact && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="rounded-2xl border">
-              <CardContent className="pt-6 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <Clock className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-2xl font-black text-foreground">{summary.impact.totalHoursCompleted}h</p>
-                  <p className="text-xs text-muted-foreground">Horas de mentoria</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-2xl border">
-              <CardContent className="pt-6 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <CalendarCheck className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-2xl font-black text-foreground">{summary.impact.totalSessionsCompleted}</p>
-                  <p className="text-xs text-muted-foreground">Sessões concluídas</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-2xl border">
-              <CardContent className="pt-6 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <Sparkles className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-2xl font-black text-foreground">{summary.impact.totalDiagnosticsDone}</p>
-                  <p className="text-xs text-muted-foreground">Diagnósticos feitos</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-2xl border">
-              <CardContent className="pt-6 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
-                  <Star className="h-5 w-5 fill-current" />
-                </div>
-                <div>
-                  <p className="text-2xl font-black text-foreground">
-                    {summary.impact.averageRating ? `${summary.impact.averageRating.toFixed(1)} ★` : "—"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Avaliação média</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <ImpactToolbar
+          period={selectedPeriod}
+          onPeriodChange={handlePeriodChange}
+          onExport={exportCsv}
+          exportDisabled={!summary || members.length === 0}
+        />
+        {summary?.impact && <ImpactCards impact={summary.impact} />}
       </div>
 
-      {summary && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-          <Card>
-            <CardContent className="pt-6 flex items-center gap-3">
-              <Users className="h-8 w-8 text-primary shrink-0" />
-              <div>
-                <p className="text-2xl font-bold">{summary.beneficiaries}</p>
-                <p className="text-xs text-muted-foreground">Beneficiários</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6 flex items-center gap-3">
-              <GraduationCap className="h-8 w-8 text-primary shrink-0" />
-              <div>
-                <p className="text-2xl font-bold">{summary.mentors}</p>
-                <p className="text-xs text-muted-foreground">Mentores da org</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6 flex items-center gap-3">
-              <CalendarCheck className="h-8 w-8 text-primary shrink-0" />
-              <div>
-                <p className="text-2xl font-bold">{summary.sessionsBookedByBeneficiaries + summary.sessionsGivenByOrgMentors}</p>
-                <p className="text-xs text-muted-foreground">Sessões (agendadas + dadas)</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {summary && <SummaryCards summary={summary} />}
 
       <div className="grid gap-6 md:grid-cols-2 mb-6">
         <Card>
