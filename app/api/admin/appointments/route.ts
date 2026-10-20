@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { requireAdmin } from "@/lib/auth/require-admin"
-import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
+import { createClient } from "@/lib/utils/supabase/server"
+import { buildAdminAppointmentsDeps } from "@/lib/services/admin/ops.composition"
 import {
   listAdminAppointments,
   toAdminErrorResponse
@@ -17,7 +18,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
 
   try {
-    const result = await listAdminAppointments(createServiceRoleClient(), {
+    const result = await listAdminAppointments(buildAdminAppointmentsDeps(await createClient()), {
       status: searchParams.get("status"),
       q: searchParams.get("q")
     })
