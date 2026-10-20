@@ -1,135 +1,89 @@
-
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { createClient } from "@/lib/utils/supabase/server"
 import { requireAdmin } from "@/lib/auth/require-admin"
-import type { Database, TablesInsert, TablesUpdate } from "@/lib/types/supabase"
+import {
+  featureFlagCreateBodySchema,
+  featureFlagDeleteQuerySchema,
+  featureFlagToggleBodySchema
+} from "@/lib/schemas/admin"
+import { adminForbiddenResponse } from "@/lib/services/admin/assert-admin"
+import { FeatureFlagNotFoundError } from "@/lib/services/admin/feature-flags.service"
+import { buildAdminFeatureFlagsService } from "@/lib/services/admin/ops.composition"
 
-// Constantes de tabela movidas para cá ou lidas do schema
-const FEATURE_FLAGS_TABLE = 'feature_flags'
-const FEATURE_FLAGS_AUDIT_LOGS_TABLE = 'feature_flag_audit_logs'
-
-// Usar Service Role para bypass RLS nas ações administrativas
-// Built per request, never at import time: `next build` imports every route
-// to collect page data, and a module-scope client throws when the key is
-// absent (CI, preview builds without secrets).
-function getSupabase() {
-  return createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+/** Traduz o erro do service para a resposta; erro de banco não vaza mensagem. */
+function errorResponse(error: unknown, context: string) {
+  const forbidden = adminForbiddenResponse(error)
+  if (forbidden) return forbidden
+  if (error instanceof FeatureFlagNotFoundError) {
+    return NextResponse.json({ error: error.message }, { status: error.status })
+  }
+  console.error(`[${context}] Error:`, error)
+  return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
 }
 
+const invalid = (message: string) => NextResponse.json({ error: message }, { status: 400 })
+
+/** GET /api/admin/feature-flags - flags e últimas linhas da trilha de auditoria. */
 export async function GET() {
-  const supabase = getSupabase()
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard.response
   try {
-    const guard = await requireAdmin()
-    if (!guard.ok) return guard.response
-
-    const { data: flags, error: flagsError } = await supabase
-      .from(FEATURE_FLAGS_TABLE)
-      .select('*')
-      .order('name')
-
-    if (flagsError) throw flagsError
-
-    const { data: logs, error: logsError } = await supabase
-      .from(FEATURE_FLAGS_AUDIT_LOGS_TABLE)
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(20)
-
-    if (logsError) throw logsError
-
-    return NextResponse.json({ flags, logs })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    const service = buildAdminFeatureFlagsService(await createClient())
+    return NextResponse.json(await service.listFlagsWithLogs())
+  } catch (error) {
+    return errorResponse(error, "GET /api/admin/feature-flags")
   }
 }
 
+/** POST /api/admin/feature-flags - cria uma flag (sempre desligada). */
 export async function POST(request: Request) {
-  const supabase = getSupabase()
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard.response
+
+  const body = featureFlagCreateBodySchema.safeParse(await request.json().catch(() => null))
+  if (!body.success) return invalid(body.error.issues[0]?.message ?? "Dados inválidos")
+
   try {
-    const guard = await requireAdmin()
-    if (!guard.ok) return guard.response
-
-    const body = await request.json()
-    const { name, description, tags } = body
-
-    const insertPayload: TablesInsert<'feature_flags'> = {
-      name,
-      description,
-      tags,
-      enabled: false
-    }
-
-    const { data, error } = await supabase
-      .from(FEATURE_FLAGS_TABLE)
-      .insert(insertPayload)
-      .select()
-      .single()
-
-    if (error) throw error
+    const service = buildAdminFeatureFlagsService(await createClient())
+    const data = await service.createFlag(guard.admin.userId, body.data)
     return NextResponse.json({ data })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    return errorResponse(error, "POST /api/admin/feature-flags")
   }
 }
 
+/** PUT /api/admin/feature-flags - liga ou desliga uma flag. */
 export async function PUT(request: Request) {
-  const supabase = getSupabase()
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard.response
+
+  const body = featureFlagToggleBodySchema.safeParse(await request.json().catch(() => null))
+  if (!body.success) return invalid("id e enabled são obrigatórios")
+
   try {
-    const guard = await requireAdmin()
-    if (!guard.ok) return guard.response
-
-    const body = await request.json()
-    const { id, enabled, name } = body
-
-    const updatePayload: TablesUpdate<'feature_flags'> = {
-      enabled,
-      updated_at: new Date().toISOString()
-    }
-
-    // 1. Atualizar flag
-    const { error: updateError } = await supabase
-      .from(FEATURE_FLAGS_TABLE)
-      .update(updatePayload)
-      .eq('id', id)
-
-    if (updateError) throw updateError
-
-    // 2. Gravar Log
-    const logPayload: TablesInsert<'feature_flag_audit_logs'> = {
-      flag_name: name,
-      action: enabled ? 'Ativada' : 'Desativada',
-      performed_by: guard.admin.userId
-    }
-
-    await supabase.from(FEATURE_FLAGS_AUDIT_LOGS_TABLE).insert(logPayload)
-
+    const service = buildAdminFeatureFlagsService(await createClient())
+    await service.setFlagEnabled(guard.admin.userId, body.data.id, body.data.enabled)
     return NextResponse.json({ success: true })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    return errorResponse(error, "PUT /api/admin/feature-flags")
   }
 }
 
+/** DELETE /api/admin/feature-flags?id= - apaga uma flag. */
 export async function DELETE(request: Request) {
-  const supabase = getSupabase()
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard.response
+
+  const query = featureFlagDeleteQuerySchema.safeParse({
+    id: new URL(request.url).searchParams.get("id")
+  })
+  if (!query.success) return invalid("ID is required")
+
   try {
-    const guard = await requireAdmin()
-    if (!guard.ok) return guard.response
-
-    const { searchParams } = new URL(request.url)
-    const id = searchParams.get('id')
-    if (!id) throw new Error("ID is required")
-
-    const { error } = await supabase
-      .from(FEATURE_FLAGS_TABLE)
-      .delete()
-      .eq('id', Number(id))
-
-    if (error) throw error
+    const service = buildAdminFeatureFlagsService(await createClient())
+    await service.deleteFlag(guard.admin.userId, query.data.id)
     return NextResponse.json({ success: true })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error) {
+    return errorResponse(error, "DELETE /api/admin/feature-flags")
   }
 }

@@ -10,7 +10,7 @@
  * `RepositoryError`, sem vazar mensagem do banco para a rota.
  */
 import type { SupabaseClient } from "@supabase/supabase-js"
-import type { Database, Tables } from "@/lib/types/supabase"
+import type { Database, Tables, TablesInsert } from "@/lib/types/supabase"
 import { RepositoryError } from "./repository-error"
 
 type Db = SupabaseClient<Database>
@@ -79,5 +79,71 @@ export function createAdminRetentionWriteRepository(db: Db) {
   }
 }
 
+/**
+ * Feature flags e a trilha de quem as mexeu (L2-5). Recebe o client
+ * privilegiado da composition (exceção E7 por ora: a troca pela sessão espera
+ * as policies de admin da M-A2).
+ */
+export function createAdminFeatureFlagsRepository(db: Db) {
+  return {
+    /** Todas as flags, em ordem alfabética. */
+    async listFlags(): Promise<Tables<"feature_flags">[]> {
+      const { data, error } = await db.from("feature_flags").select("*").order("name")
+      if (error) throw new RepositoryError("admin.featureFlags.list", error)
+      return data ?? []
+    },
+
+    /** Últimas linhas da trilha, a mais recente primeiro. */
+    async listAuditLogs(limit: number): Promise<Tables<"feature_flag_audit_logs">[]> {
+      const { data, error } = await db
+        .from("feature_flag_audit_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit)
+      if (error) throw new RepositoryError("admin.featureFlags.listLogs", error)
+      return data ?? []
+    },
+
+    /** Cria a flag (desligada) e devolve a linha criada. */
+    async createFlag(
+      input: Pick<TablesInsert<"feature_flags">, "name" | "description" | "tags">
+    ): Promise<Tables<"feature_flags">> {
+      const { data, error } = await db
+        .from("feature_flags")
+        .insert({ ...input, enabled: false })
+        .select()
+        .single()
+      if (error) throw new RepositoryError("admin.featureFlags.create", error)
+      return data
+    },
+
+    /** Liga/desliga. Devolve a linha, ou `null` se o id não existe. */
+    async setEnabled(id: number, enabled: boolean): Promise<Tables<"feature_flags"> | null> {
+      const { data, error } = await db
+        .from("feature_flags")
+        .update({ enabled, updated_at: new Date().toISOString() })
+        .eq("id", id)
+        .select()
+        .maybeSingle()
+      if (error) throw new RepositoryError("admin.featureFlags.setEnabled", error)
+      return data
+    },
+
+    /** Apaga a flag. Devolve a linha apagada, ou `null` se o id não existe. */
+    async deleteFlag(id: number): Promise<Tables<"feature_flags"> | null> {
+      const { data, error } = await db.from("feature_flags").delete().eq("id", id).select().maybeSingle()
+      if (error) throw new RepositoryError("admin.featureFlags.delete", error)
+      return data
+    },
+
+    /** Grava uma linha da trilha. */
+    async addAuditLog(entry: TablesInsert<"feature_flag_audit_logs">): Promise<void> {
+      const { error } = await db.from("feature_flag_audit_logs").insert(entry)
+      if (error) throw new RepositoryError("admin.featureFlags.audit", error)
+    }
+  }
+}
+
+export type AdminFeatureFlagsRepository = ReturnType<typeof createAdminFeatureFlagsRepository>
 export type AdminRetentionReadRepository = ReturnType<typeof createAdminRetentionReadRepository>
 export type AdminRetentionWriteRepository = ReturnType<typeof createAdminRetentionWriteRepository>
