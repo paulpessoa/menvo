@@ -39,8 +39,10 @@ e devolve a pergunta.
    `docs/blueprint/<d>-audit.md`, `supabase/tests/<d>*.test.sql`.
    Se precisar mudar um arquivo de outro domínio, para e descreve a mudança
    no relatório.
-3. **Arquivos compartilhados são só do orquestrador.** O agente não edita:
-   `lib/query/keys.ts`, `lib/query/effects.ts`, `lib/openapi/document.ts`,
+3. **Arquivos compartilhados são só do orquestrador, e só na integração.**
+   O agente não edita, nem que o teste de drift ou o typecheck "precise":
+   `lib/query/keys.ts`, `lib/query/effects.ts`, `lib/query/http.ts`,
+   `lib/openapi/document.ts`, `lib/openapi/document.test.ts`,
    `lib/agents/exposure.ts`, `lib/agents/registry.ts`, `messages/*.json`,
    `docs/STATUS.md`, `docs/blueprint/waves.md`, `lib/types/supabase.ts`,
    `package.json`, `package-lock.json`, `.github/**`, `eslint.config.mjs`,
@@ -62,29 +64,41 @@ e devolve a pergunta.
 
 ## Fluxo de uma onda
 
-1. **Preparar (orquestrador).** `git fetch origin main`, `main` atualizado,
-   `npx tsc --noEmit` limpo. Escolha as linhas em `docs/blueprint/waves.md` e
-   confira que nenhuma depende de outra da mesma onda.
-2. **Auditar em paralelo (Sonnet).** Abra um agente por linha com o prompt da
-   seção abaixo, fase `audit+plan`. Todos na mesma mensagem, para rodarem
-   juntos.
-3. **Revisar (Opus).** Leia cada `docs/blueprint/<d>-audit.md`. Corrija o plano
-   onde ele erra, junte as decisões que são do Paul numa pergunta só e espere
-   a resposta.
-4. **Aplicar em paralelo (Sonnet).** Continue cada agente com `SendMessage`
-   (mantém o contexto da auditoria), fase `apply`, com as decisões do Paul.
-   Um commit por grupo de camadas, na branch do worktree.
-5. **Integrar (Opus), uma linha por vez.**
-   - Revise o diff da branch (`git diff main...<branch>`): regras do AGENTS.md,
-     RLS, Zod nas fronteiras, nenhuma atribuição a IA nos commits.
-   - Aplique os "Pedidos para arquivos compartilhados" na própria branch, num
-     commit `chore(<d>): integra arquivos compartilhados`.
-   - `npm run verify`, `npm run build`, e `npx jest lib/openapi` se o domínio
-     ganhou contrato.
-   - Abra o PR da linha. PRs pequenas: um grupo de camadas por PR, para o
-     Paul conseguir revisar e mergear pelo celular. Depois do merge, a próxima branch faz
-     `git merge origin/main` antes de seguir. Conflito só pode aparecer nos
-     arquivos compartilhados, e quem resolve é o orquestrador.
+0. **Limite (Paul).** Só comece uma onda com **pelo menos 40% do limite
+   semanal livre**. O orquestrador não enxerga esse número: pergunte ao Paul.
+   Se ele avisar que passou de **90%** no meio da onda, mande todos os agentes
+   commitarem WIP na própria branch (`wip(<d>): ...`) e pararem.
+1. **Briefing (orquestrador, antes de abrir agentes).** Escreva
+   `docs/blueprint/<d>-brief.md` para cada linha: escopo, arquivos de partida,
+   fatos do banco que o orquestrador já consultou, decisões já tomadas, o que
+   é proibido nesta linha. O agente lê o briefing em vez de explorar o
+   repositório para descobrir isso sozinho.
+2. **Auditar e planejar (Sonnet, em paralelo).** Um agente por linha, prompt
+   da seção abaixo, fase `audit+plan`. Todos na mesma mensagem.
+3. **Checkpoint depois do plano (Opus + Paul).** Leia cada
+   `docs/blueprint/<d>-audit.md`, corrija o plano, junte as decisões do Paul
+   numa pergunta só e espere a resposta. Nenhum código antes disso.
+4. **Aplicar: uma sessão por grupo de camadas, com handoff (Sonnet).** Cada
+   grupo de camadas do plano (ex.: 3-4, 5-8, 9, 10-11) é **uma sessão nova** de
+   agente, não a mesma conversa crescendo. Ao fim do grupo o agente commita e
+   escreve o handoff na seção "Handoff" do próprio audit (o que fez, o que
+   ficou, arquivos compartilhados pendentes, em até 10 linhas). A sessão
+   seguinte começa lendo só o briefing, o plano e o handoff. Teste por agente:
+   só `npx tsc --noEmit` e o jest do próprio domínio. Nada de `npm run verify`
+   completo nem build.
+5. **Integrar (Opus), uma vez por lote.**
+   - Revise o diff de cada branch: regras do AGENTS.md, RLS, Zod nas
+     fronteiras, nenhuma atribuição a IA nos commits.
+   - Aplique de uma vez os pedidos para arquivos compartilhados de todas as
+     linhas (keys, effects, http, OpenAPI, STATUS), num commit
+     `chore: integra arquivos compartilhados da onda N`. Linhas que tocam os
+     mesmos compartilhados vão encadeadas, uma em cima da outra, para o
+     conflito ser resolvido aqui e não no merge do Paul.
+   - Rode `npm run build` e o jest completo **uma vez**, na ponta da pilha
+     integrada, não por agente nem por branch.
+   - Abra PRs pequenas (um grupo de camadas por PR), encadeadas pela base,
+     para o Paul revisar e mergear pelo celular. Depois de cada merge,
+     `git merge origin/main` na próxima (ou o botão "Update branch").
 6. **Registrar.** Atualize `docs/blueprint/waves.md` (registro) e
    `docs/STATUS.md` (journal) e diga ao Paul qual modelo usar na próxima etapa.
 
@@ -113,30 +127,39 @@ Migration: <"proibida nesta linha" | "permitida, com prefixo 2026MMDD">.
 
 Na fase audit+plan: escreva docs/blueprint/<domínio>-audit.md no formato do
 quiz e pare. Não escreva código.
-Na fase apply: siga o plano aprovado, um commit por grupo (Conventional
-Commits, sem nenhuma linha de atribuição a IA), testes no mesmo commit, e
-rode `npm run verify` antes de cada commit. Não rode build nem e2e: isso
-é do orquestrador.
+Leia primeiro docs/blueprint/<domínio>-brief.md (e, na fase apply, o plano e
+o Handoff do audit). Não explore o repositório além do que o grupo pede.
+
+Na fase apply: só o grupo <X-Y>. Um commit (Conventional Commits, sem
+nenhuma linha de atribuição a IA), testes no mesmo commit. Rode só
+`npx tsc --noEmit` e o jest do seu domínio. Não rode verify completo,
+build nem e2e. Ao terminar, escreva a seção "Handoff" do audit (até 10
+linhas) e pare.
 
 Pare e pergunte (não contorne) em: migration fora da permissão acima,
 dependência nova, mudança de formato de resposta, service_role, apagar
 arquivo que você não criou.
 
-Termine com:
-- O que mudou, por camada (arquivo → uma linha).
-- Decisões pendentes para o Paul (no máximo 3, cada uma com sua sugestão).
+Responda em NO MÁXIMO 15 linhas:
+- Commits (hash + título) e camadas feitas.
+- Pendências e decisões para o Paul (cada uma com sua sugestão).
 - Pedidos para arquivos compartilhados (arquivo → linha exata).
-- Resultado do `npm run verify`.
-- Nome da branch e lista de commits.
+- Resultado de tsc e do jest do domínio.
 ```
 
 ## Tokens
 
-- O orquestrador não lê o domínio inteiro: lê a auditoria e o diff. Quem lê
-  os arquivos é o Sonnet.
-- Continue o mesmo agente com `SendMessage` entre audit e apply, em vez de
-  abrir outro: o contexto já está carregado.
+- Subagentes sempre em Sonnet (`model: "sonnet"`). O Opus orquestra, revisa,
+  escreve SQL/RLS/ADR e integra.
+- O orquestrador não lê o domínio inteiro: escreve o briefing com o que já
+  sabe, lê a auditoria e o diff. Quem lê os arquivos é o Sonnet.
+- Uma sessão por grupo de camadas, com handoff escrito. Uma conversa de agente
+  que atravessa vários grupos fica cara, porque cada rodada relê todo o
+  histórico.
+- Resumo de retorno com no máximo 15 linhas. Detalhe vai no audit e nos
+  commits, não na mensagem.
+- Build e jest completo só uma vez por lote, na integração.
 - Domínio pequeno (até 3 rotas, sem `service_role`) não precisa de auditoria
-  separada: fase `audit+plan+apply` direto, e o orquestrador revisa só o diff.
-- Não use esforço max para orquestrar: high basta. Max fica para revisão de
+  separada: `audit+plan+apply` numa sessão só, e o orquestrador revisa o diff.
+- Não use esforço max para orquestrar: high basta. Max só para revisão de
   SQL/RLS sensível.
