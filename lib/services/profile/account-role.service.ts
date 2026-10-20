@@ -30,7 +30,7 @@ const EXCLUSIVE_ROLES: readonly ChosenRole[] = ["mentor", "mentee"]
 
 export interface AccountRoleServiceDeps {
   profile: AccountRoleRepository
-  verification: Pick<MentorRequestRepository, "requestVerification" | "withdrawVerification">
+  verification: Pick<MentorRequestRepository, "requestVerification" | "withdrawVerification" | "verificationStatus">
   catalog: RolesCatalog
   userRoles: UserRolesRepository
   mailer: Pick<ProfileMailer, "notifyNewMentee">
@@ -43,7 +43,10 @@ export interface AccountRoleUser {
   user_metadata?: Record<string, unknown> | null
 }
 
-export type ChooseRoleOutcome = { kind: "ok"; role: ChosenRole; status: "pending" | "approved" } | { kind: "failed" }
+export type ChooseRoleOutcome =
+  | { kind: "ok"; role: ChosenRole; status: "pending" | "approved" }
+  | { kind: "approved_mentor" }
+  | { kind: "failed" }
 export type StopMentoringOutcome =
   | { kind: "ok"; profile: { id: string; is_public: boolean | null } }
   | { kind: "failed"; cause: unknown }
@@ -112,6 +115,13 @@ export function createAccountRoleService({
       profileData: RoleProfileData | undefined
     ): Promise<ChooseRoleOutcome> {
       try {
+        // Mentor aprovado não volta a mentorado por aqui (D4b): o papel mudaria
+        // sem passar pela retirada da verificação e o perfil seguiria aprovado.
+        // O caminho certo é stopMentoring, que retira a verificação antes.
+        if (role === "mentee" && (await verification.verificationStatus(user.id)) === "approved") {
+          return { kind: "approved_mentor" }
+        }
+
         await profile.updateProfileFields(user.id, toProfileFields(profileData, now().toISOString()))
         if (typeof profileData?.learning_goals === "string") {
           await profile.upsertLearningGoals(user.id, profileData.learning_goals)

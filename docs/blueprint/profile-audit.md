@@ -261,3 +261,13 @@ Nada a fazer: decisão registrada é **não expor** perfil, favoritos nem notifi
 | `app/api/auth/me/route.ts` (domínio auth) | usar `profileRepository.findOwn` | depois do 2, na linha auth |
 | `docs/STATUS.md` | entrada do journal por grupo; atualizar `profiles-schema.md` (parágrafo da escrita em duas tabelas) | cada grupo |
 | `messages/*.json` | nenhuma chave nova prevista | - |
+
+## Handoff · grupo 4 + D1/D4 (aplicado)
+
+- `/api/profile` e `/onboarding` usam só o client da sessão (RLS); sem `service_role` e sem `Bearer` (D1). `profile/update` removida (rota, OpenAPI).
+- `cv_url` agora vem de `profile_cv_url()` dentro do repository (o embed já não pede a coluna, sem grant de leitura).
+- Mentorado: `update` e, se 0 linhas, `insert` (o `upsert` falha por regravar `user_id`). O método segue chamado `upsertMenteeFields`.
+- D4a: 500 de `/api/profile` sem `details` (causa no log). D4b: `role: "mentee"` de mentor `approved` responde 409.
+- `account-role.service.ts` ainda não existe (grupo 5): o 409 está inline em `app/api/profile/role/route.ts`; mover para o service no grupo 5.
+- Pendente (arquivo compartilhado): `docs/api-reference.md` ainda cita `/api/profile/update`.
+- Não coberto: o `GET` cria o perfil via INSERT próprio (provado em produção, sem teste pgTAP no repo).

@@ -6,24 +6,19 @@ import { NextRequest } from "next/server"
 const mockFrom = jest.fn()
 const mockGetSessionUser = jest.fn()
 
-jest.mock("@supabase/supabase-js", () => ({
-  createClient: jest.fn(() => ({
-    auth: { getUser: jest.fn() },
-    from: (...args: unknown[]) => mockFrom(...args)
-  }))
-}))
-
+// O client é o da sessão (RLS do dono): nenhum client com service_role entra na rota.
 jest.mock("@/lib/utils/supabase/server", () => ({
-  createClient: jest.fn(async () => ({ auth: { getUser: mockGetSessionUser } }))
+  createClient: jest.fn(async () => ({
+    auth: { getUser: mockGetSessionUser },
+    from: (...args: unknown[]) => mockFrom(...args),
+    rpc: async () => ({ data: null, error: null })
+  }))
 }))
 
 let GET: (request: NextRequest) => Promise<Response>
 let PUT: (request: NextRequest) => Promise<Response>
 
 beforeAll(() => {
-  // A rota cria o cliente admin ao ser importada, então o ambiente precisa existir antes.
-  process.env.NEXT_PUBLIC_SUPABASE_URL = "http://localhost:54321"
-  process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role-test-key"
   ;({ GET, PUT } = require("./route"))
 })
 
@@ -124,17 +119,31 @@ const put = (body: unknown) =>
     })
   )
 
-/** Tabelas falsas de perfil; devolve o que foi escrito em cada uma. */
-function mockTables(opts: { updateError?: { code?: string; message: string }; profile?: Record<string, unknown> } = {}) {
+/** Tabelas falsas de perfil; devolve o que foi escrito (`update`) e inserido em cada uma. */
+function mockTables(
+  opts: {
+    updateError?: { code?: string; message: string }
+    profile?: Record<string, unknown>
+    menteeRowExists?: boolean
+  } = {}
+) {
   const written: Record<string, unknown[]> = { profiles: [], mentor_profiles: [], mentee_profiles: [] }
+  const inserted: Record<string, unknown[]> = { mentee_profiles: [] }
   mockFrom.mockImplementation((table: string) => ({
     update: (fields: unknown) => {
       written[table].push(fields)
-      const result = { data: { id: "u1" }, error: opts.updateError ?? null }
-      return { eq: () => Object.assign(Promise.resolve(result), { select: () => ({ single: async () => result }) }) }
+      const rows = table === "mentee_profiles" && opts.menteeRowExists === false ? [] : [{ id: "u1", user_id: "u1" }]
+      const result = { data: rows, error: opts.updateError ?? null }
+      const single = { data: { id: "u1" }, error: opts.updateError ?? null }
+      return {
+        eq: () =>
+          Object.assign(Promise.resolve(single), {
+            select: () => Object.assign(Promise.resolve(result), { single: async () => single }),
+          }),
+      }
     },
-    upsert: async (fields: unknown) => {
-      written[table].push(fields)
+    insert: async (fields: unknown) => {
+      inserted[table].push(fields)
       return { error: null }
     },
     select: () => ({
@@ -146,7 +155,7 @@ function mockTables(opts: { updateError?: { code?: string; message: string }; pr
       }),
     }),
   }))
-  return written
+  return Object.assign(written, { inserted })
 }
 
 describe("PUT /api/profile", () => {
@@ -184,7 +193,16 @@ describe("PUT /api/profile", () => {
     await put({ bio: "Olá", chat_enabled: true, course: "BCC" })
     expect(written.profiles[0]).toMatchObject({ bio: "Olá" })
     expect(written.mentor_profiles).toEqual([{ chat_enabled: true }])
-    expect(written.mentee_profiles).toEqual([{ user_id: "u1", course: "BCC" }])
+    expect(written.mentee_profiles).toEqual([{ course: "BCC" }])
+    expect(written.inserted.mentee_profiles).toEqual([])
+  })
+
+  it("inserts the mentee row when the user never had one (update touched 0 rows)", async () => {
+    const written = mockTables({ menteeRowExists: false })
+    const res = await put({ course: "BCC" })
+    expect(res.status).toBe(200)
+    expect(written.mentee_profiles).toEqual([{ course: "BCC" }])
+    expect(written.inserted.mentee_profiles).toEqual([{ user_id: "u1", course: "BCC" }])
   })
 
   it("answers 409 for a slug already taken", async () => {
@@ -194,10 +212,13 @@ describe("PUT /api/profile", () => {
     expect((await res.json()).error).toContain("slug")
   })
 
-  it("answers 500 with the current error format on a database failure", async () => {
+  it("answers 500 with a generic error and keeps the database message out of the body (D4a)", async () => {
+    const logSpy = jest.spyOn(console, "error").mockImplementation(() => {})
     mockTables({ updateError: { message: "boom" } })
     const res = await put({ bio: "x" })
     expect(res.status).toBe(500)
-    expect(await res.json()).toEqual({ error: "Erro ao atualizar perfil", details: "boom" })
+    expect(await res.json()).toEqual({ error: "Erro ao atualizar perfil" })
+    expect(logSpy.mock.calls.flat().join(" ")).toContain("boom")
+    logSpy.mockRestore()
   })
 })

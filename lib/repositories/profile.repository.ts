@@ -7,19 +7,23 @@
  * Não faz: regra de negócio (ordem das escritas, 409 de slug, e-mail) nem criar
  * client; quem escolhe o client é a composição.
  * Tradeoff: o erro do driver vira `ProfileRepositoryError`, que guarda também o
- * `code` e a mensagem crua. A rota ainda devolve `details` ao cliente (formato
- * atual, mudar é a decisão D4 do Paul) e o service precisa do `code` (`23505`,
- * `PGRST116`); por isso não usamos só o `RepositoryError` genérico.
+ * `code` e a mensagem crua. A rota só a loga (nunca devolve ao cliente, D4a) e
+ * o service precisa do `code` (`23505`, `PGRST116`); por isso não usamos só o
+ * `RepositoryError` genérico.
  */
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Database, Json, TablesInsert, TablesUpdate } from "@/lib/types/supabase"
 import { OWN_PROFILE_COLUMNS } from "@/lib/services/auth/own-profile-columns"
 import { MENTOR_PROFILE_EMBED, type MentorEditableFields } from "@/lib/services/mentors/mentor-profile-fields"
-import { MENTEE_PROFILE_EMBED_WITH_CV, type MenteeEditableFields } from "@/lib/services/mentees/mentee-profile-fields"
+import { MENTEE_PROFILE_EMBED, type MenteeEditableFields } from "@/lib/services/mentees/mentee-profile-fields"
 import { RepositoryError } from "./repository-error"
 
-/** Select do perfil próprio: colunas de `profiles` + mentor + mentorado (com currículo). */
-export const PROFILE_SELECT = `${OWN_PROFILE_COLUMNS}, ${MENTOR_PROFILE_EMBED}, ${MENTEE_PROFILE_EMBED_WITH_CV}` as const
+/**
+ * Select do perfil próprio: colunas de `profiles` + mentor + mentorado. O
+ * currículo fica de fora (sem grant de leitura para `authenticated`); entra por
+ * `profile_cv_url()` em `attachCv`.
+ */
+export const PROFILE_SELECT = `${OWN_PROFILE_COLUMNS}, ${MENTOR_PROFILE_EMBED}, ${MENTEE_PROFILE_EMBED}` as const
 
 /**
  * Linha como o PostgREST devolve, ainda com os embeds `mentor_profiles` e
@@ -44,7 +48,7 @@ export class ProfileRepositoryError extends RepositoryError {
     return this.dbError?.code
   }
 
-  /** Mensagem crua do banco, como a rota a devolve em `details`. */
+  /** Mensagem crua do banco, só para log do servidor. */
   get dbMessage(): string | undefined {
     return this.dbError?.message
   }
@@ -58,7 +62,11 @@ export interface ProfileRepository {
   updateProfile(userId: string, fields: ProfileFieldsUpdate): Promise<void>
   /** `update`, não upsert: só mentor ou candidato tem linha (criada pela RPC request_mentor_verification). */
   updateMentorFields(userId: string, fields: MentorEditableFields): Promise<void>
-  /** Upsert: quem nunca preencheu dados acadêmicos não tem linha. */
+  /**
+   * Update e, se não afetou nenhuma linha, insert (quem nunca preencheu dados
+   * acadêmicos não tem linha). Não é `upsert`: o PostgREST regrava `user_id`, que
+   * não tem grant de UPDATE para `authenticated`.
+   */
   upsertMenteeFields(userId: string, fields: MenteeEditableFields): Promise<void>
   /** Flags dos tours guiados. Perfil sem linha = nenhuma flag. */
   findOnboardingFlags(userId: string): Promise<OnboardingFlags>
@@ -68,6 +76,21 @@ export interface ProfileRepository {
 export type OnboardingFlags = Record<string, Json | undefined>
 
 export function createProfileRepository(db: SupabaseClient<Database>): ProfileRepository {
+  /**
+   * Põe `cv_url` no embed do mentorado. Sem linha de mentorado não há currículo,
+   * então nem chama a função. Falha da função não derruba o perfil: o currículo
+   * só some da resposta.
+   */
+  async function attachCv(userId: string, row: OwnProfileRow): Promise<OwnProfileRow> {
+    const embed = row.mentee_profiles
+    const mentee = Array.isArray(embed) ? embed[0] : embed
+    if (!mentee || typeof mentee !== "object") return row
+
+    const { data: cvUrl, error } = await db.rpc("profile_cv_url", { p_user_id: userId })
+    if (error) console.error("⚠️ profile_cv_url error:", error.message)
+    return { ...row, mentee_profiles: { ...mentee, cv_url: error ? null : cvUrl } }
+  }
+
   return {
     async findOwn(userId) {
       const { data, error } = await db.from("profiles").select(PROFILE_SELECT).eq("id", userId).single()
@@ -75,13 +98,13 @@ export function createProfileRepository(db: SupabaseClient<Database>): ProfileRe
         if (error.code === "PGRST116") return null
         throw new ProfileRepositoryError("profile.findOwn", error)
       }
-      return data as OwnProfileRow
+      return attachCv(userId, data as OwnProfileRow)
     },
 
     async insertOwn(profile) {
       const { data, error } = await db.from("profiles").insert(profile).select(PROFILE_SELECT).single()
       if (error) throw new ProfileRepositoryError("profile.insertOwn", error)
-      return data as OwnProfileRow
+      return attachCv(profile.id, data as OwnProfileRow)
     },
 
     async updateProfile(userId, fields) {
@@ -95,10 +118,12 @@ export function createProfileRepository(db: SupabaseClient<Database>): ProfileRe
     },
 
     async upsertMenteeFields(userId, fields) {
-      const { error } = await db
-        .from("mentee_profiles")
-        .upsert({ user_id: userId, ...fields }, { onConflict: "user_id" })
+      const { data, error } = await db.from("mentee_profiles").update(fields).eq("user_id", userId).select("user_id")
       if (error) throw new ProfileRepositoryError("profile.upsertMenteeFields", error)
+      if (data && data.length > 0) return
+
+      const { error: insertError } = await db.from("mentee_profiles").insert({ user_id: userId, ...fields })
+      if (insertError) throw new ProfileRepositoryError("profile.upsertMenteeFields", insertError)
     },
 
     async findOnboardingFlags(userId) {

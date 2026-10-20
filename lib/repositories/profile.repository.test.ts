@@ -10,12 +10,12 @@ function fakeClient(result: Result) {
     eq: jest.fn().mockReturnThis(),
     insert: jest.fn().mockReturnThis(),
     update: jest.fn().mockReturnThis(),
-    upsert: jest.fn(async () => result),
     single: jest.fn(async () => result),
     then: (resolve: (v: unknown) => unknown) => Promise.resolve(result).then(resolve),
   }
-  const client = { from: jest.fn(() => query) }
-  return { client: client as unknown as SupabaseClient<Database>, query }
+  const rpc = jest.fn(async () => ({ data: "u1/cv-1.pdf", error: null }))
+  const client = { from: jest.fn(() => query), rpc }
+  return { client: client as unknown as SupabaseClient<Database>, query, rpc }
 }
 
 describe("profile repository", () => {
@@ -77,15 +77,46 @@ describe("profile repository", () => {
     expect(query.eq).toHaveBeenCalledWith("id", "u1")
   })
 
-  it("updates mentor fields by user_id and upserts mentee fields keyed on user_id", async () => {
+  it("updates mentor fields by user_id", async () => {
     const { client, query } = fakeClient({ data: null, error: null })
-    const repo = createProfileRepository(client)
-    await repo.updateMentorFields("u1", { is_volunteer: true })
+    await createProfileRepository(client).updateMentorFields("u1", { is_volunteer: true })
     expect(client.from).toHaveBeenCalledWith("mentor_profiles")
     expect(query.eq).toHaveBeenCalledWith("user_id", "u1")
+  })
 
-    await repo.upsertMenteeFields("u1", { course: "BCC" })
+  it("updates the mentee row and does not insert when it existed", async () => {
+    const { client, query } = fakeClient({ data: [{ user_id: "u1" }], error: null })
+    await createProfileRepository(client).upsertMenteeFields("u1", { course: "BCC" })
     expect(client.from).toHaveBeenCalledWith("mentee_profiles")
-    expect(query.upsert).toHaveBeenCalledWith({ user_id: "u1", course: "BCC" }, { onConflict: "user_id" })
+    expect(query.update).toHaveBeenCalledWith({ course: "BCC" })
+    expect(query.eq).toHaveBeenCalledWith("user_id", "u1")
+    expect(query.insert).not.toHaveBeenCalled()
+  })
+
+  it("inserts the mentee row (user_id + fields) when the update touched 0 rows", async () => {
+    const { client, query } = fakeClient({ data: [], error: null })
+    await createProfileRepository(client).upsertMenteeFields("u1", { course: "BCC" })
+    expect(query.update).toHaveBeenCalledWith({ course: "BCC" })
+    expect(query.insert).toHaveBeenCalledWith({ user_id: "u1", course: "BCC" })
+  })
+
+  it("never upserts the mentee row (PostgREST would rewrite user_id, which has no UPDATE grant)", async () => {
+    const { client, query } = fakeClient({ data: [], error: null })
+    await createProfileRepository(client).upsertMenteeFields("u1", { course: "BCC" })
+    expect(query).not.toHaveProperty("upsert")
+  })
+
+  it("reads the cv through profile_cv_url, since cv_url has no select grant", async () => {
+    const { client, rpc } = fakeClient({ data: { id: "u1", mentee_profiles: { course: "BCC" } }, error: null })
+    const row = await createProfileRepository(client).findOwn("u1")
+    expect(PROFILE_SELECT).not.toContain("cv_url")
+    expect(rpc).toHaveBeenCalledWith("profile_cv_url", { p_user_id: "u1" })
+    expect(row?.mentee_profiles).toEqual({ course: "BCC", cv_url: "u1/cv-1.pdf" })
+  })
+
+  it("skips the cv call when the user has no mentee row", async () => {
+    const { client, rpc } = fakeClient({ data: { id: "u1", mentee_profiles: null }, error: null })
+    await createProfileRepository(client).findOwn("u1")
+    expect(rpc).not.toHaveBeenCalled()
   })
 })
