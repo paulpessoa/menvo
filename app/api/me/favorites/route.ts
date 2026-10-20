@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
-import { z } from "zod"
+import { toggleFavoriteSchema } from "@/lib/schemas/me"
+import { buildMyFavoritesService } from "@/lib/services/me/my-favorites.composition"
 
 /**
  * GET/POST /api/me/favorites - the caller's favorited mentor ids. Replaces
@@ -11,6 +12,7 @@ import { z } from "zod"
  * RLS on `user_favorites` should already scope this to `auth.uid()`, but
  * deriving it here too means a caller can't even try to read or write
  * someone else's favorites by passing a different id.
+ * Thin on purpose: auth, Zod, service, status.
  */
 async function requireUser() {
   const supabase = await createClient()
@@ -26,23 +28,13 @@ export async function GET() {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
   }
 
-  const { data, error } = await supabase
-    .from("user_favorites")
-    .select("mentor_id")
-    .eq("user_id", user.id)
-
-  if (error) {
-    console.error("[GET /api/me/favorites] Erro:", error.message)
+  const outcome = await buildMyFavoritesService(supabase).list(user.id)
+  if (outcome.kind === "failed") {
     return NextResponse.json({ error: "Não foi possível carregar os favoritos" }, { status: 500 })
   }
 
-  return NextResponse.json({ favorites: (data || []).map((f) => f.mentor_id) })
+  return NextResponse.json({ favorites: outcome.mentorIds })
 }
-
-const toggleSchema = z.object({
-  mentorId: z.string().uuid(),
-  action: z.enum(["add", "remove"]),
-})
 
 export async function POST(request: NextRequest) {
   const { supabase, user } = await requireUser()
@@ -50,19 +42,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Não autenticado" }, { status: 401 })
   }
 
-  const parsed = toggleSchema.safeParse(await request.json().catch(() => null))
+  const parsed = toggleFavoriteSchema.safeParse(await request.json().catch(() => null))
   if (!parsed.success) {
     return NextResponse.json({ error: "Dados inválidos" }, { status: 400 })
   }
-  const { mentorId, action } = parsed.data
 
-  const { error } =
-    action === "add"
-      ? await supabase.from("user_favorites").insert({ user_id: user.id, mentor_id: mentorId } as any)
-      : await supabase.from("user_favorites").delete().eq("user_id", user.id).eq("mentor_id", mentorId)
-
-  if (error) {
-    console.error("[POST /api/me/favorites] Erro:", error.message)
+  const outcome = await buildMyFavoritesService(supabase).toggle(user.id, parsed.data)
+  if (outcome.kind === "failed") {
     return NextResponse.json({ error: "Não foi possível atualizar os favoritos" }, { status: 500 })
   }
 
