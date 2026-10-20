@@ -12,7 +12,7 @@ const config = {
   testEnvironment: 'jest-environment-jsdom',
   // e2e/ belongs to Playwright; .worktrees/ and .claude/worktrees/ hold other
   // checkouts of this repo (agent worktrees), whose tests must not run here.
-  testPathIgnorePatterns: ['/node_modules/', '/e2e/', '/.worktrees/', '/.claude/worktrees/'],
+  testPathIgnorePatterns: ['/node_modules/', '/e2e/', '/.worktrees/', '<rootDir>/.claude/worktrees/'],
   modulePathIgnorePatterns: ['<rootDir>/.claude/worktrees/'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
