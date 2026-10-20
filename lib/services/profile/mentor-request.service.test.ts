@@ -15,7 +15,10 @@ function deps(status: string | null = "pending") {
         return { user_id: id, verification_status: status }
       }),
     },
-    mailer: { notifyAdminNewMentor: jest.fn(async () => void calls.push("mail")) },
+    mailer: {
+      notifyAdminNewMentor: jest.fn(async () => void calls.push("mail")),
+      notifyNewMentee: jest.fn(async () => undefined),
+    },
   }
 }
 

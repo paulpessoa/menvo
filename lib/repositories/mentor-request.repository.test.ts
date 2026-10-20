@@ -21,6 +21,12 @@ describe("mentor request repository", () => {
     expect(rpc).toHaveBeenCalledWith("request_mentor_verification")
   })
 
+  it("leaves verification only through the RPC too", async () => {
+    const { client, rpc } = fakeClient({ data: null, error: null })
+    await createMentorRequestRepository(client).withdrawVerification()
+    expect(rpc).toHaveBeenCalledWith("withdraw_mentor_verification")
+  })
+
   it("saves the texts on the caller's mentor_profiles row and returns the status", async () => {
     const { client, query } = fakeClient({ data: { user_id: "u1", verification_status: "pending" }, error: null })
     const row = await createMentorRequestRepository(client).saveApproach("u1", {
