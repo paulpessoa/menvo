@@ -19,6 +19,7 @@ import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { createAppointmentsRepository } from "@/lib/repositories/appointments.repository"
 import { createAppointmentFeedbacksRepository } from "@/lib/repositories/appointment-feedbacks.repository"
 import { brevoAppointmentMailer } from "@/lib/ports/adapters/appointment-mailer.brevo"
+import { googleAppointmentCalendar } from "@/lib/ports/adapters/appointment-calendar.google"
 import { createAppointmentsService } from "./appointments.service"
 
 export function buildAppointmentsService() {
@@ -27,5 +28,6 @@ export function buildAppointmentsService() {
     repo: createAppointmentsRepository(db),
     feedbacks: createAppointmentFeedbacksRepository(db),
     mailer: brevoAppointmentMailer,
+    calendar: googleAppointmentCalendar,
   })
 }
