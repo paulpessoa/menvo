@@ -13,6 +13,7 @@
  */
 import { meKeys } from "./keys/me"
 import { mentorsKeys } from "./keys/mentors"
+import { orgKeys } from "./keys/org"
 import { profileKeys } from "./keys/profile"
 import { quizKeys } from "./keys/quiz"
 
@@ -21,4 +22,5 @@ export const qk = {
   mentors: mentorsKeys,
   profile: profileKeys,
   me: meKeys,
+  org: orgKeys,
 } as const
