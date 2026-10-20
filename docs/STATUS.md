@@ -108,6 +108,10 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-19 - Onda 0 da modernização em paralelo
+- **Catálogo (tarefa 2 do `hardening-plan.md`):** `20261019000000_mentors_view_public_stats.sql` faz a `mentors_view` ler `mentor_public_stats` (security definer, só agregados de mentor público e aprovado). Visitantes deixam de ver 0 sessões e 0 avaliações em `/mentors` e no perfil. Mentor fora do catálogo cai no `mentor_stats` de antes. Mesmas colunas e tipos. Aplicada em produção (PR #107). pgTAP em `supabase/tests/mentors_view_public_stats.test.sql`.
+- **Paralelismo:** skill `menvo-waves` (um domínio por subagente em worktree, Opus orquestra, Sonnet aplica, arquivos compartilhados só pelo orquestrador, uma migration por onda). Plano e registro em [`blueprint/waves.md`](blueprint/waves.md). `lib/query/keys.ts` e `effects.ts` passam a só montar os arquivos por domínio (`keys/<d>.ts`, `effects/<d>.ts`).
+
 ### 2026-10-15 - Tours de onboarding revisados
 `useOnboarding` recomeçava o tour do zero sempre que a página re-renderizava (o array de passos entrava nas dependências do efeito) e apontava para alvos escondidos: menu do topo no celular, botão "Agendar" do desktop no perfil do mentor, ou o botão trocado por "Me avise". Agora os passos ficam numa ref e cada passo usa o primeiro alvo visível; sem alvo visível, vira popover centralizado (`resolveTourSteps`, testado). Textos atualizados com o que entrou de 13 a 15/10: mentorado (pedir aviso quando o mentor não tem horário, check-in pós-sessão que libera o próximo agendamento), mentor (abrir horários e alerta de agenda, pausar mentorias, check-in que conta horas e vira certificado) e benefícios de mentor em `/onboarding`. Quem já concluiu um tour não o vê de novo.
 

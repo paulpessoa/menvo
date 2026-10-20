@@ -4,17 +4,19 @@
  * invalida por este mapa, nunca com chave inline. Leia como a tabela de
  * dependências da tela: enviar o quiz atualiza o dashboard do mentorado porque
  * o resumo do dashboard vive em `qk.quiz.latest`, sob `qk.quiz.all`.
+ *
+ * Cada domínio declara as suas ações em `effects/<domínio>.ts` (prefixo
+ * `<domínio>.`); este arquivo só junta os mapas, para que domínios diferentes
+ * não editem o mesmo arquivo.
  */
 import type { QueryClient } from "@tanstack/react-query"
-import { qk } from "./keys"
+import { quizEffects } from "./effects/quiz"
+import type { Keys } from "./effects/types"
 
-type Keys = readonly (readonly unknown[])[]
+export type { Keys }
 
 export const effects = {
-  /** Anônimo ou logado: o resumo do dashboard e o resultado ficam velhos. */
-  "quiz.submit": (): Keys => [qk.quiz.all],
-  /** Criar conta vincula o quiz ao usuário: resultado (`is_owner`) e resumo mudam. */
-  "quiz.account.create": (ctx: { quizId: string }): Keys => [qk.quiz.result(ctx.quizId), qk.quiz.all],
+  ...quizEffects,
 } satisfies Record<string, (ctx: never) => Keys>
 
 export function runEffects(qc: QueryClient, keys: Keys) {
