@@ -1,65 +1,19 @@
 "use client"
 
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {
-  Calendar,
-  Clock,
-  Video,
-  MessageSquare,
-  ExternalLink,
-  XCircle,
-  CheckCircle2,
-  Linkedin,
-  UserX
-} from "lucide-react"
-import { AppointmentStatusBadge } from "./appointment-status-badge"
-import type { AppointmentStatus } from "@/lib/domain/appointments/appointment-status.entity"
-import { ConfirmAppointmentButton } from "./confirm-appointment-button"
-import { CancelAppointmentButton } from "./cancel-appointment-button"
-import { ChatButton } from "./chat-button"
+import { Card } from "@/components/ui/card"
 import { CompleteAppointmentModal } from "./complete-appointment-modal"
 import { NoShowModal } from "./no-show-modal"
 import { useState } from "react"
-import { useTranslations, useFormatter } from "next-intl"
+import { useTranslations } from "next-intl"
 import { useRouter } from "@/i18n/routing"
 import { useFeatureFlag } from "@/lib/feature-flags"
 import { toast } from "sonner"
 import { useCompleteAppointment } from "@/hooks/appointments/useCompleteAppointment"
-
-interface AppointmentFeedbackItem {
-  id: string | number
-  reviewer_id: string
-}
-
-interface Appointment {
-  id: string | number
-  scheduled_at: string
-  duration_minutes: number
-  status: AppointmentStatus
-  notes_mentee?: string
-  notes_mentor?: string
-  google_meet_link?: string
-  cancellation_reason?: string
-  cancelled_at?: string
-  cancelled_by?: string
-  feedbacks?: AppointmentFeedbackItem[]
-  mentor: {
-    id: string
-    full_name: string
-    email: string
-    avatar_url?: string
-    linkedin_url?: string | null
-  }
-  mentee: {
-    id: string
-    full_name: string
-    email: string
-    avatar_url?: string
-    linkedin_url?: string | null
-  }
-}
+import type { Appointment } from "./appointment-card.types"
+import { deriveAppointmentCardState } from "./appointment-card-state"
+import { AppointmentCardHeader } from "./appointment-card-header"
+import { AppointmentCardBody } from "./appointment-card-body"
+import { AppointmentCardActions } from "./appointment-card-actions"
 
 /** Shape returned by `/api/appointments/list`, as consumed by the card. */
 export type AppointmentCardData = Appointment
@@ -70,28 +24,29 @@ interface AppointmentCardProps {
   onAppointmentUpdate?: (appointment: Appointment) => void
 }
 
+/**
+ * One session in a list. Orchestrates the mutations and modals; what to show is
+ * derived in `appointment-card-state` and drawn by the header/body/actions parts.
+ */
 export function AppointmentCard({
   appointment,
   currentUserId,
   onAppointmentUpdate
 }: AppointmentCardProps) {
   const t = useTranslations("appointments")
-  const commonT = useTranslations("common")
-  const format = useFormatter()
   const router = useRouter()
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false)
   const [isNoShowModalOpen, setIsNoShowModalOpen] = useState(false)
   const complete = useCompleteAppointment()
-  const isCompleting = complete.isPending
   const isChatEnabled = useFeatureFlag("chat_flag")
+  const state = deriveAppointmentCardState(appointment, currentUserId, isChatEnabled)
+  const { otherPerson, isMentor } = state
 
   const handleMentorComplete = async () => {
     try {
       await complete.mutateAsync({ appointmentId: appointment.id })
       toast.success(t("sessionCompletedSuccess"))
-      if (onAppointmentUpdate) {
-        onAppointmentUpdate({ ...appointment, status: "completed" })
-      }
+      onAppointmentUpdate?.({ ...appointment, status: "completed" })
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Erro ao concluir a sessão.")
     }
@@ -102,322 +57,49 @@ export function AppointmentCard({
     const reason = trimmedNotes
       ? `Mentorado não compareceu: ${trimmedNotes}`
       : "Mentorado não compareceu à sessão"
-    if (onAppointmentUpdate) {
-      onAppointmentUpdate({
-        ...appointment,
-        status: "cancelled",
-        cancellation_reason: reason,
-        notes_mentor: trimmedNotes || "Mentorado não compareceu à sessão.",
-        cancelled_by: currentUserId,
-        cancelled_at: new Date().toISOString()
-      })
-    }
+    onAppointmentUpdate?.({
+      ...appointment,
+      status: "cancelled",
+      cancellation_reason: reason,
+      notes_mentor: trimmedNotes || "Mentorado não compareceu à sessão.",
+      cancelled_by: currentUserId,
+      cancelled_at: new Date().toISOString()
+    })
   }
-
-  const mentor = Array.isArray(appointment.mentor)
-    ? appointment.mentor[0]
-    : appointment.mentor
-  const mentee = Array.isArray(appointment.mentee)
-    ? appointment.mentee[0]
-    : appointment.mentee
-
-  const isMentor = mentor?.id === currentUserId
-  const otherPerson = (isMentor ? mentee : mentor) || { id: "", full_name: "Usuário", avatar_url: null, linkedin_url: null }
-  const userRole = isMentor ? "mentor" : "mentee"
-
-  // Avaliação calculada diretamente dos dados da consulta mãe, sem query N+1
-  const hasUserEvaluated = Boolean(
-    appointment.feedbacks &&
-      appointment.feedbacks.some((f) => f.reviewer_id === currentUserId)
-  )
-
-  const dateObj = new Date(appointment.scheduled_at)
-  const now = new Date()
-  const isToday = dateObj.toDateString() === now.toDateString()
-  const endTime = new Date(
-    dateObj.getTime() + appointment.duration_minutes * 60 * 1000
-  )
-  const isPast = endTime < now
-
-  // Formatação explícita com Timezone de Brasília para evitar erro de 3h
-  const formattedDate = dateObj.toLocaleDateString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    day: "numeric",
-    month: "short",
-    weekday: isToday ? undefined : "short"
-  })
-
-  const formattedTime = dateObj.toLocaleTimeString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    hour: "2-digit",
-    minute: "2-digit"
-  })
-
-  const getInitials = (name: string) => {
-    if (!name) return "??"
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2)
-  }
-
-  // O status do banco não sabe que o tempo passou: um pedido nunca respondido
-  // continua "pending" e uma sessão realizada continua "confirmed" até a
-  // avaliação. O badge mostra o estado real para quem está olhando.
-  const badgeStatus =
-    isPast && appointment.status === "pending"
-      ? "expired"
-      : isPast && appointment.status === "confirmed"
-        ? "completed"
-        : appointment.status
-
-  const canConfirm = isMentor && appointment.status === "pending" && !isPast
-  const canCancel =
-    (appointment.status === "pending" || appointment.status === "confirmed") &&
-    !isPast
-  const canJoinMeet =
-    appointment.status === "confirmed" &&
-    appointment.google_meet_link &&
-    !isPast
-  const canChat =
-    appointment.status === "pending" || appointment.status === "confirmed"
-  const canComplete =
-    !isMentor &&
-    (appointment.status === "confirmed" || appointment.status === "completed") &&
-    isPast &&
-    !hasUserEvaluated
-  const canMentorComplete = isMentor && appointment.status === "confirmed" && isPast
-  const canReportNoShow =
-    isMentor &&
-    isPast &&
-    (appointment.status === "confirmed" || appointment.status === "completed")
-
-  const showLinkedin = !isChatEnabled && (canChat || canConfirm) && !!otherPerson?.linkedin_url
-  const hasActions =
-    (isChatEnabled && (canChat || canConfirm)) ||
-    showLinkedin ||
-    canComplete ||
-    canConfirm ||
-    canCancel ||
-    canJoinMeet ||
-    canMentorComplete ||
-    canReportNoShow
 
   const handleProfileClick = () => {
-    if (!isMentor && otherPerson?.id) {
-      router.push(`/mentors/${(otherPerson as any).slug || otherPerson.id}`)
+    if (!isMentor && otherPerson.id) {
+      router.push(`/mentors/${otherPerson.slug || otherPerson.id}`)
     }
   }
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div
-            className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={handleProfileClick}
-          >
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={otherPerson.avatar_url || undefined} />
-              <AvatarFallback>
-                {getInitials(otherPerson.full_name)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className="font-semibold text-sm hover:text-primary transition-colors">
-                {otherPerson.full_name}
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                {isMentor
-                  ? t("roleMentee", { defaultValue: "Mentee" })
-                  : t("roleMentor", { defaultValue: "Mentor" })}
-              </p>
-            </div>
-          </div>
-          <AppointmentStatusBadge status={badgeStatus} />
-        </div>
-      </CardHeader>
+      <AppointmentCardHeader
+        otherPerson={otherPerson}
+        isMentor={isMentor}
+        badgeStatus={state.badgeStatus}
+        onProfileClick={handleProfileClick}
+      />
+      <AppointmentCardBody
+        appointment={appointment}
+        currentUserId={currentUserId}
+        otherPerson={otherPerson}
+        dateObj={state.dateObj}
+        isToday={state.isToday}
+      />
 
-      <CardContent className="space-y-3">
-        <div className="flex items-center gap-2 text-sm">
-          <Calendar className="w-4 h-4 text-muted-foreground" />
-          <span className={isToday ? "font-bold text-primary" : ""}>
-            {isToday ? t("today") : formattedDate}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm">
-          <Clock className="w-4 h-4 text-muted-foreground" />
-          <span className="font-medium text-gray-900">{formattedTime}</span>
-          <span className="text-muted-foreground">
-            ({appointment.duration_minutes} {t("minutes")})
-          </span>
-        </div>
-
-        {appointment.notes_mentee && (
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm">
-              <MessageSquare className="w-4 h-4 text-muted-foreground" />
-              <span className="font-medium">{t("menteeComments")}</span>
-            </div>
-            <p className="text-sm text-muted-foreground pl-6 whitespace-pre-wrap break-words">
-              {appointment.notes_mentee}
-            </p>
-          </div>
-        )}
-
-        {appointment.notes_mentor && (
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm">
-              <MessageSquare className="w-4 h-4 text-muted-foreground" />
-              <span className="font-semibold text-gray-700">
-                {t("mentorNotes")}
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground pl-6 whitespace-pre-wrap break-words">
-              {appointment.notes_mentor}
-            </p>
-          </div>
-        )}
-
-        {appointment.status === "cancelled" &&
-          appointment.cancellation_reason && (
-            <div className="space-y-1 bg-red-50 p-3 rounded-md border border-red-200">
-              <div className="flex items-center gap-2 text-sm">
-                <XCircle className="w-4 h-4 text-red-600" />
-                <span className="font-medium text-red-900">
-                  {(() => {
-                    const isCancelledAutomatically = 
-                      !appointment.cancelled_by && 
-                      appointment.cancelled_at && 
-                      appointment.scheduled_at && 
-                      new Date(appointment.cancelled_at) >= new Date(appointment.scheduled_at);
-                    
-                    if (isCancelledAutomatically) {
-                      return t("cancelledAutomatically");
-                    }
-                    
-                    return t("cancelledBy", {
-                      name:
-                        appointment.cancelled_by === currentUserId
-                          ? t("you")
-                          : otherPerson.full_name
-                    });
-                  })()}
-                </span>
-              </div>
-              <p className="text-sm font-medium text-red-900 pl-6 mb-1">
-                {t("reason")}
-              </p>
-              <p className="text-sm text-red-800 pl-6">
-                {appointment.cancellation_reason}
-              </p>
-              {appointment.cancelled_at && (
-                <p className="text-xs text-red-600 pl-6 mt-1">
-                  {t("cancelledAt", {
-                    date: format.dateTime(new Date(appointment.cancelled_at), {
-                      dateStyle: "short",
-                      timeStyle: "short"
-                    })
-                  })}
-                </p>
-              )}
-            </div>
-          )}
-      </CardContent>
-
-      {hasActions && (
-      <CardFooter className="pt-3 flex-col sm:flex-row gap-3">
-        <div className="flex gap-2 flex-wrap">
-          {isChatEnabled && (canChat || canConfirm) && (
-            <ChatButton
-              appointment={appointment}
-              currentUserId={currentUserId}
-              isMentor={isMentor}
-            />
-          )}
-          {/* Chat desligado: a conversa acontece no LinkedIn da outra pessoa */}
-          {showLinkedin && (
-            <Button variant="outline" size="sm" asChild>
-              <a href={otherPerson.linkedin_url ?? undefined} target="_blank" rel="noopener noreferrer">
-                <Linkedin className="w-4 h-4 mr-2" />
-                LinkedIn
-              </a>
-            </Button>
-          )}
-        </div>
-
-        <div className="flex gap-2 flex-wrap sm:ml-auto">
-          {canMentorComplete && (
-            <Button
-              size="sm"
-              className="bg-primary hover:bg-primary/90 text-white font-medium"
-              onClick={handleMentorComplete}
-              disabled={isCompleting}
-            >
-              <CheckCircle2 className="h-4 w-4 mr-2" />
-              {t("markAsCompleted")}
-            </Button>
-          )}
-
-          {canReportNoShow && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 font-medium"
-              onClick={() => setIsNoShowModalOpen(true)}
-            >
-              <UserX className="h-4 w-4 mr-2" />
-              {t("markNoShow")}
-            </Button>
-          )}
-
-          {canComplete && (
-            <Button
-              size="sm"
-              className="bg-primary hover:bg-primary/90 text-white font-medium"
-              onClick={() => setIsCompleteModalOpen(true)}
-            >
-              <CheckCircle2 className="h-4 w-4 mr-2" />
-              {t("evaluate")}
-            </Button>
-          )}
-
-          {canConfirm && (
-            <ConfirmAppointmentButton
-              appointment={appointment}
-              onConfirmed={() => onAppointmentUpdate?.(appointment)}
-            />
-          )}
-
-          {canCancel && (
-            <CancelAppointmentButton
-              appointment={appointment}
-              onCancelled={() => onAppointmentUpdate?.(appointment)}
-              variant="outline"
-            />
-          )}
-          {canJoinMeet && (
-            <Button
-              size="sm"
-              className="bg-primary hover:bg-primary/90 text-white font-medium"
-              asChild
-            >
-              <a
-                href={appointment.google_meet_link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Video className="w-4 h-4 mr-2" />
-                {t("joinMeet")}
-                <ExternalLink className="w-3 h-3 ml-1" />
-              </a>
-            </Button>
-          )}
-        </div>
-      </CardFooter>
+      {state.hasActions && (
+        <AppointmentCardActions
+          appointment={appointment}
+          currentUserId={currentUserId}
+          state={state}
+          isCompleting={complete.isPending}
+          onMentorComplete={handleMentorComplete}
+          onOpenComplete={() => setIsCompleteModalOpen(true)}
+          onOpenNoShow={() => setIsNoShowModalOpen(true)}
+          onChanged={() => onAppointmentUpdate?.(appointment)}
+        />
       )}
 
       <CompleteAppointmentModal
@@ -426,9 +108,7 @@ export function AppointmentCard({
         appointment={appointment}
         currentUserId={currentUserId}
         isMentor={isMentor}
-        onCompleted={() => {
-          onAppointmentUpdate?.(appointment)
-        }}
+        onCompleted={() => onAppointmentUpdate?.(appointment)}
       />
 
       <NoShowModal
