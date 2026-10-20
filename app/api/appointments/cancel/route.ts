@@ -62,6 +62,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // O client acima ignora RLS, então a regra "só quem participa cancela" tem de
+    // estar aqui. Sem ela, qualquer pessoa logada que soubesse o id cancelava a
+    // sessão de outras. Responde 404 (e não 403) para não confirmar que o id existe.
+    if (user.id !== appointment.mentor_id && user.id !== appointment.mentee_id) {
+      return NextResponse.json(
+        { error: 'Agendamento não encontrado' },
+        { status: 404 }
+      );
+    }
+
     // Verificar se já está cancelado
     if (appointment.status === 'cancelled') {
       return NextResponse.json(
