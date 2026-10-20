@@ -1,16 +1,15 @@
 ---
 title: "ADR 0008 - service_role em org, profile e appointments: o que fica, onde mora e o que sai"
 owner: paul
-status: proposed
+status: current
 last_reviewed: 2026-10-19
 source_of_truth: [docs/blueprint/org-audit.md, docs/blueprint/profile-audit.md, docs/blueprint/appointments-audit.md]
 ---
 
 # ADR 0008 - service_role em org, profile e appointments
 
-- **Status:** proposto (2026-10-19), aguardando o Paul. Enquanto não for
-  aceito, nenhuma linha da onda 1 cria uso novo de `service_role`; as que já
-  existem só mudam de lugar (para `*.composition.ts`).
+- **Status:** aceito (2026-10-20, merge da PR #126). As exceções da seção 3
+  valem; o que está na seção 4 sai à medida que cada rota passa pelo service.
 - **Relacionado:** ADR 0005 (convites), ADR 0007 (quiz), ADR 0006
   (arquitetura de referência), `docs/blueprint/waves.md` (onda 1).
 

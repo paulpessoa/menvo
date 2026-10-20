@@ -40,4 +40,9 @@ Páginas acima de 600 linhas: `mentors/page.tsx` (972), `assistant/page.tsx`
 | Data | Onda | Linha | Branch/PR | Observações |
 |---|---|---|---|---|
 | 2026-10-19 | 0 | catálogo | PR #107 | Migration `20261019000000_mentors_view_public_stats.sql` aplicada em produção; anon passou de 0 para as sessões reais. pgTAP em `supabase/tests/mentors_view_public_stats.test.sql` (não roda no CI; precisa de Docker). |
-| 2026-10-19 | 0 | query layer e skill | `chore/waves-orchestration` | `lib/query/keys/<d>.ts` e `lib/query/effects/<d>.ts`; `keys.ts` e `effects.ts` só montam. |
+| 2026-10-19 | 0 | query layer e skill | PR #108 | `lib/query/keys/<d>.ts` e `lib/query/effects/<d>.ts`; `keys.ts` e `effects.ts` só montam. |
+| 2026-10-19 | 1 | appointments (segurança) | PRs #109, #110, #117 | `cancel` exige participante; `create` grava em `topic`; trigger `appointments_guard_update` aplicado em produção (transições, ator e participantes). |
+| 2026-10-19 | 1 | org | PRs #111–#113, #119, #120 | Entity, Zod, repository, dashboard sobre o repository, página de 612 para 327 linhas. |
+| 2026-10-19 | 1 | profile | PRs #114–#116, #121, #122 | Contrato único dos campos, repository e service do perfil, onboarding, request-mentor, favoritos, notificações. |
+| 2026-10-19 | 1 | appointments | PRs #123, #124 | Entity do status (tabela de transições) e repositories. |
+| 2026-10-20 | 1 | governança | PRs #118, #125, #126 | jest ignora worktrees; prompt de migrations (`docs/operations/supabase-migrations.md`); ADR 0008 aceito. |

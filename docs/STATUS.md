@@ -108,6 +108,11 @@ in `RETENTION_MODE=dry_run` - see [`domains/account-retention.md`](domains/accou
 
 ## 📓 Engineering Journal
 
+### 2026-10-20 - Onda 1 da modernização (appointments, org, profile)
+- **Segurança:** `POST /api/appointments/cancel` deixava qualquer pessoa logada cancelar a sessão de outra (service_role sem checar participante, PR #109). A policy de UPDATE de `appointments` deixava o participante mudar qualquer coluna pela API do Supabase (mentorado confirmava o próprio pedido, reabria sessão cancelada, trocava `mentor_id`): trigger `appointments_guard_update` aplicado em produção (`20261020000000`, PR #117) e policies duplicadas removidas.
+- **Bug:** "agendar de novo" (`/api/appointments/create`) gravava a coluna inexistente `mentorship_topics` e respondia 500 (PR #110).
+- **Padrão:** org, profile e appointments ganharam entity, Zod, repository e services (PRs #111–#124); `service_role` regido pelo ADR 0008 (aceito). Registro completo em [`blueprint/waves.md`](blueprint/waves.md).
+
 ### 2026-10-19 - Onda 0 da modernização em paralelo
 - **Catálogo (tarefa 2 do `hardening-plan.md`):** `20261019000000_mentors_view_public_stats.sql` faz a `mentors_view` ler `mentor_public_stats` (security definer, só agregados de mentor público e aprovado). Visitantes deixam de ver 0 sessões e 0 avaliações em `/mentors` e no perfil. Mentor fora do catálogo cai no `mentor_stats` de antes. Mesmas colunas e tipos. Aplicada em produção (PR #107). pgTAP em `supabase/tests/mentors_view_public_stats.test.sql`.
 - **Paralelismo:** skill `menvo-waves` (um domínio por subagente em worktree, Opus orquestra, Sonnet aplica, arquivos compartilhados só pelo orquestrador, uma migration por onda). Plano e registro em [`blueprint/waves.md`](blueprint/waves.md). `lib/query/keys.ts` e `effects.ts` passam a só montar os arquivos por domínio (`keys/<d>.ts`, `effects/<d>.ts`).
