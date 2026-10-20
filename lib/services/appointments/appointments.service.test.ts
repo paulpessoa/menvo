@@ -3,6 +3,7 @@
  */
 import type { Appointment, AppointmentWithParties } from "@/lib/domain/appointments/appointment.entity"
 import type { AppointmentsRepository } from "@/lib/repositories/appointments.repository"
+import type { AppointmentMentorRepository } from "@/lib/repositories/appointment-mentor.repository"
 import type { AppointmentFeedbacksRepository } from "@/lib/repositories/appointment-feedbacks.repository"
 import { RepositoryError } from "@/lib/repositories/repository-error"
 import type { AppointmentMailer } from "@/lib/ports/appointment-mailer"
@@ -37,6 +38,12 @@ function setup(opts: { found?: Appointment | AppointmentWithParties | null; tran
     findWithParties: jest.fn().mockResolvedValue(found),
     findWithPartiesByActionToken: jest.fn().mockResolvedValue(found),
     setFields: jest.fn().mockResolvedValue(undefined),
+    hasSlotConflict: jest.fn().mockResolvedValue(false),
+    insertPending: jest.fn(async (row: Record<string, unknown>) => ({
+      ...withParties({ status: "pending" }),
+      ...row,
+      status: "pending",
+    })),
     transitionStatus: jest.fn(async () => {
       if (opts.transition instanceof Error) throw opts.transition
       return opts.transition === undefined ? base({ status: "completed" }) : opts.transition
@@ -51,6 +58,8 @@ function setup(opts: { found?: Appointment | AppointmentWithParties | null; tran
     updatePublicFeedback: jest.fn().mockResolvedValue(undefined),
   } as unknown as jest.Mocked<AppointmentFeedbacksRepository>
   const mailer: jest.Mocked<AppointmentMailer> = {
+    sendRequest: jest.fn().mockResolvedValue(undefined),
+    notifyAdminOfRequest: jest.fn().mockResolvedValue(undefined),
     sendCancellation: jest.fn().mockResolvedValue(undefined),
     sendConfirmation: jest.fn().mockResolvedValue(undefined),
   }
@@ -60,12 +69,126 @@ function setup(opts: { found?: Appointment | AppointmentWithParties | null; tran
     deleteEvent: jest.fn().mockResolvedValue(undefined),
   }
   // Aqui as duas "pontas" são os mesmos mocks; "client split" abaixo separa e prova quem usa qual.
-  const service = createAppointmentsService({ repo, feedbacks, admin: () => ({ repo, feedbacks }), mailer, calendar, now: () => NOW })
-  return { service, repo, feedbacks, mailer, calendar }
+  const mentors = {
+    findRequestable: jest
+      .fn()
+      .mockResolvedValue({ id: "mentor-1", full_name: "Mentor Joe", email: "mentor@test.com", verified: true }),
+  } as jest.Mocked<AppointmentMentorRepository>
+  const pendingCheckin = jest.fn().mockResolvedValue(null)
+  const service = createAppointmentsService({
+    repo,
+    feedbacks,
+    admin: () => ({ repo, feedbacks }),
+    mentors,
+    pendingCheckin,
+    mailer,
+    calendar,
+    now: () => NOW,
+  })
+  return { service, repo, feedbacks, mailer, calendar, mentors, pendingCheckin }
 }
 
 beforeEach(() => jest.spyOn(console, "error").mockImplementation(() => {}))
 afterEach(() => jest.restoreAllMocks())
+
+describe("requestAppointment", () => {
+  const input = {
+    menteeId: "mentee-1",
+    menteeEmail: "mentee@test.com",
+    mentorId: "mentor-1",
+    scheduledAt: FUTURE,
+    durationMinutes: 45,
+    topics: ["Carreira", "Entrevistas"],
+    reason: "Quero orientação sobre transição de carreira para a área de dados",
+  }
+
+  it("creates a pending request with a 7-day token and tells the mentor and the team", async () => {
+    const { service, repo, mailer } = setup()
+    const result = await service.requestAppointment(input)
+
+    expect(result.kind).toBe("ok")
+    const row = repo.insertPending.mock.calls[0][0]
+    expect(row).toMatchObject({
+      mentor_id: "mentor-1",
+      mentee_id: "mentee-1",
+      scheduled_at: FUTURE,
+      duration_minutes: 45,
+      topic: "Carreira, Entrevistas",
+      notes_mentee: input.reason,
+      message: input.reason,
+    })
+    expect(row.token_expires_at).toBe(new Date(NOW.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString())
+    expect(row.action_token).toMatch(/^[0-9a-f]{64}$/)
+    expect(mailer.sendRequest).toHaveBeenCalledWith({
+      mentorEmail: "mentor@test.com",
+      mentorName: "Mentor Joe",
+      menteeName: "Mentee Sam",
+      scheduledAt: FUTURE,
+      message: input.reason,
+      token: row.action_token,
+    })
+    expect(mailer.notifyAdminOfRequest).toHaveBeenCalledWith(
+      expect.objectContaining({ mentorEmail: "mentor@test.com", menteeEmail: "mentee@test.com", notes: input.reason })
+    )
+  })
+
+  it("blocks with the pending check-in before touching the mentor or the slot", async () => {
+    const { service, repo, mentors, pendingCheckin } = setup()
+    const checkin = { appointmentId: "apt-0", scheduledAt: PAST, mentorName: "Marta" }
+    pendingCheckin.mockResolvedValue(checkin)
+
+    expect(await service.requestAppointment(input)).toEqual({ kind: "pending_checkin", checkin })
+    expect(pendingCheckin).toHaveBeenCalledWith("mentee-1")
+    expect(mentors.findRequestable).not.toHaveBeenCalled()
+    expect(repo.insertPending).not.toHaveBeenCalled()
+  })
+
+  it("refuses to book oneself", async () => {
+    const { service, mentors } = setup()
+    expect(await service.requestAppointment({ ...input, mentorId: "mentee-1" })).toEqual({ kind: "self_booking" })
+    expect(mentors.findRequestable).not.toHaveBeenCalled()
+  })
+
+  it("is mentor_not_found for an unknown mentor and mentor_not_verified for an unapproved one", async () => {
+    const { service, mentors, repo } = setup()
+    mentors.findRequestable.mockResolvedValueOnce(null)
+    expect(await service.requestAppointment(input)).toEqual({ kind: "mentor_not_found" })
+
+    mentors.findRequestable.mockResolvedValueOnce({ id: "mentor-1", full_name: "J", email: "j@x.com", verified: false })
+    expect(await service.requestAppointment(input)).toEqual({ kind: "mentor_not_verified" })
+    expect(repo.insertPending).not.toHaveBeenCalled()
+  })
+
+  it("reports slot_taken without inserting or e-mailing", async () => {
+    const { service, repo, mailer } = setup()
+    repo.hasSlotConflict.mockResolvedValue(true)
+    expect(await service.requestAppointment(input)).toEqual({ kind: "slot_taken" })
+    expect(repo.hasSlotConflict).toHaveBeenCalledWith("mentor-1", FUTURE)
+    expect(repo.insertPending).not.toHaveBeenCalled()
+    expect(mailer.sendRequest).not.toHaveBeenCalled()
+  })
+
+  it("keeps the request when an e-mail fails, and still tells the team when the mentor has no address", async () => {
+    const { service, mailer, mentors } = setup()
+    mailer.sendRequest.mockRejectedValue(new Error("brevo down"))
+    mailer.notifyAdminOfRequest.mockRejectedValue(new Error("brevo down"))
+    expect((await service.requestAppointment(input)).kind).toBe("ok")
+
+    mailer.sendRequest.mockClear()
+    mailer.notifyAdminOfRequest.mockClear().mockResolvedValue(undefined)
+    mentors.findRequestable.mockResolvedValue({ id: "mentor-1", full_name: "Joe", email: null, verified: true })
+    jest.spyOn(console, "warn").mockImplementation(() => {})
+    expect((await service.requestAppointment(input)).kind).toBe("ok")
+    expect(mailer.sendRequest).not.toHaveBeenCalled()
+    expect(mailer.notifyAdminOfRequest).toHaveBeenCalledTimes(1)
+  })
+
+  it("lets a database error on insert surface", async () => {
+    const { service, repo } = setup()
+    repo.insertPending.mockRejectedValue(new RepositoryError("appointments.insertPending", { message: "boom" }))
+    await expect(service.requestAppointment(input)).rejects.toBeInstanceOf(RepositoryError)
+  })
+})
 
 describe("markCompleted", () => {
   it("completes a confirmed session for its mentor with a conditional update", async () => {
@@ -545,7 +668,14 @@ describe("client split (session x admin)", () => {
       repo: session.repo,
       feedbacks: session.feedbacks,
       admin,
-      mailer: { sendCancellation: jest.fn().mockResolvedValue(undefined), sendConfirmation: jest.fn().mockResolvedValue(undefined) },
+      mentors: { findRequestable: jest.fn().mockResolvedValue(null) },
+      pendingCheckin: jest.fn().mockResolvedValue(null),
+      mailer: {
+        sendRequest: jest.fn().mockResolvedValue(undefined),
+        notifyAdminOfRequest: jest.fn().mockResolvedValue(undefined),
+        sendCancellation: jest.fn().mockResolvedValue(undefined),
+        sendConfirmation: jest.fn().mockResolvedValue(undefined),
+      },
       calendar: {
         availability: jest.fn().mockResolvedValue({ configured: false, missing: [] }),
         createEvent: jest.fn(),

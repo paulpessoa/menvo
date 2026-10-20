@@ -20,9 +20,11 @@ import type { Database } from "@/lib/types/supabase"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { createAppointmentsRepository } from "@/lib/repositories/appointments.repository"
 import { createAppointmentFeedbacksRepository } from "@/lib/repositories/appointment-feedbacks.repository"
+import { createAppointmentMentorRepository } from "@/lib/repositories/appointment-mentor.repository"
 import { brevoAppointmentMailer } from "@/lib/ports/adapters/appointment-mailer.brevo"
 import { googleAppointmentCalendar } from "@/lib/ports/adapters/appointment-calendar.google"
 import { createAppointmentsService } from "./appointments.service"
+import { findPendingMenteeCheckin } from "./checkin-responses.service"
 
 export function buildAppointmentsService(session: SupabaseClient<Database>) {
   let admin: SupabaseClient<Database> | null = null
@@ -35,6 +37,9 @@ export function buildAppointmentsService(session: SupabaseClient<Database>) {
       repo: createAppointmentsRepository(getAdmin()),
       feedbacks: createAppointmentFeedbacksRepository(getAdmin()),
     }),
+    // Pedido novo (`requestAppointment`) roda inteiro na sessão do mentorado.
+    mentors: createAppointmentMentorRepository(session),
+    pendingCheckin: (menteeId) => findPendingMenteeCheckin(session, menteeId),
     mailer: brevoAppointmentMailer,
     calendar: googleAppointmentCalendar,
   })

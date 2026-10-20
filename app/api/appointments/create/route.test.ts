@@ -35,6 +35,8 @@ describe('POST /api/appointments/create', () => {
         single: jest.fn().mockImplementation(async () => ({
           data: {
             id: 'appt-1',
+            status: 'pending',
+            action_token: 'secret-token',
             scheduled_at: '2026-10-07T16:00:00.000Z',
             notes_mentee: insertMock.mock.calls[0][0].notes_mentee,
             mentor: { full_name: 'Bianca Dias', email: 'mentora@example.com' },
@@ -47,7 +49,25 @@ describe('POST /api/appointments/create', () => {
 
     mockSupabase = {
       auth: { getUser: jest.fn().mockResolvedValue({ data: { user: { id: 'mentee-1' } }, error: null }) },
-      from: jest.fn().mockReturnValue({ insert: insertMock }),
+      // O service lê o mentor (profiles), confere o horário (appointments.select) e grava (insert).
+      from: jest.fn().mockImplementation((table: string) =>
+        table === 'profiles'
+          ? {
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              single: jest.fn().mockResolvedValue({
+                data: { id: MENTOR_ID, full_name: 'Bianca Dias', email: 'mentora@example.com', mentor_profiles: { verification_status: 'approved' } },
+                error: null,
+              }),
+            }
+          : {
+              select: jest.fn().mockReturnThis(),
+              eq: jest.fn().mockReturnThis(),
+              in: jest.fn().mockReturnThis(),
+              limit: jest.fn().mockResolvedValue({ data: [], error: null }),
+              insert: insertMock,
+            }
+      ),
     }
     ;(createClient as jest.Mock).mockResolvedValue(mockSupabase)
   })

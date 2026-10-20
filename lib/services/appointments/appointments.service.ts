@@ -20,7 +20,7 @@ import type {
   AppointmentListItem,
   AppointmentWithParties,
 } from "@/lib/domain/appointments/appointment.entity"
-import { isActionTokenExpired, participantRole } from "@/lib/domain/appointments/appointment.entity"
+import { actionTokenExpiry, isActionTokenExpired, participantRole } from "@/lib/domain/appointments/appointment.entity"
 import {
   assertTransition,
   canTransition,
@@ -39,7 +39,10 @@ import type {
   AppointmentFeedbacksRepository,
   FeedbackListItem,
 } from "@/lib/repositories/appointment-feedbacks.repository"
+import type { AppointmentMentorRepository } from "@/lib/repositories/appointment-mentor.repository"
 import { RepositoryError } from "@/lib/repositories/repository-error"
+import type { PendingCheckin } from "./checkin-responses.service"
+import { randomBytes } from "crypto"
 
 export interface AppointmentsServiceDeps {
   /** Client da SESSÃO do usuário (RLS + trigger). Usado onde o ADR 0008 §4 tirou o `service_role`. */
@@ -52,10 +55,36 @@ export interface AppointmentsServiceDeps {
    * com embed de `profiles`, e apagar avaliações no no-show.
    */
   admin: () => { repo: AppointmentsRepository; feedbacks: AppointmentFeedbacksRepository }
+  /** Mentor alvo do pedido (existe? verificado? e-mail). Também com a sessão do mentorado. */
+  mentors: AppointmentMentorRepository
+  /** Sessão passada do mentorado sem resposta ao "aconteceu?", que bloqueia um pedido novo. */
+  pendingCheckin: (menteeId: string) => Promise<PendingCheckin | null>
   mailer: AppointmentMailer
   calendar: AppointmentCalendar
   now?: () => Date
 }
+
+/** Pedido já normalizado pela rota (camelCase e snake_case viram isto antes de chegar aqui). */
+export interface RequestAppointmentInput {
+  menteeId: string
+  /** Só para o nome do mentorado no e-mail quando o perfil dele não tem `full_name`. */
+  menteeEmail?: string | null
+  mentorId: string
+  scheduledAt: string
+  durationMinutes: number
+  topics: string[]
+  /** Motivo já validado (`mentorshipReasonSchema`): é o contexto que o mentor recebe. */
+  reason: string
+}
+
+export type RequestAppointmentResult =
+  | { kind: "ok"; appointment: AppointmentWithParties }
+  /** A última mentoria do mentorado ainda não teve o "aconteceu?" respondido. */
+  | { kind: "pending_checkin"; checkin: PendingCheckin }
+  | { kind: "self_booking" }
+  | { kind: "mentor_not_found" }
+  | { kind: "mentor_not_verified" }
+  | { kind: "slot_taken" }
 
 export interface EvaluationInput {
   rating: number
@@ -175,6 +204,79 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
   const now = deps.now ?? (() => new Date())
 
   return {
+    /**
+     * O mentorado pede uma mentoria: nasce `pending`, com um link de confirmação
+     * que vale 7 dias, e o mentor (e a equipe) são avisados. É o único caminho de
+     * criação; `POST /api/appointments/schedule` e `/create` só normalizam a entrada.
+     * Ordem das regras: check-in pendente, auto-agendamento, mentor existe, mentor
+     * verificado, horário livre, insert. O conflito é checado só contra o início
+     * exato (pendente ou confirmado); duas requests no mesmo segundo ainda passam
+     * juntas até existir o índice único (docs/blueprint/appointments-audit.md, item 7).
+     * Tudo roda com a sessão do mentorado (RLS); nenhum `service_role`.
+     * Os e-mails são `best effort` e ficam depois do insert: falha de envio não
+     * desfaz o pedido, e a equipe é avisada mesmo se o mentor não tiver e-mail.
+     */
+    async requestAppointment(input: RequestAppointmentInput): Promise<RequestAppointmentResult> {
+      const { menteeId, mentorId, scheduledAt } = input
+
+      const checkin = await deps.pendingCheckin(menteeId)
+      if (checkin) return { kind: "pending_checkin", checkin }
+
+      if (mentorId === menteeId) return { kind: "self_booking" }
+
+      const mentor = await deps.mentors.findRequestable(mentorId)
+      if (!mentor) return { kind: "mentor_not_found" }
+      if (!mentor.verified) return { kind: "mentor_not_verified" }
+
+      if (await deps.repo.hasSlotConflict(mentorId, scheduledAt)) return { kind: "slot_taken" }
+
+      const actionToken = randomBytes(32).toString("hex")
+      const appointment = await deps.repo.insertPending({
+        mentor_id: mentorId,
+        mentee_id: menteeId,
+        scheduled_at: scheduledAt,
+        duration_minutes: input.durationMinutes,
+        topic: input.topics.join(", "),
+        notes_mentee: input.reason,
+        message: input.reason,
+        action_token: actionToken,
+        token_expires_at: actionTokenExpiry(now()),
+      })
+
+      const menteeName = appointment.mentee?.full_name || input.menteeEmail || "Mentee"
+      if (mentor.email) {
+        try {
+          await deps.mailer.sendRequest({
+            mentorEmail: mentor.email,
+            mentorName: mentor.full_name || "Mentor",
+            menteeName,
+            scheduledAt,
+            message: input.reason,
+            token: actionToken,
+          })
+        } catch (error) {
+          console.error("[appointments] erro ao avisar o mentor do pedido:", (error as Error).message)
+        }
+      } else {
+        console.warn("[appointments] mentor sem e-mail cadastrado, aviso do pedido não enviado:", mentorId)
+      }
+
+      try {
+        await deps.mailer.notifyAdminOfRequest({
+          mentorName: mentor.full_name || "Mentor",
+          mentorEmail: mentor.email ?? "",
+          menteeName,
+          menteeEmail: appointment.mentee?.email ?? input.menteeEmail ?? "",
+          scheduledAt,
+          notes: input.reason,
+        })
+      } catch (error) {
+        console.error("[appointments] erro ao avisar a equipe do pedido:", (error as Error).message)
+      }
+
+      return { kind: "ok", appointment }
+    },
+
     /**
      * O mentor conclui a sessão sem avaliação (o mentorado avalia depois).
      * Só `confirmed -> completed`; repetir o clique em uma sessão já concluída é `wrong_status`.

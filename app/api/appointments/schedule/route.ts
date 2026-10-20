@@ -1,25 +1,31 @@
 import { createClient } from "@/lib/utils/supabase/server"
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import {
   errorResponse,
   handleApiError,
   successResponse
 } from "@/lib/api/error-handler"
-import { sendAppointmentRequest } from "@/lib/email/brevo"
 import {
   MENTORSHIP_REASON_REQUIRED_MESSAGE,
   mentorshipReasonSchema
 } from "@/lib/schemas/appointment"
-import { randomUUID } from "crypto"
-import { actionTokenExpiry } from "@/lib/domain/appointments/appointment.entity"
-import { withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
-import { findPendingMenteeCheckin } from "@/lib/services/appointments/checkin-responses.service"
+import { buildAppointmentsService } from "@/lib/services/appointments/appointments.composition"
+import { REQUEST_MESSAGES } from "../request-messages"
 
+const DEFAULT_DURATION_MINUTES = 45
+
+/**
+ * Pede uma mentoria (formato `{ data, message }`, usado pelo BookMentorshipModal).
+ *
+ * Aceita snake_case e camelCase, e `requested_date` + hora (fuso -03:00) no lugar
+ * de `scheduled_at`. A regra (check-in pendente, mentor verificado, horário
+ * livre, token de 7 dias, e-mails) está em `appointments.service.requestAppointment`,
+ * a mesma de `/api/appointments/create`.
+ */
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
 
-    // 1. Verificar autenticação
     const {
       data: { user },
       error: authError
@@ -29,19 +35,6 @@ export async function POST(request: NextRequest) {
       return errorResponse("Unauthorized", "UNAUTHORIZED", 401)
     }
 
-    // Antes de agendar de novo, a sessão anterior precisa ter o "aconteceu?"
-    // respondido (docs/domains/session-checkin.md §4). O modal pergunta antes;
-    // isto garante a regra para qualquer cliente da API.
-    const pendingCheckin = await findPendingMenteeCheckin(supabase, user.id)
-    if (pendingCheckin) {
-      return errorResponse(
-        "Conte se a sua última mentoria aconteceu antes de agendar outra.",
-        "CONFLICT",
-        409,
-        { reason: "pending_checkin", ...pendingCheckin }
-      )
-    }
-
     const body = await request.json()
     const {
       // snake_case (API-direct callers)
@@ -49,7 +42,6 @@ export async function POST(request: NextRequest) {
       scheduled_at,
       requested_date,
       requested_start_time,
-      requested_end_time,
       duration_minutes,
       mentorship_topics,
       notes_mentee,
@@ -58,7 +50,6 @@ export async function POST(request: NextRequest) {
       scheduledAt,
       requestedDate,
       requestedStartTime,
-      requestedEndTime,
       duration,
       durationMinutes,
       message,
@@ -80,12 +71,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const resolvedDuration = duration_minutes ?? durationMinutes ?? duration ?? 45
+    const resolvedDuration = Number(duration_minutes ?? durationMinutes ?? duration ?? DEFAULT_DURATION_MINUTES)
     const resolvedNotes = notes_mentee ?? message ?? ""
-    const resolvedTopics = mentorship_topics ?? []
+    const resolvedTopics: string[] = Array.isArray(mentorship_topics)
+      ? mentorship_topics.filter((topic: unknown): topic is string => typeof topic === "string")
+      : []
 
     if (!resolvedMentorId || !resolvedScheduledAt) {
       return errorResponse("Missing required fields", "VALIDATION_ERROR", 400)
+    }
+
+    if (!Number.isInteger(resolvedDuration) || resolvedDuration < 15 || resolvedDuration > 180) {
+      return errorResponse("Duração inválida (de 15 a 180 minutos)", "VALIDATION_ERROR", 400)
     }
 
     // O motivo é obrigatório: é o único contexto que o mentor recebe sobre o pedido.
@@ -97,108 +94,51 @@ export async function POST(request: NextRequest) {
         400
       )
     }
-    const reason = reasonCheck.data
 
-    // Prevenir auto-agendamento
-    if (resolvedMentorId === user.id) {
-      return errorResponse("Você não pode agendar uma mentoria consigo mesmo", "FORBIDDEN", 400)
+    const result = await buildAppointmentsService(supabase).requestAppointment({
+      menteeId: user.id,
+      menteeEmail: user.email,
+      mentorId: resolvedMentorId,
+      scheduledAt: resolvedScheduledAt,
+      durationMinutes: resolvedDuration,
+      topics: resolvedTopics,
+      reason: reasonCheck.data
+    })
+
+    switch (result.kind) {
+      case "pending_checkin":
+        // O modal pergunta antes; isto garante a regra para qualquer cliente da API.
+        return errorResponse(REQUEST_MESSAGES.pendingCheckin, "CONFLICT", 409, {
+          reason: "pending_checkin",
+          ...result.checkin
+        })
+      case "self_booking":
+        return errorResponse(REQUEST_MESSAGES.selfBooking, "FORBIDDEN", 400)
+      case "mentor_not_found":
+        return errorResponse(REQUEST_MESSAGES.mentorNotFound, "NOT_FOUND", 404)
+      case "mentor_not_verified":
+        return errorResponse(REQUEST_MESSAGES.mentorNotVerified, "FORBIDDEN", 403)
+      case "slot_taken":
+        return errorResponse(REQUEST_MESSAGES.slotTaken, "CONFLICT", 409)
+      case "ok": {
+        // Sem `action_token`: é a credencial do mentor e não sai desta resposta.
+        const { id, mentor_id: apptMentorId, mentee_id, scheduled_at: apptScheduledAt, duration_minutes: apptDuration, status, mentor, mentee } =
+          result.appointment
+        return successResponse(
+          {
+            id,
+            mentor_id: apptMentorId,
+            mentee_id,
+            scheduled_at: apptScheduledAt,
+            duration_minutes: apptDuration,
+            status,
+            mentor: mentor && { full_name: mentor.full_name, avatar_url: mentor.avatar_url },
+            mentee: mentee && { full_name: mentee.full_name, avatar_url: mentee.avatar_url }
+          },
+          "Mentorship scheduled successfully"
+        )
+      }
     }
-
-    // 2. Verificar se o mentor existe, está verificado e buscar email para notificação
-    const { data: mentor, error: mentorError } = await (supabase
-      .from("profiles")
-      .select("id, full_name, email, mentor_profiles(verification_status)")
-      .eq("id", resolvedMentorId)
-      .single() as any)
-
-    if (mentorError || !mentor) {
-      return errorResponse("Mentor not found", "NOT_FOUND", 404)
-    }
-
-    // Verificação mora em mentor_profiles (única fonte).
-    const isMentorVerified = withMentorFields(mentor).verified
-    if (!isMentorVerified) {
-      return errorResponse("Mentor is not verified", "FORBIDDEN", 403)
-    }
-
-    // Verificar conflito de horário simultâneo (pending ou confirmed)
-    const { data: existingAppt } = await (supabase
-      .from("appointments")
-      .select("id")
-      .eq("mentor_id", resolvedMentorId)
-      .eq("scheduled_at", resolvedScheduledAt)
-      .in("status", ["pending", "confirmed"])
-      .maybeSingle() as any)
-
-    if (existingAppt) {
-      return errorResponse(
-        "Este horário acabou de ser reservado. Por favor, escolha outro horário.",
-        "CONFLICT",
-        409
-      )
-    }
-
-    // Buscar nome do mentee para o email
-    const { data: menteeProfile } = await (supabase
-      .from("profiles")
-      .select("full_name, email")
-      .eq("id", user.id)
-      .single() as any)
-
-    // 3. Criar agendamento com token de confirmação por email
-    // Colunas reais validadas via: supabase gen types (lib/types/supabase.ts)
-    const actionToken = randomUUID()
-    const tokenExpiresAt = actionTokenExpiry() // 7 dias
-
-    const { data: appointment, error: insertError } = await (supabase
-      .from("appointments")
-      .insert({
-        mentor_id: resolvedMentorId,
-        mentee_id: user.id,
-        scheduled_at: resolvedScheduledAt,
-        duration_minutes: resolvedDuration,
-        topic: Array.isArray(resolvedTopics) ? resolvedTopics.join(", ") : "",
-        notes_mentee: reason,
-        message: reason,
-        status: "pending",
-        action_token: actionToken,
-        token_expires_at: tokenExpiresAt,
-      } as any)
-      .select(`
-        id,
-        mentor_id,
-        mentee_id,
-        scheduled_at,
-        duration_minutes,
-        status,
-        mentor:profiles!mentor_id(full_name, avatar_url),
-        mentee:profiles!mentee_id(full_name, avatar_url)
-      `)
-      .single() as any)
-
-    if (insertError) {
-      console.error("[schedule] DB insert error:", JSON.stringify(insertError))
-      throw insertError
-    }
-
-    // 4. Notificar mentor por email (não bloqueia a resposta se falhar)
-    if (mentor.email) {
-      sendAppointmentRequest({
-        mentorEmail: mentor.email,
-        mentorName: mentor.full_name || "Mentor",
-        menteeName: menteeProfile?.full_name || user.email || "Mentee",
-        scheduledAt: resolvedScheduledAt,
-        message: reason,
-        token: actionToken,
-      }).catch((emailErr) => {
-        // Email failure não deve quebrar o agendamento
-        console.error("[schedule] Email send failed (non-critical):", emailErr)
-      })
-    } else {
-      console.warn("[schedule] Mentor sem email cadastrado, notificação não enviada:", resolvedMentorId)
-    }
-
-    return successResponse(appointment, "Mentorship scheduled successfully")
   } catch (error) {
     console.error("[schedule] Unexpected error:", error)
     return handleApiError(error)
