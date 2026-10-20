@@ -1,19 +1,15 @@
 /**
  * Camada 9 · Contrato OpenAPI (appointments)
- * Regra: descreve as 15 operações de `app/api/appointments/**` com os mesmos
+ * Regra: descreve as 11 operações de `app/api/appointments/**` com os mesmos
  * schemas Zod da camada 4 (`lib/schemas/appointment.ts` e
  * `appointment-responses.ts`). Os status documentados são os que o código devolve
  * hoje; o teste de drift (`document.test.ts`) garante que cada rota exista aqui.
  * Não faz: registrar rotas de outro domínio. Nenhuma rota mudou para isto.
- * Tradeoff: rotas sem chamador no app (`[id]`, `schedule` GET, `action`) ficam
- * documentadas como `deprecated`, porque o teste exige uma entrada por rota e
- * porque documentar é como se vê que elas existem e que `PATCH /{id}` aceita
- * qualquer status válido (a proteção real é o trigger do banco).
+ * As rotas sem chamador (`[id]`, `schedule` GET, `action`) foram apagadas.
  */
 import { registry } from "../registry"
 import { apiErrorSchema } from "@/lib/schemas/api"
 import {
-  actionAppointmentSchema,
   availabilityQuerySchema,
   cancelAppointmentSchema,
   completeAppointmentSchema,
@@ -25,9 +21,7 @@ import {
   updateFeedbackSchema,
 } from "@/lib/schemas/appointment"
 import {
-  actionResponseSchema,
   appointmentDataResponseSchema,
-  appointmentIdPathSchema,
   appointmentSuccessSchema,
   availabilityResponseSchema,
   cancelResponseSchema,
@@ -35,8 +29,6 @@ import {
   listAppointmentsResponseSchema,
   listFeedbacksQuerySchema,
   listFeedbacksResponseSchema,
-  patchAppointmentBodySchema,
-  scheduleListQuerySchema,
   scheduleRequestSchema,
 } from "@/lib/schemas/appointment-responses"
 import { z } from "zod"
@@ -102,20 +94,6 @@ registry.registerPath({
 })
 
 registry.registerPath({
-  method: "get",
-  path: "/api/appointments/schedule",
-  tags: ["appointments"],
-  summary: "Lista sessões por mentor ou mentorado",
-  description: "Sem chamador no app. Depende só da RLS para limitar o que volta; sem verificação própria de sessão.",
-  deprecated: true,
-  request: { query: scheduleListQuerySchema },
-  responses: {
-    200: { description: "Sessões (`data`)", content: json(appointmentDataResponseSchema) },
-    500: serverError,
-  },
-})
-
-registry.registerPath({
   method: "post",
   path: "/api/appointments/create",
   tags: ["appointments"],
@@ -146,23 +124,6 @@ registry.registerPath({
     403: error("`appointmentId` sem sessão ou por quem não é o mentor"),
     404: error("Agendamento não encontrado ou token inválido"),
     409: statusConflict,
-    500: serverError,
-  },
-})
-
-registry.registerPath({
-  method: "post",
-  path: "/api/appointments/action",
-  tags: ["appointments"],
-  summary: "Confirma ou recusa pelo token do e-mail (rota antiga)",
-  description:
-    "Sem chamador: nenhum e-mail aponta para a página que a usa. Roda com o client da sessão, então para visitante a RLS devolve 0 linhas. Candidata a remoção.",
-  deprecated: true,
-  request: { body: { content: json(actionAppointmentSchema) } },
-  responses: {
-    200: { description: "Feito", content: json(actionResponseSchema) },
-    400: error("Token ou ação ausentes/inválidos, ou já processado"),
-    404: error("Agendamento não encontrado ou token inválido"),
     500: serverError,
   },
 })
@@ -269,42 +230,6 @@ registry.registerPath({
     401: unauthenticated,
     403: error("Só o autor edita"),
     404: error("Avaliação não encontrada"),
-    500: serverError,
-  },
-})
-
-registry.registerPath({
-  method: "patch",
-  path: "/api/appointments/{id}",
-  tags: ["appointments"],
-  summary: "Muda o status de uma sessão (rota antiga)",
-  description:
-    "Sem chamador no app e sem validação do `status` na rota: com a sessão do usuário, quem decide o que passa é a RLS de UPDATE do participante e o trigger `appointments_guard_update` (transições e colunas imutáveis). Candidata a remoção.",
-  deprecated: true,
-  request: { params: appointmentIdPathSchema, body: { content: json(patchAppointmentBodySchema) } },
-  responses: {
-    200: { description: "Atualizada (`data`)", content: json(appointmentDataResponseSchema) },
-    401: unauthenticated,
-    403: error("Não participa da sessão"),
-    404: notFound,
-    500: serverError,
-  },
-})
-
-registry.registerPath({
-  method: "delete",
-  path: "/api/appointments/{id}",
-  tags: ["appointments"],
-  summary: "Apaga uma sessão (rota antiga)",
-  description:
-    "Sem chamador no app. Não existe policy de DELETE em `appointments`, então com a sessão do usuário nada é apagado. Candidata a remoção.",
-  deprecated: true,
-  request: { params: appointmentIdPathSchema },
-  responses: {
-    200: { description: "Resposta de sucesso (`data: null`)", content: json(appointmentDataResponseSchema) },
-    401: unauthenticated,
-    403: error("Não participa da sessão"),
-    404: notFound,
     500: serverError,
   },
 })

@@ -203,32 +203,3 @@ export async function POST(request: NextRequest) {
     return handleApiError(error)
   }
 }
-
-export async function GET(request: NextRequest) {
-  try {
-    const supabase = await createClient()
-    const { searchParams } = new URL(request.url)
-    const mentorId = searchParams.get("mentorId")
-    const menteeId = searchParams.get("menteeId")
-
-    let query = supabase
-      .from("appointments" as any)
-      .select(`
-        *,
-        mentor:profiles!mentor_id(full_name, avatar_url),
-        mentee:profiles!mentee_id(full_name, avatar_url)
-      `)
-
-    if (mentorId) query = (query as any).eq("mentor_id", mentorId)
-    if (menteeId) query = (query as any).eq("mentee_id", menteeId)
-
-    const { data, error } = await (query as any)
-      .order("scheduled_at", { ascending: false })
-
-    if (error) throw error
-
-    return successResponse(data)
-  } catch (error) {
-    return handleApiError(error)
-  }
-}
