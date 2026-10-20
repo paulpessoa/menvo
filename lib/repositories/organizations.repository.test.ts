@@ -217,6 +217,84 @@ describe("quizDoneEmails", () => {
   })
 })
 
+describe("person-side membership", () => {
+  it("findJoinTargetBySlug only sees active orgs and narrows join_policy", async () => {
+    const { repo, calls } = repoWith({ data: { id: "o1", name: "Giral", join_policy: "invite_only" }, error: null })
+    expect(await repo.findJoinTargetBySlug("giral")).toEqual({ id: "o1", name: "Giral", join_policy: "invite_only" })
+    expect(calls.eq).toEqual([
+      ["slug", "giral"],
+      ["status", "active"],
+    ])
+    expect(await repoWith({ data: null, error: null }).repo.findJoinTargetBySlug("x")).toBeNull()
+  })
+
+  it("findMembershipStatus returns the status or null", async () => {
+    expect(await repoWith({ data: { status: "invited" }, error: null }).repo.findMembershipStatus("o1", "u1")).toBe("invited")
+    expect(await repoWith({ data: null, error: null }).repo.findMembershipStatus("o1", "u1")).toBeNull()
+  })
+
+  it("listMembershipsOf reads the user's rows newest first and flattens the org embed", async () => {
+    const org = { id: "o1", slug: "giral", name: "Giral", type: "ngo", status: "active" }
+    const { repo, calls } = repoWith({
+      data: [
+        { organization_id: "o1", role: "member", status: "active", created_at: "2026-01-02", organizations: org },
+        { organization_id: "o2", role: "member", status: "invited", created_at: "2026-01-01", organizations: [org] },
+        { organization_id: "o3", role: "member", status: "requested", created_at: "2026-01-01", organizations: null },
+      ],
+      error: null,
+    })
+    const rows = await repo.listMembershipsOf("u1")
+    expect(rows.map(r => r.organizations)).toEqual([org, org, null])
+    expect(calls.eq).toEqual([["user_id", "u1"]])
+    expect(calls.order).toEqual([["created_at", { ascending: false }]])
+  })
+
+  it("requestMembership inserts a member row with status requested", async () => {
+    const { repo, calls } = repoWith({ error: null })
+    await repo.requestMembership("o1", "u1")
+    expect(calls.insert).toEqual([[{ organization_id: "o1", user_id: "u1", role: "member", status: "requested" }]])
+  })
+
+  it("acceptInvite only sets the status, scoped to org and user", async () => {
+    const { repo, calls } = repoWith({ error: null })
+    await repo.acceptInvite("o1", "u1")
+    expect(calls.update).toEqual([[{ status: "active" }]])
+    expect(calls.eq).toEqual([
+      ["organization_id", "o1"],
+      ["user_id", "u1"],
+    ])
+  })
+
+  it("removeMembership deletes by org and user", async () => {
+    const { repo, calls } = repoWith({ error: null })
+    await repo.removeMembership("o1", "u1")
+    expect(calls.delete).toHaveLength(1)
+    expect(calls.eq).toEqual([
+      ["organization_id", "o1"],
+      ["user_id", "u1"],
+    ])
+  })
+
+  it("findOwnContact reads name and e-mail of that profile", async () => {
+    const { repo, calls } = repoWith({ data: { full_name: "Ana", email: "a@x" }, error: null })
+    expect(await repo.findOwnContact("u1")).toEqual({ full_name: "Ana", email: "a@x" })
+    expect(calls.eq).toEqual([["id", "u1"]])
+  })
+
+  it.each([
+    ["findJoinTargetBySlug", (r: ReturnType<typeof repoWith>["repo"]) => r.findJoinTargetBySlug("x")],
+    ["findMembershipStatus", (r: ReturnType<typeof repoWith>["repo"]) => r.findMembershipStatus("o", "u")],
+    ["listMembershipsOf", (r: ReturnType<typeof repoWith>["repo"]) => r.listMembershipsOf("u")],
+    ["requestMembership", (r: ReturnType<typeof repoWith>["repo"]) => r.requestMembership("o", "u")],
+    ["acceptInvite", (r: ReturnType<typeof repoWith>["repo"]) => r.acceptInvite("o", "u")],
+    ["removeMembership", (r: ReturnType<typeof repoWith>["repo"]) => r.removeMembership("o", "u")],
+    ["findOwnContact", (r: ReturnType<typeof repoWith>["repo"]) => r.findOwnContact("u")],
+  ])("%s throws a RepositoryError on failure", async (_name, call) => {
+    const { repo } = repoWith({ data: null, error: { message: "RLS denied" } })
+    await expect(call(repo)).rejects.toBeInstanceOf(RepositoryError)
+  })
+})
+
 describe("listAdminOrganizations", () => {
   it("asks for active admin rows of the user and flattens the embedded org", async () => {
     const { repo, calls } = repoWith({
