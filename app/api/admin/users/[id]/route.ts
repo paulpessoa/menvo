@@ -1,11 +1,10 @@
 
 import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
-import { z } from "zod"
 import { requireAdmin } from "@/lib/auth/require-admin"
 import { deleteUserCompletely } from "@/lib/services/admin/delete-user.service"
 import { splitMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
-import { toPlainText } from "@/lib/schemas/plain-text"
+import { adminUserPatchBodySchema as patchBodySchema } from "@/lib/schemas/admin-users"
 
 // Admin client com service role para ignorar RLS
 // Built per request, never at import time: `next build` imports every route
@@ -23,30 +22,6 @@ function getSupabaseAdmin() {
     }
   )
 }
-
-/**
- * Profile fields an admin may edit from the user modal. Verification columns
- * (`verified`, `verification_status`, `verification_notes`, `is_pending_mentor`)
- * are deliberately NOT here: they only change through POST /api/admin/verify,
- * which also assigns the mentor role and notifies the person. Unknown keys
- * are stripped.
- */
-const updatesSchema = z.object({
-  first_name: z.string().max(100).optional(),
-  last_name: z.string().max(100).optional(),
-  bio: z.string().max(5000).transform(toPlainText).optional(),
-  avatar_url: z.string().max(2000).optional(),
-  is_public: z.boolean().optional(),
-  institution: z.string().max(200).optional(),
-  course: z.string().max(200).optional(),
-  academic_level: z.string().max(100).optional(),
-  expected_graduation: z.string().max(50).optional()
-})
-
-const patchBodySchema = z.object({
-  updates: updatesSchema.default({}),
-  roles: z.array(z.enum(["mentee", "mentor", "admin", "moderator"])).optional()
-})
 
 export async function PATCH(
   request: NextRequest,
