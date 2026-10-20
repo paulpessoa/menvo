@@ -19,7 +19,7 @@ type AdminProfileRow = Record<string, unknown> & {
 
 export async function GET(request: NextRequest) {
   try {
-    const guard = await requireAdmin(["admin", "moderator"])
+    const guard = await requireAdmin()
     if (!guard.ok) return guard.response
 
     const supabase = await createClient()

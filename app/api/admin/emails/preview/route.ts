@@ -3,7 +3,7 @@ import { getEmailTemplatePreviewHtml } from "@/lib/email/brevo"
 import { requireAdmin } from "@/lib/auth/require-admin"
 
 export async function GET(request: NextRequest) {
-  const guard = await requireAdmin(["admin", "moderator"])
+  const guard = await requireAdmin()
   if (!guard.ok) return guard.response
 
   const { searchParams } = new URL(request.url)
