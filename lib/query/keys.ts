@@ -1,22 +1,20 @@
 /**
  * Camada 10 · Query keys
- * Regra: nenhuma queryKey é escrita fora deste arquivo. As chaves são
+ * Regra: nenhuma queryKey é escrita fora de `lib/query/keys/`. As chaves são
  * hierárquicas: invalidar `qk.quiz.all` invalida tudo que começa com `["quiz"]`.
  * Tradeoff: um import a mais em cada hook, em troca de renomear e invalidar com
- * segurança e de o TypeScript achar todos os usos. Só o domínio quiz foi
- * migrado; as chaves soltas dos outros domínios entram aqui quando cada um for
- * tocado (`grep -rn "queryKey:" hooks components app lib`).
+ * segurança e de o TypeScript achar todos os usos.
+ *
+ * Cada domínio tem o próprio arquivo em `keys/<domínio>.ts`; este arquivo só
+ * monta o `qk`. Assim dois agentes trabalhando em domínios diferentes não
+ * editam o mesmo arquivo: quem integra a branch acrescenta uma linha aqui.
+ * Domínios ainda não migrados têm chaves soltas
+ * (`grep -rn "queryKey:" hooks components app lib`).
  */
+import { mentorsKeys } from "./keys/mentors"
+import { quizKeys } from "./keys/quiz"
+
 export const qk = {
-  quiz: {
-    all: ["quiz"] as const,
-    latest: (userId: string) => ["quiz", "latest", userId] as const,
-    result: (id: string) => ["quiz", "result", id] as const,
-    /** O token `k` fica fora da chave de propósito: é credencial e apareceria no devtools. */
-    accountLink: (id: string) => ["quiz", "account-link", id] as const,
-  },
-  mentors: {
-    /** Resolução de nomes sugeridos pela IA para slug/id de perfil. */
-    slugs: (names: readonly string[]) => ["mentors", "slugs", [...names].sort()] as const,
-  },
+  quiz: quizKeys,
+  mentors: mentorsKeys,
 } as const
