@@ -9,7 +9,6 @@ import { registry } from "./registry"
 import "./paths/quiz"
 import "./paths/mentors"
 import "./paths/legal"
-import "./paths/appointments"
 
 export function buildOpenApiDocument() {
   return new OpenApiGeneratorV31(registry.definitions).generateDocument({
@@ -24,7 +23,6 @@ export function buildOpenApiDocument() {
       { name: "quiz", description: "Diagnóstico de carreira (quiz) e análise por IA" },
       { name: "mentors", description: "Agenda e perfil público de mentores" },
       { name: "legal", description: "Aceite dos Termos de Uso" },
-      { name: "appointments", description: "Pedidos, confirmação, cancelamento, conclusão e avaliação de sessões de mentoria" },
     ],
   })
 }
