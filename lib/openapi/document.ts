@@ -12,6 +12,7 @@ import "./paths/legal"
 import "./paths/profile"
 import "./paths/me"
 import "./paths/org"
+import "./paths/appointments"
 
 export function buildOpenApiDocument() {
   return new OpenApiGeneratorV31(registry.definitions).generateDocument({
@@ -29,6 +30,7 @@ export function buildOpenApiDocument() {
       { name: "profile", description: "Perfil e conta do próprio usuário (papel, onboarding, mentoria, exclusão)" },
       { name: "me", description: "Favoritos e notificações do próprio usuário" },
       { name: "org", description: "Organizações parceiras: dashboard do admin e vínculo de cada pessoa" },
+      { name: "appointments", description: "Pedidos, confirmação, cancelamento, conclusão e avaliação de sessões de mentoria" },
     ],
   })
 }
