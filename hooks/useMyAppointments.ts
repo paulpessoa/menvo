@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { z } from "zod"
 import { useAuth } from "@/lib/auth"
+import { appointmentStatusSchema } from "@/lib/schemas/appointment"
 import type { AppointmentCardData } from "@/components/appointments/appointment-card"
 import type { Perspective } from "@/lib/mentorship/group-appointments"
 
@@ -15,7 +16,7 @@ const appointmentSchema = z
     id: z.union([z.string(), z.number()]),
     scheduled_at: z.string(),
     duration_minutes: z.number(),
-    status: z.enum(["pending", "confirmed", "cancelled", "completed", "rejected"]),
+    status: appointmentStatusSchema,
     mentor: participantSchema.nullable(),
     mentee: participantSchema.nullable(),
     feedbacks: z.array(z.object({ id: z.union([z.string(), z.number()]), reviewer_id: z.string() })).nullable().optional(),
