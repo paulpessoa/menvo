@@ -13,11 +13,20 @@ import {
   createAdminRetentionReadRepository,
   createAdminRetentionWriteRepository
 } from "@/lib/repositories/admin-ops.repository"
+import { getAdminOverview } from "./overview.service"
 import { createAdminRetentionService } from "./retention.service"
 
 function lazyPrivilegedClient() {
   let client: SupabaseClient<Database> | null = null
   return () => (client ??= createServiceRoleClient() as SupabaseClient<Database>)
+}
+
+/**
+ * Visão geral do painel: tudo pela sessão do admin, menos `appointments`, que
+ * usa o client privilegiado (lazy, só depois do `assertAdmin`).
+ */
+export function loadAdminOverview(sessionDb: SupabaseClient<Database>) {
+  return getAdminOverview(sessionDb, lazyPrivilegedClient())
 }
 
 /** Service de retenção: leituras pela sessão, isenção pelo client privilegiado. */
