@@ -46,6 +46,10 @@ export function getJson<T>(url: string, schema: ResponseSchema<T>): Promise<T> {
   return request(url, undefined, schema)
 }
 
+export function deleteJson<T>(url: string, schema: ResponseSchema<T>): Promise<T> {
+  return request(url, { method: "DELETE" }, schema)
+}
+
 export function postJson<T>(url: string, body: unknown, schema: ResponseSchema<T>): Promise<T> {
   return sendJson("POST", url, body, schema)
 }

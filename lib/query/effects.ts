@@ -11,6 +11,7 @@
  */
 import type { QueryClient } from "@tanstack/react-query"
 import { meEffects } from "./effects/me"
+import { orgEffects } from "./effects/org"
 import { profileEffects } from "./effects/profile"
 import { quizEffects } from "./effects/quiz"
 import type { Keys } from "./effects/types"
@@ -21,6 +22,7 @@ export const effects = {
   ...quizEffects,
   ...profileEffects,
   ...meEffects,
+  ...orgEffects,
 } satisfies Record<string, (ctx: never) => Keys>
 
 export function runEffects(qc: QueryClient, keys: Keys) {
