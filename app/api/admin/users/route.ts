@@ -6,6 +6,7 @@ import {
   successResponse
 } from "@/lib/api/error-handler"
 import { requireAdmin } from "@/lib/auth/require-admin"
+import { adminUsersQuerySchema } from "@/lib/schemas/admin-users"
 import { MENTOR_PROFILE_EMBED, withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
 import { MENTEE_PROFILE_EMBED, withMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
 import { fetchCvUrls } from "@/lib/services/mentees/mentee-cv.service"
@@ -26,15 +27,16 @@ export async function GET(request: NextRequest) {
 
     // 2. Buscar parâmetros de paginação e filtro
     const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get("page") || "1")
-    const limit = parseInt(searchParams.get("limit") || "10")
-    
-    const search = searchParams.get("search") || ""
-    const origin = searchParams.get("origin") || "" // "menvo" | "jotform" | "" (all)
-    const role = searchParams.get("role") || "" // "mentor" | "mentee" | ""
-    const status = searchParams.get("status") || "" // "pending" | "verified" | ""
-    const sortBy = searchParams.get("sort_by") || "created_at" // "created_at" | "full_name"
-    const sortOrder = searchParams.get("sort_order") || "desc" // "asc" | "desc"
+    const {
+      page,
+      limit,
+      search,
+      origin,
+      role,
+      status,
+      sort_by: sortBy,
+      sort_order: sortOrder
+    } = adminUsersQuerySchema.parse(Object.fromEntries(searchParams))
 
     const from = (page - 1) * limit
     const to = from + limit - 1
