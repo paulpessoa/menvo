@@ -1,20 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
 import { computeAvailableSlots } from "@/lib/services/appointments/availability.service"
+import { buildPublicAvailabilityDeps } from "@/lib/services/appointments/appointments.composition"
 
 export async function GET(request: NextRequest) {
   try {
-    // Usar Service Role para permitir leitura pública da disponibilidade
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    )
     const { searchParams } = new URL(request.url)
 
     const mentorId = searchParams.get("mentor_id")
@@ -35,7 +24,7 @@ export async function GET(request: NextRequest) {
       : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
 
     // Generate available time slots using the new shared service
-    const availableSlots = await computeAvailableSlots(supabase, mentorId, start, end)
+    const availableSlots = await computeAvailableSlots(buildPublicAvailabilityDeps(), mentorId, start, end)
 
     return NextResponse.json({
       success: true,

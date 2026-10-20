@@ -1,4 +1,5 @@
-import { SupabaseClient } from "@supabase/supabase-js"
+import type { AppointmentsRepository } from "@/lib/repositories/appointments.repository"
+import type { MentorAvailabilityRepository } from "@/lib/repositories/mentor-availability.repository"
 import { getFeatureFlags } from "@/lib/feature-flags-server"
 
 export interface AvailabilitySlotResult {
@@ -10,31 +11,35 @@ export interface AvailabilitySlotResult {
   datetime: string
 }
 
+/**
+ * Leituras que a disponibilidade precisa. Entram por parâmetro para o service não
+ * saber qual client (sessão ou `service_role`) está por trás: quem escolhe é
+ * `appointments.composition.ts`.
+ */
+export interface AvailabilityDeps {
+  availability: Pick<MentorAvailabilityRepository, "listByMentor">
+  appointments: Pick<AppointmentsRepository, "listBusyIntervals">
+}
+
+/**
+ * Gera os horários livres do mentor no intervalo: agenda semanal menos pedidos
+ * pending/confirmed e menos o ocupado do Google Calendar (se a flag estiver ligada).
+ * Por que o Google falha em silêncio: a agenda externa é bônus, a lista da Menvo
+ * não pode sumir por causa de token vencido ou timeout de 3s.
+ */
 export async function computeAvailableSlots(
-  supabase: SupabaseClient,
+  deps: AvailabilityDeps,
   mentorId: string,
   startDate: Date,
   endDate: Date
 ): Promise<AvailabilitySlotResult[]> {
-  // Get mentor availability
-  const { data: availability, error: availabilityError } = await supabase
-    .from("mentor_availability")
-    .select("*")
-    .eq("mentor_id", mentorId)
-    .order("day_of_week", { ascending: true })
-
-  if (availabilityError || !availability || availability.length === 0) {
+  const availability = await deps.availability.listByMentor(mentorId)
+  if (availability.length === 0) {
     return []
   }
 
-  // Get existing appointments in the date range
-  const { data: appointments } = await supabase
-    .from("appointments")
-    .select("scheduled_at, duration_minutes")
-    .eq("mentor_id", mentorId)
-    .in("status", ["pending", "confirmed"])
-    .gte("scheduled_at", startDate.toISOString())
-    .lte("scheduled_at", endDate.toISOString())
+  // Pedidos que já ocupam horário no intervalo
+  const appointments = await deps.appointments.listBusyIntervals(mentorId, startDate, endDate)
 
   // Generate available time slots
   const availableSlots: AvailabilitySlotResult[] = []
@@ -75,7 +80,7 @@ export async function computeAvailableSlots(
     const slotEnd = new Date(slotStart.getTime() + slotDuration * 60 * 1000)
 
     // Check Menvo internal appointments
-    const hasMenvoConflict = (appointments || []).some((apt: any) => {
+    const hasMenvoConflict = appointments.some((apt) => {
       const aptStart = new Date(apt.scheduled_at)
       const aptEnd = new Date(aptStart.getTime() + apt.duration_minutes * 60 * 1000)
       return slotStart < aptEnd && slotEnd > aptStart
@@ -106,7 +111,7 @@ export async function computeAvailableSlots(
     if (dayAvailability.length > 0) {
       const dateStr = current.toISOString().split("T")[0]
 
-      for (const avail of dayAvailability as any[]) {
+      for (const avail of dayAvailability) {
         const [startHour, startMinute] = avail.start_time.split(":").map(Number)
         const [endHour, endMinute] = avail.end_time.split(":").map(Number)
 

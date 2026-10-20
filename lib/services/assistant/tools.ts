@@ -5,6 +5,7 @@ import { mentorService } from "@/lib/services/mentors/mentors.service"
 import { buildMentorProfileService } from "@/lib/services/mentors/mentor-profile.composition"
 import { displayName } from "@/lib/domain/mentors/mentor.entity"
 import { computeAvailableSlots } from "@/lib/services/appointments/availability.service"
+import { buildAvailabilityDeps } from "@/lib/services/appointments/appointments.composition"
 import { kbService } from "@/lib/services/kb/kb.service"
 
 // --- 1. searchMentors ---
@@ -139,7 +140,7 @@ export async function getMentorAvailability(
   const startDate = new Date()
   const endDate = new Date(Date.now() + input.days * 24 * 60 * 60 * 1000)
 
-  const rawSlots = await computeAvailableSlots(supabase, mentorId, startDate, endDate)
+  const rawSlots = await computeAvailableSlots(buildAvailabilityDeps(supabase as SupabaseClient<Database>), mentorId, startDate, endDate)
 
   const slots = rawSlots.map(s => ({
     date: s.date,
