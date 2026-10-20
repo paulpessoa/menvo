@@ -1,20 +1,13 @@
 "use client"
 
-import { useRef, useEffect } from "react"
-import {  Camera, MapPin , Loader2 } from "lucide-react"
-import { toast } from "sonner"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useAuth } from "@/lib/auth"
-import { useSimpleImageUpload } from "@/hooks/useSimpleUpload"
-import { useDetectLocation } from "@/hooks/useDetectLocation"
-import { COMMON_TIMEZONES } from "@/lib/utils/timezone"
+import { Field } from "./ProfileField"
+import { ProfileLocationFields } from "./ProfileLocationFields"
+import { ProfilePhotoPicker } from "./ProfilePhotoPicker"
 import type { ProfileFormData, ProfileFormPatch } from "./profile-form"
 
 interface ProfileAboutSectionProps {
@@ -23,37 +16,16 @@ interface ProfileAboutSectionProps {
   isMentor: boolean
 }
 
+/** Lowercase, spaces to hyphens, drop everything a URL slug cannot hold. */
+const toSlug = (value: string) => value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
+
 /**
  * "Perfil" tab: identity, visibility, location and timezone in one card.
  * These used to be split across "Pessoal" and "Localização" tabs with 3–4
- * fields each, which hid required info behind extra clicks.
+ * fields each, which hid required info behind extra clicks. The photo and the
+ * location block live in their own components.
  */
 export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSectionProps) {
-  const { refreshProfile } = useAuth()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const imageUpload = useSimpleImageUpload("/api/upload/profile-photo")
-  const location = useDetectLocation((loc) =>
-    onChange({ city: loc.city || form.city, state: loc.state || form.state, country: loc.country || form.country })
-  )
-
-  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-    const result = await imageUpload.upload(file)
-    if (result.success) {
-      onChange({ avatar_url: `${result.data.url}?t=${Date.now()}` })
-      await refreshProfile()
-      toast.success("Foto atualizada!")
-    }
-  }
-
-  // Detect location on mount if not filled yet
-  useEffect(() => {
-    if (!form.city && !form.state) {
-      location.detect(true) // silent
-    }
-  }, []) // only run once on mount
-
   return (
     <Card>
       <CardContent className="space-y-6 pt-6">
@@ -70,31 +42,20 @@ export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSe
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-          <div className="relative self-start">
-            <Avatar className="h-24 w-24 border-2">
-              <AvatarImage src={form.avatar_url} />
-              <AvatarFallback>{form.first_name?.[0]}</AvatarFallback>
-            </Avatar>
-            <button
-              type="button"
-              aria-label="Alterar foto"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={imageUpload.isUploading}
-              className="absolute bottom-0 right-0 bg-primary text-white p-2 rounded-full shadow-lg"
-            >
-              {imageUpload.isUploading ? <Loader2 className="animate-spin h-4 w-4" /> : <Camera className="h-4 w-4" />}
-            </button>
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
-          </div>
+          <ProfilePhotoPicker
+            avatarUrl={form.avatar_url}
+            firstName={form.first_name}
+            onUploaded={(url) => onChange({ avatar_url: url })}
+          />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
             <Field label="Nome *" value={form.first_name} onValue={(v) => onChange({ first_name: v })} />
             <Field label="Sobrenome *" value={form.last_name} onValue={(v) => onChange({ last_name: v })} />
             <div className="sm:col-span-2 space-y-1">
               <div className="flex items-center justify-between">
                 <Label>Endereço do perfil (slug) *</Label>
-                <button 
-                  type="button" 
-                  onClick={() => onChange({ slug: `${form.first_name || ""}-${form.last_name || ""}`.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") })} 
+                <button
+                  type="button"
+                  onClick={() => onChange({ slug: toSlug(`${form.first_name || ""}-${form.last_name || ""}`) })}
                   className="text-xs text-primary hover:underline font-medium"
                 >
                   Gerar automaticamente
@@ -102,7 +63,7 @@ export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSe
               </div>
               <Input
                 value={form.slug}
-                onChange={(e) => onChange({ slug: e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") })}
+                onChange={(e) => onChange({ slug: toSlug(e.target.value) })}
                 placeholder="ex: maria-silva"
               />
               <p className="text-[10px] text-muted-foreground">Sua URL será: menvo.com.br/mentee/{form.slug || "..."}</p>
@@ -115,49 +76,8 @@ export function ProfileAboutSection({ form, onChange, isMentor }: ProfileAboutSe
           <Textarea value={form.bio} onChange={(e) => onChange({ bio: e.target.value })} rows={4} placeholder="Conte sua história e o que te motiva..." />
         </div>
 
-        <div className="space-y-3 pt-4 border-t">
-          <div className="flex items-center justify-between gap-4">
-            <h3 className="font-semibold flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> Localização</h3>
-            <Button type="button" variant="outline" size="sm" onClick={() => location.detect(false)} disabled={location.isDetecting}>
-              {location.isDetecting && <Loader2 className="mr-2 animate-spin h-4 w-4" />}
-              {location.isDetecting ? "Detectando..." : "Detectar"}
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Field label="Cidade" value={form.city} onValue={(v) => onChange({ city: v })} />
-            <Field label="Estado" value={form.state} onValue={(v) => onChange({ state: v })} />
-            <Field label="País" value={form.country} onValue={(v) => onChange({ country: v })} />
-          </div>
-          <div className="space-y-1">
-            <Label>Fuso horário (usado na agenda)</Label>
-            <Select value={form.timezone} onValueChange={(v) => onChange({ timezone: v })}>
-              <SelectTrigger><SelectValue placeholder="Selecione seu fuso horário" /></SelectTrigger>
-              <SelectContent>
-                {COMMON_TIMEZONES.map((tz) => (
-                  <SelectItem key={tz.value} value={tz.value}>{tz.label} ({tz.value})</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <ProfileLocationFields form={form} onChange={onChange} />
       </CardContent>
     </Card>
-  )
-}
-
-interface FieldProps {
-  label: string
-  value: string
-  onValue: (value: string) => void
-  placeholder?: string
-}
-
-/** Label + text input pair; the profile form has ~15 of these. */
-export function Field({ label, value, onValue, placeholder }: FieldProps) {
-  return (
-    <div className="space-y-1">
-      <Label>{label}</Label>
-      <Input value={value} onChange={(e) => onValue(e.target.value)} placeholder={placeholder} />
-    </div>
   )
 }
