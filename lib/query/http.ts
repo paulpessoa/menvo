@@ -46,6 +46,18 @@ export function getJson<T>(url: string, schema: ResponseSchema<T>): Promise<T> {
   return request(url, undefined, schema)
 }
 
+export function patchJson<T>(url: string, body: unknown, schema: ResponseSchema<T>): Promise<T> {
+  return request(
+    url,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    },
+    schema
+  )
+}
+
 export function deleteJson<T>(url: string, schema: ResponseSchema<T>): Promise<T> {
   return request(url, { method: "DELETE" }, schema)
 }
