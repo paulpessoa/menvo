@@ -1,6 +1,7 @@
 import { z } from "zod"
 import { createClient } from "@/lib/utils/supabase/server"
 import { requireOrgAdmin } from "@/lib/auth/require-org-admin"
+import { orgIdParamSchema, orgPeriodSchema } from "@/lib/schemas/organizations"
 import { getOrgDashboard } from "@/lib/services/organizations/org-dashboard.service"
 import { errorResponse, handleApiError, successResponse } from "@/lib/api/error-handler"
 
@@ -11,13 +12,15 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: organizationId } = await params
+    const idCheck = orgIdParamSchema.safeParse((await params).id)
+    if (!idCheck.success) return errorResponse("Organização inválida", "VALIDATION_ERROR", 400)
+    const organizationId = idCheck.data
+
     const guard = await requireOrgAdmin(organizationId)
     if (!guard.ok) return guard.response
 
-    const url = new URL(request.url)
-    const rawPeriod = url.searchParams.get("period")
-    const period = rawPeriod === "30d" || rawPeriod === "90d" || rawPeriod === "1y" ? rawPeriod : "all"
+    // Unknown ?period= values fall back to "all" (same as before).
+    const period = orgPeriodSchema.parse(new URL(request.url).searchParams.get("period"))
 
     const supabase = await createClient()
     const dashboard = await getOrgDashboard(supabase, organizationId, period)

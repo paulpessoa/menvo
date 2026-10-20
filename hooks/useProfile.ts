@@ -4,25 +4,17 @@ import { useState, useEffect, useCallback } from "react"
 import { useAuth } from "@/lib/auth"
 import { handleAsyncOperation } from "@/lib/error-handler"
 import { logger } from "@/lib/logger"
-import type { Database } from "@/lib/types/supabase"
-import type { FlattenedMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
-import type { FlattenedMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
-
-/**
- * Perfil como /api/profile devolve: a linha de `profiles` mais os campos de
- * mentor de `mentor_profiles`, achatados (verified/is_pending_mentor calculados).
- */
-export type Profile = Database["public"]["Tables"]["profiles"]["Row"] & FlattenedMentorFields & FlattenedMenteeFields
+import type { OwnProfile } from "@/lib/domain/profile/profile.entity"
 
 export interface ProfileUpdateResult {
   success: boolean;
-  data?: Profile;
+  data?: OwnProfile;
   error?: string;
 }
 
 export function useProfile() {
   const { user } = useAuth()
-  const [profile, setProfile] = useState<Profile | null>(null)
+  const [profile, setProfile] = useState<OwnProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -46,7 +38,7 @@ export function useProfile() {
 
         const data = await response.json()
         logger.debug('Profile fetched successfully via API', 'useProfile', { userId: user.id });
-        return data.profile as Profile;
+        return data.profile as OwnProfile;
       },
       'fetchProfile'
     );
@@ -71,7 +63,7 @@ export function useProfile() {
     }
   }, [user, fetchProfile])
 
-  const updateProfile = async (updates: Partial<Profile>): Promise<ProfileUpdateResult> => {
+  const updateProfile = async (updates: Partial<OwnProfile>): Promise<ProfileUpdateResult> => {
     if (!user) {
       const error = 'No user found';
       logger.error(error, 'useProfile');
@@ -100,7 +92,7 @@ export function useProfile() {
 
     // Optimistic update
     const previousProfile = profile;
-    const optimisticProfile = { ...profile, ...updates } as Profile;
+    const optimisticProfile = { ...profile, ...updates } as OwnProfile;
     setProfile(optimisticProfile);
 
     const result = await handleAsyncOperation(

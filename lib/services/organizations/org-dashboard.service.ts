@@ -1,218 +1,126 @@
+/**
+ * Camada 7 · Service (dashboard da organização)
+ * Regra: monta o que `/dashboard/org` mostra (org, membros com papel derivado,
+ * resumo e impacto) a partir do repository. A regra de contagem mora na entity
+ * (funções puras); aqui só se orquestra a leitura.
+ * Não faz: HTTP, autorização (o guard da rota confere o admin; a RLS e as RPCs
+ * `security definer` são a última barreira) nem SQL.
+ * Tradeoff: `getOrgDashboard(client, …)` mantém a assinatura antiga para os
+ * chamadores não mudarem; `buildOrgDashboard(repo, …)` é a que se testa com um
+ * repository falso.
+ */
 import type { SupabaseClient } from "@supabase/supabase-js"
-
-export interface OrgDashboardMember {
-  userId: string
-  role: "admin" | "member"
-  status: "invited" | "requested" | "active"
-  /** Derived from user_roles - never a separate membership field (roadmap §6, Q1). */
-  platformRole: "mentor" | "mentee" | null
-  joinedAt: string
-  fullName: string | null
-  email: string | null
-  /** Sessions booked as a beneficiary (mentee_id match). */
-  sessionsBooked: number
-  /** Sessions given as an org mentor (mentor_id match). */
-  sessionsGiven: number
-  quizDone: boolean
-}
-
-export interface OrgDashboardImpact {
-  period: "all" | "30d" | "90d" | "1y"
-  totalSessionsCompleted: number
-  totalHoursCompleted: number
-  totalDiagnosticsDone: number
-  averageRating: number | null
-}
-
-export interface OrgDashboardSummary {
-  beneficiaries: number
-  mentors: number
-  pendingRequests: number
-  pendingInvites: number
-  sessionsBookedByBeneficiaries: number
-  sessionsGivenByOrgMentors: number
-  impact: OrgDashboardImpact
-}
+import type { Database, Tables } from "@/lib/types/supabase"
+import {
+  computeSessionImpact,
+  derivePlatformRole,
+  periodStart,
+  summarizeMembers,
+  type OrgDashboardMember,
+  type OrgDashboardSummary,
+  type OrgPeriod,
+  type PlatformRole,
+} from "@/lib/domain/organizations/organization.entity"
+import {
+  createOrganizationsRepository,
+  type OrganizationsRepository,
+} from "@/lib/repositories/organizations.repository"
 
 export interface OrgDashboard {
-  organization: Record<string, unknown>
+  organization: Tables<"organizations">
   members: OrgDashboardMember[]
   summary: OrgDashboardSummary
+}
+
+function countBy<T>(items: readonly T[], key: (item: T) => string): Map<string, number> {
+  const counts = new Map<string, number>()
+  for (const item of items) counts.set(key(item), (counts.get(key(item)) ?? 0) + 1)
+  return counts
 }
 
 /**
  * Everything `/dashboard/org` needs: org info, its members with their
  * derived platform role (mentor/mentee - never a separate field, see
- * roadmap §6 Q1) and per-role stats, and aggregate counts. Pulled out of
- * the route handler so it's a plain function other callers (MCP tools,
- * an eventual assistant) can reuse without going through HTTP.
+ * roadmap §6 Q1) and per-role stats, and aggregate counts. A plain function
+ * other callers (MCP tools, an eventual assistant) can reuse without HTTP.
+ *
+ * Returns `null` when the org does not exist (or RLS hides it).
  */
-export async function getOrgDashboard(
-  supabase: SupabaseClient,
+export async function buildOrgDashboard(
+  repo: OrganizationsRepository,
   organizationId: string,
-  period: "all" | "30d" | "90d" | "1y" = "all"
+  period: OrgPeriod = "all",
+  now: Date = new Date()
 ): Promise<OrgDashboard | null> {
-  const { data: organization, error: orgError } = await supabase
-    .from("organizations" as any)
-    .select("*")
-    .eq("id", organizationId)
-    .maybeSingle()
-
-  if (orgError) throw orgError
+  const organization = await repo.findById(organizationId)
   if (!organization) return null
 
-  const { data: members, error: membersError } = await supabase
-    .from("organization_members" as any)
-    .select("user_id, role, status, created_at, profiles(id, full_name, email)")
-    .eq("organization_id", organizationId)
-    .order("created_at", { ascending: false })
-
-  if (membersError) throw membersError
-
-  const memberRows = (members ?? []) as any[]
+  const memberRows = await repo.listMembers(organizationId)
   const memberIds = memberRows.map(m => m.user_id)
-  const memberEmails = memberRows
-    .map(m => m.profiles?.email)
-    .filter((email): email is string => Boolean(email))
+  const hasMemberEmails = memberRows.some(m => Boolean(m.profile?.email))
+  const since = periodStart(period, now)
 
-  const now = Date.now()
-  let startDateIso: string | null = null
-  if (period === "30d") startDateIso = new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString()
-  else if (period === "90d") startDateIso = new Date(now - 90 * 24 * 60 * 60 * 1000).toISOString()
-  else if (period === "1y") startDateIso = new Date(now - 365 * 24 * 60 * 60 * 1000).toISOString()
-
-  let bookedBuilder = supabase
-    .from("appointments")
-    .select("id, mentee_id, status, duration_minutes, scheduled_at")
-    .in("mentee_id", memberIds)
-
-  let givenBuilder = supabase
-    .from("appointments")
-    .select("id, mentor_id, status, duration_minutes, scheduled_at")
-    .in("mentor_id", memberIds)
-
-  if (startDateIso) {
-    bookedBuilder = bookedBuilder.gte("scheduled_at", startDateIso)
-    givenBuilder = givenBuilder.gte("scheduled_at", startDateIso)
-  }
-
-  const [{ data: bookedAppointments }, { data: givenAppointments }, { data: quizzes }, { data: roleRows }] = await Promise.all([
-    memberIds.length ? bookedBuilder : Promise.resolve({ data: [] as any[] }),
-    memberIds.length ? givenBuilder : Promise.resolve({ data: [] as any[] }),
+  const [bookedList, givenList, quizEmails, roleNames] = await Promise.all([
+    repo.listAppointments(memberIds, "mentee", since),
+    repo.listAppointments(memberIds, "mentor", since),
     // quiz_responses has no direct-select policy any more (RLS audit,
     // STATUS.md 2026-09-23) - org admins see "did the quiz?" only through
     // this security-definer RPC, which checks is_org_admin() itself and
     // never exposes another member's raw quiz answers.
-    memberEmails.length
-      ? supabase.rpc("org_members_quiz_done", { p_org: organizationId })
-      : Promise.resolve({ data: [] as { email: string }[] }),
-    memberIds.length
-      ? supabase
-          .from("user_roles")
-          .select("user_id, roles(name)")
-          .in("user_id", memberIds)
-      : Promise.resolve({ data: [] as { user_id: string; roles: { name: string } | null }[] })
+    hasMemberEmails ? repo.quizDoneEmails(organizationId) : Promise.resolve([] as string[]),
+    repo.listUserRoleNames(memberIds),
   ])
 
-  const bookedList = (bookedAppointments ?? []) as { id: string; mentee_id: string; status: string; duration_minutes?: number }[]
-  const givenList = (givenAppointments ?? []) as { id: string; mentor_id: string; status: string; duration_minutes?: number }[]
+  const bookedByMentee = countBy(bookedList, a => a.mentee_id)
+  const givenByMentor = countBy(givenList, a => a.mentor_id)
+  const quizEmailSet = new Set(quizEmails)
 
-  const bookedByMentee = new Map<string, number>()
-  for (const appt of bookedList) {
-    bookedByMentee.set(appt.mentee_id, (bookedByMentee.get(appt.mentee_id) ?? 0) + 1)
-  }
-  const givenByMentor = new Map<string, number>()
-  for (const appt of givenList) {
-    givenByMentor.set(appt.mentor_id, (givenByMentor.get(appt.mentor_id) ?? 0) + 1)
-  }
-  const quizEmailSet = new Set(((quizzes ?? []) as { email: string }[]).map(q => q.email))
-
-  const platformRoleByUser = new Map<string, "mentor" | "mentee">()
-  for (const row of (roleRows ?? []) as { user_id: string; roles: { name: string } | null }[]) {
-    const name = row.roles?.name
-    if (name !== "mentor" && name !== "mentee") continue
-    if (name === "mentor" || !platformRoleByUser.has(row.user_id)) {
-      platformRoleByUser.set(row.user_id, name)
-    }
-  }
-
-  const members_: OrgDashboardMember[] = memberRows.map(m => ({
+  const members: OrgDashboardMember[] = memberRows.map(m => ({
     userId: m.user_id,
     role: m.role,
     status: m.status,
-    platformRole: platformRoleByUser.get(m.user_id) ?? null,
+    platformRole: derivePlatformRole(roleNames.get(m.user_id) ?? []),
     joinedAt: m.created_at,
-    fullName: m.profiles?.full_name ?? null,
-    email: m.profiles?.email ?? null,
+    fullName: m.profile?.full_name ?? null,
+    email: m.profile?.email ?? null,
     sessionsBooked: bookedByMentee.get(m.user_id) ?? 0,
     sessionsGiven: givenByMentor.get(m.user_id) ?? 0,
-    quizDone: m.profiles?.email ? quizEmailSet.has(m.profiles.email) : false
+    quizDone: m.profile?.email ? quizEmailSet.has(m.profile.email) : false,
   }))
 
-  // Completed sessions calculation
-  const completedApptsMap = new Map<string, { id: string; duration_minutes?: number }>()
-  for (const a of bookedList) {
-    if (a.status === "completed" && a.id) completedApptsMap.set(a.id, a)
-  }
-  for (const a of givenList) {
-    if (a.status === "completed" && a.id) completedApptsMap.set(a.id, a)
-  }
+  const summary = summarizeMembers(members, {
+    period,
+    ...computeSessionImpact(bookedList, givenList),
+    totalDiagnosticsDone: members.filter(m => m.quizDone).length,
+  })
 
-  const completedAppts = Array.from(completedApptsMap.values())
-  const totalSessionsCompleted = completedAppts.length
-  const totalMinutes = completedAppts.reduce((sum, a) => sum + (a.duration_minutes || 45), 0)
-  const totalHoursCompleted = Number((totalMinutes / 60).toFixed(1))
-
-  let averageRating: number | null = null
-  const completedIds = Array.from(completedApptsMap.keys())
-  if (completedIds.length > 0) {
-    const { data: feedbacks } = await supabase
-      .from("appointment_feedbacks")
-      .select("rating")
-      .in("appointment_id", completedIds)
-      .not("rating", "is", null)
-
-    const ratings = (feedbacks ?? []).map((f: any) => f.rating).filter((r): r is number => typeof r === "number")
-    if (ratings.length > 0) {
-      const sum = ratings.reduce((acc, r) => acc + r, 0)
-      averageRating = Number((sum / ratings.length).toFixed(1))
-    }
-  }
-
-  const activeMembers = members_.filter(m => m.status === "active")
-  const summary: OrgDashboardSummary = {
-    beneficiaries: activeMembers.filter(m => m.platformRole !== "mentor").length,
-    mentors: activeMembers.filter(m => m.platformRole === "mentor").length,
-    pendingRequests: members_.filter(m => m.status === "requested").length,
-    pendingInvites: members_.filter(m => m.status === "invited").length,
-    sessionsBookedByBeneficiaries: activeMembers.reduce((sum, m) => sum + m.sessionsBooked, 0),
-    sessionsGivenByOrgMentors: activeMembers.reduce((sum, m) => sum + m.sessionsGiven, 0),
-    impact: {
-      period,
-      totalSessionsCompleted,
-      totalHoursCompleted,
-      totalDiagnosticsDone: members_.filter(m => m.quizDone).length,
-      averageRating,
-    },
-  }
-
-  return { organization, members: members_, summary }
+  return { organization, members, summary }
 }
 
-/** Single-user version of the platformRole derivation above, for callers
- * (e.g. the invite email) that only need one person's role. */
-export async function getPlatformRole(
-  supabase: SupabaseClient,
-  userId: string
-): Promise<"mentor" | "mentee" | null> {
-  const { data } = await supabase
-    .from("user_roles")
-    .select("roles(name)")
-    .eq("user_id", userId)
-    .returns<{ roles: { name: string } | null }[]>()
+/** `buildOrgDashboard` com o repository criado a partir do client do usuário (RLS). */
+export function getOrgDashboard(
+  supabase: SupabaseClient<Database>,
+  organizationId: string,
+  period: OrgPeriod = "all"
+): Promise<OrgDashboard | null> {
+  return buildOrgDashboard(createOrganizationsRepository(supabase), organizationId, period)
+}
 
-  const names = (data ?? []).map(r => r.roles?.name)
-  if (names.includes("mentor")) return "mentor"
-  if (names.includes("mentee")) return "mentee"
-  return null
+/**
+ * Single-user version of the platformRole derivation above, for callers
+ * (e.g. the invite email) that only need one person's role. A failed lookup
+ * returns `null` instead of throwing: the role only picks the e-mail copy, and
+ * it must not fail an invite or a join request that already succeeded.
+ */
+export async function getPlatformRole(
+  supabase: SupabaseClient<Database>,
+  userId: string
+): Promise<PlatformRole | null> {
+  try {
+    const roleNames = await createOrganizationsRepository(supabase).listUserRoleNames([userId])
+    return derivePlatformRole(roleNames.get(userId) ?? [])
+  } catch (error) {
+    console.warn("[org-dashboard.getPlatformRole]", error instanceof Error ? error.message : error)
+    return null
+  }
 }
