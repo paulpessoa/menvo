@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Calendar, Clock, User, Video } from 'lucide-react'
 import { toast } from 'sonner'
+import { useConfirmAppointment } from '@/hooks/appointments/useConfirmAppointment'
 
 interface Appointment {
     id: string | number
@@ -29,14 +30,15 @@ interface Appointment {
 
 interface ConfirmAppointmentButtonProps {
     appointment: Appointment
-    onConfirmed?: (appointment: any) => void
+    onConfirmed?: () => void
 }
 
 export function ConfirmAppointmentButton({
     appointment,
     onConfirmed
 }: ConfirmAppointmentButtonProps) {
-    const [isConfirming, setIsConfirming] = useState(false)
+    const confirm = useConfirmAppointment()
+    const isConfirming = confirm.isPending
     const [mentorNotes, setMentorNotes] = useState('')
     const [isDialogOpen, setIsDialogOpen] = useState(false)
 
@@ -57,30 +59,16 @@ export function ConfirmAppointmentButton({
     }
 
     const handleConfirm = async () => {
-        setIsConfirming(true)
-
         try {
-            const response = await fetch('/api/appointments/confirm', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    appointmentId: appointment.id,
-                    mentorNotes: mentorNotes.trim() || undefined,
-                }),
+            const data = await confirm.mutateAsync({
+                appointmentId: appointment.id,
+                mentorNotes: mentorNotes.trim() || undefined,
             })
 
-            const data = await response.json()
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Erro ao confirmar agendamento')
-            }
-
             // Mensagem de sucesso baseada no resultado
-            const description = data.googleMeetLink
+            const description = 'googleMeetLink' in data && data.googleMeetLink
                 ? 'Um evento foi criado no Google Calendar com link do Meet.'
-                : data.calendarError
+                : 'calendarError' in data && data.calendarError
                     ? `Mentoria confirmada, mas houve um problema ao criar o evento: ${data.calendarError}`
                     : 'Mentoria confirmada com sucesso!';
 
@@ -92,7 +80,7 @@ export function ConfirmAppointmentButton({
             setMentorNotes('')
 
             if (onConfirmed) {
-                onConfirmed(data.appointment)
+                onConfirmed()
             }
 
         } catch (error) {
@@ -100,8 +88,6 @@ export function ConfirmAppointmentButton({
             toast.error('Erro ao confirmar agendamento', {
                 description: error instanceof Error ? error.message : 'Tente novamente mais tarde.',
             })
-        } finally {
-            setIsConfirming(false)
         }
     }
 

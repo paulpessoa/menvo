@@ -18,6 +18,7 @@ import {
   mentorshipUtils
 } from "@/lib/services/mentorship/mentorship.service"
 import { toast } from "sonner"
+import { useRequestAppointment } from "@/hooks/appointments/useRequestAppointment"
 import { AvailabilityAlertButton } from "@/components/mentorship/AvailabilityAlertButton"
 import {
   MENTORSHIP_REASON_MAX_LENGTH,
@@ -43,7 +44,8 @@ export default function BookingForm({
     null
   )
   const [message, setMessage] = useState("")
-  const [loading, setLoading] = useState(false)
+  const request = useRequestAppointment().create
+  const loading = request.isPending
   const reasonLength = message.trim().length
   const hasValidReason = reasonLength >= MENTORSHIP_REASON_MIN_LENGTH
   const [fetchingSlots, setFetchingSlots] = useState(true)
@@ -86,33 +88,18 @@ export default function BookingForm({
     }
 
     try {
-      setLoading(true)
-
       // Calculate the next occurrence of the day_of_week
       const scheduledAt = mentorshipUtils.getNextOccurrence(
         selectedSlot.day_of_week,
         selectedSlot.start_time
       )
 
-      const response = await fetch("/api/appointments/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          mentor_id: mentorId,
-          scheduled_at: scheduledAt.toISOString(),
-          duration_minutes: 60,
-          notes_mentee: message.trim()
-        })
+      const data = await request.mutateAsync({
+        mentor_id: mentorId,
+        scheduled_at: scheduledAt.toISOString(),
+        duration_minutes: 60,
+        notes_mentee: message.trim()
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to create appointment")
-      }
-
-      const data = await response.json()
       toast.success("Agendamento criado com sucesso!")
 
       if (onSuccess) {
@@ -123,8 +110,6 @@ export default function BookingForm({
       toast.error(
         error instanceof Error ? error.message : "Erro ao criar agendamento"
       )
-    } finally {
-      setLoading(false)
     }
   }
 

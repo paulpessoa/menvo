@@ -120,3 +120,9 @@ export const scheduleRequestSchema = z.object({
   message: mentorshipReasonSchema.optional(),
 })
 
+
+/** `POST /api/appointments/create`: o pedido criado (sem `action_token`). */
+export const createResponseSchema = z.object({
+  success: z.literal(true),
+  appointment: z.object({ id: z.string() }).passthrough(),
+})
