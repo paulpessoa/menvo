@@ -250,3 +250,7 @@ PATCH antes de mexer). O resto é baixo.
 - L2-6: `organizations`, `[id]`, `[id]/admins` e `org-leads` pela SESSAO (sem service_role) via `organizations.service.ts` (`assertAdmin`) e `createAdminOrganizationsRepository`/`createAdminOrgLeadsRepository`; id inexistente agora 404 e `[id]` invalido 400; `org-leads.service.ts` ficou so com `createOrganizationLead` (E8). Erro de banco: texto fixo.
 - L2-7: `invites/*` e `emails/*` com `invites.service.ts`/`emails.service.ts` (`assertAdmin`), port `lib/ports/admin-email.ts` + adapter Brevo; client privilegiado so em `ops.composition.ts`; `resolveAudience(params, db)` e `createInviteToken(params, db?)` recebem o client (cron de retencao segue com o default).
 - Pedido ao orquestrador: nenhum arquivo compartilhado editado; `AuditAction` ainda sem `invite_batch_sent` (usa `bulk_action`).
+
+**L1-8 (feito, sem migration).**
+- `lib/query/keys/admin-users.ts` (`adminUsersKeys`), `lib/query/effects/admin-users.ts` (`adminUsers.update|delete|verification.decide`), respostas em `lib/schemas/admin-users-responses.ts`, hooks em `hooks/admin-users/` (`useAdminUsers`, `useAdminUpdateUser`, `useAdminDeleteUser`, `useMentorVerifications`, `useDecideVerification`), sem uso ainda.
+- Pedido ao orquestrador: em `keys.ts` `import { adminUsersKeys } from "./keys/admin-users"` + `adminUsers: adminUsersKeys,`; em `effects.ts` `import { adminUsersEffects } from "./effects/admin-users"` + `...adminUsersEffects,`. A raiz `["mentors"]` esta fixa no effect (falta `qk.mentors.all`).
