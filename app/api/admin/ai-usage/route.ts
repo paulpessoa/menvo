@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createClient } from "@/lib/utils/supabase/server"
 import { requireAdmin } from "@/lib/auth/require-admin"
+import { adminForbiddenResponse } from "@/lib/services/admin/assert-admin"
 import { getAiUsageReport } from "@/lib/services/ai/ai-usage.service"
 
 const monthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/)
@@ -19,6 +20,8 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient()
     return NextResponse.json(await getAiUsageReport(supabase, `${month.data}-01`))
   } catch (error) {
+    const forbidden = adminForbiddenResponse(error)
+    if (forbidden) return forbidden
     console.error("[AdminAIUsage] error:", error)
     return NextResponse.json({ error: "Erro ao carregar uso de IA" }, { status: 500 })
   }
