@@ -1,16 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
-import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { updateUserRoleSchema } from "@/lib/schemas/profile"
-import { sendNewMenteeProfileEmail } from "@/lib/email/brevo"
+import { buildAccountRoleService } from "@/lib/services/profile/account-role.composition"
 
+/**
+ * POST /api/profile/role - escolhe o papel (mentor ou mentorado) no
+ * onboarding. Fina: auth, Zod, service, status. A troca de papel e a
+ * exceção de `service_role` (ADR 0008, E2) moram em `account-role.*`.
+ */
 export async function POST(request: NextRequest) {
   try {
-    const supabaseAdmin = createSupabaseClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { persistSession: false } }
-    )
     const supabase = await createClient()
     const {
       data: { user },
@@ -21,9 +20,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
     }
 
-    const rawBody = await request.json().catch(() => ({}))
-    const validation = updateUserRoleSchema.safeParse(rawBody)
-
+    const validation = updateUserRoleSchema.safeParse(await request.json().catch(() => ({})))
     if (!validation.success) {
       return NextResponse.json(
         { error: validation.error.errors[0]?.message || "Dados inválidos" },
@@ -32,135 +29,17 @@ export async function POST(request: NextRequest) {
     }
 
     const { role, profileData } = validation.data
+    const outcome = await buildAccountRoleService(supabase).chooseRole(user, role, profileData)
 
-    // 1. Atualizar o perfil do usuário
-    // NÃO incluir "user_role" aqui: essa coluna não existe em `profiles`
-    // (a role real vive só em `user_roles`, atualizada mais abaixo). O
-    // PostgREST rejeita o payload inteiro se ele contiver uma coluna
-    // desconhecida, então isso fazia esse UPDATE falhar com 500 para
-    // QUALQUER usuário terminando o onboarding.
-    // Verificação só existe para candidato a mentor (mentor_profiles, via RPC
-    // mais abaixo). Antes este UPDATE gravava 'approved' em todo mentorado.
-    const profileUpdates: Record<string, any> = {
-      updated_at: new Date().toISOString(),
-    }
-
-    if (profileData && typeof profileData === "object") {
-      if (typeof profileData.bio === "string") profileUpdates.bio = profileData.bio
-      if (typeof profileData.job_title === "string") profileUpdates.job_title = profileData.job_title
-      if (typeof profileData.company === "string") profileUpdates.company = profileData.company
-      if (typeof profileData.linkedin_url === "string") profileUpdates.linkedin_url = profileData.linkedin_url
-      if (typeof profileData.city === "string") profileUpdates.city = profileData.city
-      if (typeof profileData.state === "string") profileUpdates.state = profileData.state
-      if (typeof profileData.country === "string") profileUpdates.country = profileData.country
-      if (Array.isArray(profileData.expertise_areas)) profileUpdates.expertise_areas = profileData.expertise_areas
-      if (Array.isArray(profileData.mentorship_topics)) profileUpdates.mentorship_topics = profileData.mentorship_topics
-    }
-
-    const { error: updateError } = await (supabase
-      .from("profiles") as any)
-      .update(profileUpdates)
-      .eq("id", user.id);
-
-    if (updateError) {
-      console.error("❌ Erro ao salvar perfil:", updateError)
+    if (outcome.kind === "failed") {
       return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
-    }
-
-    if (profileData && typeof profileData === "object" && typeof profileData.learning_goals === "string") {
-      const { error: menteeError } = await supabase
-        .from("mentee_profiles")
-        .upsert({ user_id: user.id, learning_goals: profileData.learning_goals }, { onConflict: "user_id" })
-      if (menteeError) {
-        console.error("❌ Erro ao salvar objetivos:", menteeError)
-        return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
-      }
-    }
-
-    // Candidato a mentor entra na fila de verificação. O admin aprova com base
-    // em `mentor_profiles.verification_status`.
-    if (role === "mentor") {
-      const { error: requestError } = await supabase.rpc("request_mentor_verification")
-      if (requestError) {
-        console.error("❌ Erro ao pedir verificação de mentor:", requestError)
-        return NextResponse.json({ error: "Erro ao salvar role" }, { status: 500 })
-      }
-
-      const inclusiveTags = profileData?.inclusive_tags
-      if (Array.isArray(inclusiveTags)) {
-        const { error: tagsError } = await supabase
-          .from("mentor_profiles")
-          .update({ inclusive_tags: inclusiveTags })
-          .eq("user_id", user.id)
-        if (tagsError) console.error("❌ Erro ao salvar tags inclusivas:", tagsError)
-      }
-    }
-
-    // 2. Atribuir a role no sistema de RBAC
-    // "mentor" e "mentee" são mutuamente exclusivos: sem isso, um usuário que
-    // troca de role pelo onboarding (ex.: reenvia o POST) acumula as duas
-    // linhas em user_roles, o que quebra todo endpoint admin que faz
-    // `.select("roles(name)").single()` para esse usuário. Não tocamos em
-    // "admin"/"moderator", que são atribuídas por outro fluxo.
-    const { data: exclusiveRoles } = await supabase
-      .from("roles")
-      .select("id, name")
-      .in("name", ["mentor", "mentee"])
-
-    const roleIdByName = new Map(
-      (exclusiveRoles ?? []).map(r => [(r as any).name as string, (r as any).id as number])
-    )
-    // Se a role solicitada for "mentor", ele entra como "mentee" até ser aprovado pelo admin
-    const roleToAssign = role === "mentor" ? "mentee" : role
-
-    const otherRoleIds = [...roleIdByName.entries()]
-      .filter(([name]) => name !== roleToAssign)
-      .map(([, id]) => id)
-
-    if (otherRoleIds.length > 0) {
-      await supabaseAdmin
-        .from("user_roles")
-        .delete()
-        .eq("user_id", user.id)
-        .in("role_id", otherRoleIds)
-    }
-
-    const roleId = roleIdByName.get(roleToAssign)
-    if (roleId) {
-      const { data: existingRole } = await supabaseAdmin
-        .from("user_roles")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("role_id", roleId)
-        .maybeSingle()
-
-      if (!existingRole) {
-        await supabaseAdmin
-          .from("user_roles")
-          .insert({ user_id: user.id, role_id: roleId })
-
-        if (role === "mentee" && user.email) {
-          const recipientName =
-            user.user_metadata?.full_name ||
-            user.user_metadata?.name ||
-            (profileUpdates.full_name as string) ||
-            "Mentorado"
-
-          sendNewMenteeProfileEmail({
-            email: user.email,
-            name: recipientName,
-          }).catch((err) => {
-            console.error("[ONBOARDING] Erro ao enviar e-mail de perfil completo:", err)
-          })
-        }
-      }
     }
 
     return NextResponse.json({
       success: true,
       message: "Role atualizada com sucesso",
-      role,
-      status: role === "mentor" ? "pending" : "approved",
+      role: outcome.role,
+      status: outcome.status,
     })
   } catch (error) {
     console.error("[POST /api/profile/role] Erro:", error)

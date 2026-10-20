@@ -14,7 +14,7 @@ import { ProfileRepositoryError } from "@/lib/repositories/profile.repository"
 import type { ProfileMailer } from "@/lib/ports/profile-mailer"
 
 export interface MentorRequestServiceDeps {
-  repo: MentorRequestRepository
+  repo: Pick<MentorRequestRepository, "requestVerification" | "saveApproach">
   mailer: ProfileMailer
 }
 

@@ -4,8 +4,9 @@
  * `lib/email/brevo.ts`.
  */
 import type { ProfileMailer } from "../profile-mailer"
-import { sendAdminNewMentorNotification } from "@/lib/email/brevo"
+import { sendAdminNewMentorNotification, sendNewMenteeProfileEmail } from "@/lib/email/brevo"
 
 export const brevoProfileMailer: ProfileMailer = {
   notifyAdminNewMentor: (message) => sendAdminNewMentorNotification(message),
+  notifyNewMentee: (message) => sendNewMenteeProfileEmail(message),
 }

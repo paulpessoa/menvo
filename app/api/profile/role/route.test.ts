@@ -22,6 +22,12 @@ jest.mock('@supabase/supabase-js', () => {
 describe('POST /api/profile/role', () => {
   let mockSupabase: any
 
+  // O client privilegiado da troca de papel vem de createServiceRoleClient, que exige as chaves.
+  beforeAll(() => {
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'http://localhost:54321'
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-test-key'
+  })
+
   const createMockRequest = (body: any) => {
     return new NextRequest('http://localhost:3000/api/profile/role', {
       method: 'POST',
