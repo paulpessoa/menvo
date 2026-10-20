@@ -273,3 +273,10 @@ OpenAPI não precisa de decisão aqui.)
 5. D2 (migration) só é aberta depois do PR 9, se o pgTAP ou o crescimento de uso pedir.
 
 Nenhum PR precisa de migration nova.
+
+## Handoff (PR 4 · administração da org)
+- Feito: `org-admin.service.ts` (+ `.composition.ts`) com `invite` (no_account/already_active/reinvited/approved/invited), `approve`, `remove` (self, `last_admin`) e `updateJoinPolicy`; ports `OrgMailer` (+`sendInvite`, `sendApproved`) e `OrgDirectory` (+`findAccountByEmail`, exceção E4); repository com `isOrgAdmin` (RPC), `findMemberState`, `countActiveAdmins`, `inviteMember`, `approveRequest`, `updateJoinPolicy`.
+- `requireOrgAdmin` usa o repository (RPC `is_org_admin` + papel de plataforma); mesmos 401/403. Rotas `members` (POST/PATCH/DELETE) e `PATCH /api/org/[id]` sem `service_role` nem `as any`.
+- Mudanças de comportamento: D4 (último admin ativo: 400 `BAD_REQUEST`); `[id]` não-UUID e `userId` não-UUID dão 400; e-mail do convite é normalizado para minúsculas; falha de banco na busca de conta/guard dá 500 (antes virava 404/403).
+- Fica para a integração: `getDashboard`/`listMine` seguem em `org-dashboard.service.ts`/`membership.service.ts`; rotas `app/api/admin/organizations/**` não foram tocadas; OpenAPI (`lib/openapi/document*`) deve descrever o 400 de último admin em `DELETE …/members`.
+- UI: nenhum hook/página foi tocado; o 400 do último admin chega como erro da mutation `remove` de `useOrgMemberActions`, e a mensagem vem do corpo da API (texto novo, em PT).

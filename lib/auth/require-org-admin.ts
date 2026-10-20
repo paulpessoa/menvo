@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
+import { createOrganizationsRepository } from "@/lib/repositories/organizations.repository"
 
 interface AuthorizedOrgAdmin {
   userId: string
@@ -14,8 +15,11 @@ type GuardResult =
 /**
  * Authorizes the caller of an org-scoped admin API route (`/dashboard/org`).
  * A caller passes if they are either:
- *  - an `organization_members` row with role='admin' for this org, or
- *  - a platform admin (user_roles.role = 'admin'), who can manage any org.
+ *  - a platform admin (user_roles.role = 'admin'), who can manage any org, or
+ *  - an ACTIVE admin of this org, asked through the `is_org_admin` RPC (via the
+ *    repository, so no route or guard queries `organization_members` itself).
+ * Why the RPC: it is the same rule the RLS policies use, so the guard and the
+ * database cannot disagree about who counts as an org admin.
  */
 export async function requireOrgAdmin(organizationId: string): Promise<GuardResult> {
   const supabase = await createClient()
@@ -35,26 +39,14 @@ export async function requireOrgAdmin(organizationId: string): Promise<GuardResu
     }
   }
 
-  const { data: roleRows } = await supabase
-    .from("user_roles")
-    .select("roles(name)")
-    .eq("user_id", user.id)
-    .returns<{ roles: { name: string } | null }[]>()
+  const repo = createOrganizationsRepository(supabase)
 
-  const isPlatformAdmin = (roleRows ?? []).some(row => row.roles?.name === "admin")
-
-  if (isPlatformAdmin) {
+  const roleNames = (await repo.listUserRoleNames([user.id])).get(user.id) ?? []
+  if (roleNames.includes("admin")) {
     return { ok: true, admin: { userId: user.id, organizationId, isPlatformAdmin: true } }
   }
 
-  const { data: membership } = await supabase
-    .from("organization_members")
-    .select("role, status")
-    .eq("organization_id", organizationId)
-    .eq("user_id", user.id)
-    .maybeSingle()
-
-  if ((membership as any)?.role !== "admin" || (membership as any)?.status !== "active") {
+  if (!(await repo.isOrgAdmin(organizationId))) {
     return {
       ok: false,
       response: NextResponse.json(

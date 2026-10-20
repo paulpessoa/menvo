@@ -50,3 +50,26 @@ describe("createSupabaseOrgDirectory.listAdminEmails", () => {
     await expect(createSupabaseOrgDirectory(() => client).listAdminEmails("o1")).rejects.toThrow(/boom/)
   })
 })
+
+describe("createSupabaseOrgDirectory.findAccountByEmail", () => {
+  it("looks up profiles by exact e-mail and returns only id, name and e-mail", async () => {
+    const { client, calls } = adminWith({ data: { id: "u1", full_name: "Ana", email: "ana@x.org", phone: "x" }, error: null })
+    expect(await createSupabaseOrgDirectory(() => client).findAccountByEmail("ana@x.org")).toEqual({
+      id: "u1",
+      full_name: "Ana",
+      email: "ana@x.org",
+    })
+    expect(client.from).toHaveBeenCalledWith("profiles")
+    expect(calls.eq).toEqual([["email", "ana@x.org"]])
+  })
+
+  it("is null when no account has that e-mail", async () => {
+    const { client } = adminWith({ data: null, error: null })
+    expect(await createSupabaseOrgDirectory(() => client).findAccountByEmail("no@x.org")).toBeNull()
+  })
+
+  it("throws on a database error instead of pretending the account does not exist", async () => {
+    const { client } = adminWith({ data: null, error: { message: "boom" } })
+    await expect(createSupabaseOrgDirectory(() => client).findAccountByEmail("a@x.org")).rejects.toThrow(/boom/)
+  })
+})

@@ -295,6 +295,76 @@ describe("person-side membership", () => {
   })
 })
 
+describe("admin-side membership", () => {
+  it("isOrgAdmin calls the is_org_admin RPC and is true only for an explicit true", async () => {
+    const rpc = (result: unknown) => ({ rpc: jest.fn().mockResolvedValue(result) })
+    const yes = rpc({ data: true, error: null })
+    expect(await createOrganizationsRepository(yes as unknown as SupabaseClient<Database>).isOrgAdmin("o1")).toBe(true)
+    expect(yes.rpc).toHaveBeenCalledWith("is_org_admin", { p_organization_id: "o1" })
+    const no = rpc({ data: null, error: null })
+    expect(await createOrganizationsRepository(no as unknown as SupabaseClient<Database>).isOrgAdmin("o1")).toBe(false)
+    const bad = rpc({ data: null, error: { message: "x" } })
+    await expect(
+      createOrganizationsRepository(bad as unknown as SupabaseClient<Database>).isOrgAdmin("o1")
+    ).rejects.toBeInstanceOf(RepositoryError)
+  })
+
+  it("findMemberState returns role and status, or null", async () => {
+    expect(await repoWith({ data: { role: "admin", status: "active" }, error: null }).repo.findMemberState("o1", "u1")).toEqual({
+      role: "admin",
+      status: "active",
+    })
+    expect(await repoWith({ data: null, error: null }).repo.findMemberState("o1", "u1")).toBeNull()
+  })
+
+  it("countActiveAdmins counts only active admins of the org", async () => {
+    const { repo, calls } = repoWith({ count: 2, error: null })
+    expect(await repo.countActiveAdmins("o1")).toBe(2)
+    expect(calls.eq).toEqual([
+      ["organization_id", "o1"],
+      ["role", "admin"],
+      ["status", "active"],
+    ])
+    expect(await repoWith({ count: null, error: null }).repo.countActiveAdmins("o1")).toBe(0)
+  })
+
+  it("inviteMember inserts a member row with status invited", async () => {
+    const { repo, calls } = repoWith({ error: null })
+    await repo.inviteMember("o1", "u1")
+    expect(calls.insert).toEqual([[{ organization_id: "o1", user_id: "u1", role: "member", status: "invited" }]])
+  })
+
+  it("approveRequest only touches a requested row and returns the contact (or null when there was no request)", async () => {
+    const { repo, calls } = repoWith({ data: { user_id: "u1", profiles: { full_name: "Ana", email: "a@x" } }, error: null })
+    expect(await repo.approveRequest("o1", "u1")).toEqual({ full_name: "Ana", email: "a@x" })
+    expect(calls.update).toEqual([[{ status: "active" }]])
+    expect(calls.eq).toEqual([
+      ["organization_id", "o1"],
+      ["user_id", "u1"],
+      ["status", "requested"],
+    ])
+    expect(await repoWith({ data: null, error: null }).repo.approveRequest("o1", "u1")).toBeNull()
+  })
+
+  it("updateJoinPolicy writes only join_policy and returns the row", async () => {
+    const { repo, calls } = repoWith({ data: { id: "o1", join_policy: "invite_only" }, error: null })
+    expect(await repo.updateJoinPolicy("o1", "invite_only")).toEqual({ id: "o1", join_policy: "invite_only" })
+    expect(calls.update).toEqual([[{ join_policy: "invite_only" }]])
+    expect(calls.eq).toEqual([["id", "o1"]])
+  })
+
+  it.each([
+    ["findMemberState", (r: ReturnType<typeof repoWith>["repo"]) => r.findMemberState("o", "u")],
+    ["countActiveAdmins", (r: ReturnType<typeof repoWith>["repo"]) => r.countActiveAdmins("o")],
+    ["inviteMember", (r: ReturnType<typeof repoWith>["repo"]) => r.inviteMember("o", "u")],
+    ["approveRequest", (r: ReturnType<typeof repoWith>["repo"]) => r.approveRequest("o", "u")],
+    ["updateJoinPolicy", (r: ReturnType<typeof repoWith>["repo"]) => r.updateJoinPolicy("o", "open")],
+  ])("%s throws a RepositoryError on failure", async (_name, call) => {
+    const { repo } = repoWith({ data: null, error: { message: "RLS denied" } })
+    await expect(call(repo)).rejects.toBeInstanceOf(RepositoryError)
+  })
+})
+
 describe("listAdminOrganizations", () => {
   it("asks for active admin rows of the user and flattens the embedded org", async () => {
     const { repo, calls } = repoWith({

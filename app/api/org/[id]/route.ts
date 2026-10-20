@@ -1,8 +1,8 @@
-import { z } from "zod"
 import { createClient } from "@/lib/utils/supabase/server"
 import { requireOrgAdmin } from "@/lib/auth/require-org-admin"
-import { orgIdParamSchema, orgPeriodSchema } from "@/lib/schemas/organizations"
+import { orgIdParamSchema, orgPeriodSchema, updateOrgSettingsSchema } from "@/lib/schemas/organizations"
 import { getOrgDashboard } from "@/lib/services/organizations/org-dashboard.service"
+import { buildOrgAdminService } from "@/lib/services/organizations/org-admin.composition"
 import { errorResponse, handleApiError, successResponse } from "@/lib/api/error-handler"
 
 // GET /api/org/[id] - org admin's scoped dashboard: org info, members with
@@ -35,34 +35,28 @@ export async function GET(
   }
 }
 
-const updateOrgSchema = z.object({
-  join_policy: z.enum(["open", "invite_only"])
-})
-
 // PATCH /api/org/[id] - org admin updates settings (currently: join_policy)
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: organizationId } = await params
+    const idCheck = orgIdParamSchema.safeParse((await params).id)
+    if (!idCheck.success) return errorResponse("Organização inválida", "VALIDATION_ERROR", 400)
+    const organizationId = idCheck.data
+
     const guard = await requireOrgAdmin(organizationId)
     if (!guard.ok) return guard.response
 
-    const validation = updateOrgSchema.safeParse(await request.json().catch(() => ({})))
+    const validation = updateOrgSettingsSchema.safeParse(await request.json().catch(() => ({})))
     if (!validation.success) {
       return errorResponse(validation.error.errors[0]?.message || "Dados inválidos", "VALIDATION_ERROR", 400)
     }
 
-    const supabase = await createClient()
-    const { data: organization, error } = await supabase
-      .from("organizations" as any)
-      .update(validation.data as any)
-      .eq("id", organizationId)
-      .select()
-      .single()
-
-    if (error) throw error
+    const organization = await buildOrgAdminService(await createClient()).updateJoinPolicy(
+      organizationId,
+      validation.data.join_policy
+    )
 
     return successResponse(organization, "Organização atualizada")
   } catch (error) {
