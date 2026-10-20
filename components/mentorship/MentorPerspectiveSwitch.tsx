@@ -3,7 +3,7 @@
 import { Inbox, Send } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { useAuth } from "@/lib/auth"
-import { useMyAppointments } from "@/hooks/useMyAppointments"
+import { useMyAppointments } from "@/hooks/appointments/useMyAppointments"
 import { groupAppointments, type Perspective } from "@/lib/mentorship/group-appointments"
 import { cn } from "@/lib/utils"
 

@@ -1,10 +1,10 @@
 'use client';
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar } from "lucide-react";
-import { AppointmentWithProfiles } from '@/lib/types/models/mentorship';
+import { useAppointmentsList } from '@/hooks/appointments/useAppointmentsList';
 import { toast } from 'sonner';
 import { AppointmentCard } from './appointment-card';
 import { useAuth } from '@/lib/auth';
@@ -22,42 +22,13 @@ export default function AppointmentsList({
     limit = 10
 }: AppointmentsListProps) {
     const t = useTranslations("appointments");
-    const [appointments, setAppointments] = useState<AppointmentWithProfiles[]>([]);
-    const [loading, setLoading] = useState(true);
     const { user, loading: authLoading } = useAuth();
-
-    const fetchAppointments = useCallback(async () => {
-        if (!user) return;
-
-        try {
-            setLoading(true);
-
-            const params = new URLSearchParams();
-            if (role) params.append('role', role);
-            if (status) params.append('status', status);
-            params.append('limit', limit.toString());
-
-            const response = await fetch(`/api/appointments/list?${params}`);
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch appointments');
-            }
-
-            const data = await response.json();
-            setAppointments(data.appointments || []);
-        } catch (error) {
-            console.error('Error fetching appointments:', error);
-            toast.error(t("error"));
-        } finally {
-            setLoading(false);
-        }
-    }, [role, status, limit, user, t]);
+    const { data, isLoading: loading, isError, refetch } = useAppointmentsList({ role, status, limit });
+    const appointments = data ?? [];
 
     useEffect(() => {
-        if (!authLoading && user) {
-            fetchAppointments();
-        }
-    }, [user, authLoading, fetchAppointments]);
+        if (isError) toast.error(t("error"));
+    }, [isError, t]);
 
     if (authLoading || (loading && appointments.length === 0)) {
         return (
@@ -84,9 +55,9 @@ export default function AppointmentsList({
             {appointments.map((appointment) => (
                 <AppointmentCard
                     key={appointment.id}
-                    appointment={appointment as any}
+                    appointment={appointment}
                     currentUserId={user?.id || ''}
-                    onAppointmentUpdate={fetchAppointments as any}
+                    onAppointmentUpdate={() => { void refetch() }}
                 />
             ))}
         </div>
