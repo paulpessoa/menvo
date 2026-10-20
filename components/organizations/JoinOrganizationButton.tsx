@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { Link, useRouter } from "@/i18n/routing"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth"
+import { useJoinOrganization } from "@/hooks/organizations/useJoinOrganization"
+import { useMyMemberships } from "@/hooks/organizations/useMyMemberships"
 import { toast } from "sonner"
 import { CheckCircle2, Clock, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
@@ -20,41 +21,28 @@ export function JoinOrganizationButton({ slug, orgName, joinPolicy }: Props) {
   const t = useTranslations("organizationLanding")
   const { user, loading: authLoading } = useAuth()
   const router = useRouter()
-  const [status, setStatus] = useState<MembershipStatus | null>(null)
-  const [submitting, setSubmitting] = useState(false)
+  const memberships = useMyMemberships(user?.id)
+  const joinMutation = useJoinOrganization(user?.id)
+  const submitting = joinMutation.isPending
 
-  useEffect(() => {
-    if (authLoading) return
-    if (!user) {
-      setStatus("none")
-      return
+  // null = ainda carregando. Falha ao buscar os vínculos conta como "sem vínculo"
+  // (a pessoa ainda pode tentar entrar; o servidor decide).
+  let status: MembershipStatus | null = null
+  if (!authLoading) {
+    if (!user) status = "none"
+    else if (memberships.isError) status = "none"
+    else if (memberships.data) {
+      status = memberships.data.find(m => m.organizations.slug === slug)?.status ?? "none"
     }
-    fetch("/api/me/organizations")
-      .then(r => r.json())
-      .then(json => {
-        const row = (json.data ?? []).find((m: any) => m.organizations?.slug === slug)
-        setStatus((row?.status as MembershipStatus) ?? "none")
-      })
-      .catch(() => setStatus("none"))
-  }, [user, authLoading, slug])
+  }
 
   const join = async () => {
-    setSubmitting(true)
     try {
-      const response = await fetch("/api/me/organizations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug })
-      })
-      const json = await response.json()
-      if (!response.ok) throw new Error(json.error || "Não foi possível enviar a solicitação")
-      toast.success(json.message)
-      setStatus(json.data.status)
-      if (json.data.status === "active") router.push("/dashboard")
-    } catch (error: any) {
-      toast.error(error.message)
-    } finally {
-      setSubmitting(false)
+      const result = await joinMutation.mutateAsync(slug)
+      toast.success(result.message)
+      if (result.data.status === "active") router.push("/dashboard")
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível enviar a solicitação")
     }
   }
 
