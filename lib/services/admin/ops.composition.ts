@@ -10,6 +10,7 @@ import type { Database } from "@/lib/types/supabase"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { logAdminAction } from "@/lib/audit-logger"
 import {
+  createAdminFeatureFlagsRepository,
   createAdminRetentionReadRepository,
   createAdminRetentionWriteRepository
 } from "@/lib/repositories/admin-ops.repository"
@@ -18,6 +19,7 @@ import { googleAppointmentCalendar } from "@/lib/ports/adapters/appointment-cale
 import type { AdminAppointmentsDeps } from "@/lib/services/appointments/admin-appointments.service"
 import { getAdminOverview } from "./overview.service"
 import { createAdminRetentionService } from "./retention.service"
+import { createAdminFeatureFlagsService } from "./feature-flags.service"
 
 function lazyPrivilegedClient() {
   let client: SupabaseClient<Database> | null = null
@@ -59,4 +61,13 @@ export function buildAdminAppointmentsDeps(
     mailer: brevoAppointmentMailer,
     calendar: googleAppointmentCalendar
   }
+}
+
+/** Service de feature flags (E7 por ora): escreve pelo client privilegiado lazy. */
+export function buildAdminFeatureFlagsService(sessionDb: SupabaseClient<Database>) {
+  const privileged = lazyPrivilegedClient()
+  return createAdminFeatureFlagsService({
+    sessionDb,
+    repo: () => createAdminFeatureFlagsRepository(privileged())
+  })
 }

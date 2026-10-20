@@ -12,3 +12,23 @@ export const retentionExemptBodySchema = z.object({
 })
 
 export type RetentionExemptBody = z.infer<typeof retentionExemptBodySchema>
+
+/** Body de `POST /api/admin/feature-flags`: nasce sempre desligada. */
+export const featureFlagCreateBodySchema = z.object({
+  name: z.string().trim().min(1, "Nome é obrigatório").max(100),
+  description: z.string().trim().max(500).nullish(),
+  tags: z.array(z.string().trim().min(1).max(50)).max(20).optional()
+})
+
+/** Body de `PUT /api/admin/feature-flags`: liga ou desliga uma flag. */
+export const featureFlagToggleBodySchema = z.object({
+  id: z.number().int().positive(),
+  enabled: z.boolean()
+})
+
+/** Query de `DELETE /api/admin/feature-flags?id=`: chega como texto. */
+export const featureFlagDeleteQuerySchema = z.object({
+  id: z.coerce.number().int().positive()
+})
+
+export type FeatureFlagCreateBody = z.infer<typeof featureFlagCreateBodySchema>
