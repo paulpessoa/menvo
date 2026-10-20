@@ -86,6 +86,17 @@ describe('POST /api/appointments/create', () => {
     )
   })
 
+  it('should store topics in the existing `topic` column, never in the missing `mentorship_topics`', async () => {
+    const response = await POST(
+      createMockRequest({ ...base, message: VALID_REASON, mentorship_topics: ['Carreira', 'Entrevistas'] })
+    )
+
+    expect(response.status).toBe(201)
+    const row = insertMock.mock.calls[0][0]
+    expect(row.topic).toBe('Carreira, Entrevistas')
+    expect(row).not.toHaveProperty('mentorship_topics')
+  })
+
   it('should forward the reason to the mentor e-mail instead of "Nenhuma mensagem enviada."', async () => {
     await POST(createMockRequest({ ...base, notes_mentee: VALID_REASON }))
 
