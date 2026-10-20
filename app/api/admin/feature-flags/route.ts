@@ -22,7 +22,7 @@ function getSupabase() {
 export async function GET() {
   const supabase = getSupabase()
   try {
-    const guard = await requireAdmin(["admin", "moderator"])
+    const guard = await requireAdmin()
     if (!guard.ok) return guard.response
 
     const { data: flags, error: flagsError } = await supabase

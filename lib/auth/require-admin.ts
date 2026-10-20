@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/utils/supabase/server"
 
-export type AdminRole = "admin" | "moderator"
+export type AdminRole = "admin"
 
 interface AuthorizedAdmin {
   userId: string
