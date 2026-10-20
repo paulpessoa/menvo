@@ -170,7 +170,7 @@ de onde RLS já resolve, e (c) a estrutura de código acima do dado.
 
 Mudança pequena, sem tocar em rota. Fecha o risco principal.
 - `lib/domain/profile/profile.entity.ts`: `OwnProfile` (tipo do perfil achatado, hoje em `hooks/useProfile.ts`), `PROFILE_WRITABLE_FIELDS` por tabela de destino (profiles / mentor_profiles / mentee_profiles), funções puras `isMentorCandidate`, `hasPublicListing`.
-- `lib/schemas/profile.ts`: `roleProfileDataSchema` no lugar de `z.record(z.any())` (9 campos + `learning_goals` + `inclusive_tags`, todos `.nullish()` com `.catch(undefined)` por campo, para manter "tipo errado ou null = não mexe"; achado 8), `onboardingFlagSchema` (chave `^[a-z0-9_-]{1,64}$`, valor string curta/booleano), `organizationIdParamSchema` (UUID), `requestMentorSchema`. `UpdateUserRoleInput` passa a vir dos schemas novos.
+- `lib/schemas/profile.ts`: `roleProfileDataSchema` no lugar de `z.record(z.any())` (9 campos + `learning_goals` + `inclusive_tags`, todos `.nullish()` com `.catch(undefined)` por campo, para manter "tipo errado ou null = não mexe"; achado 8), `onboardingFlagSchema` (chave `^[a-z0-9_-]{1,64}$`, valor string curta/booleano), `requestMentorSchema` (o schema do `organizationId` ficou com a linha org, grupo 7). `UpdateUserRoleInput` passa a vir dos schemas novos.
 - **Teste de contrato** (`lib/domain/profile/profile-fields.contract.test.ts`): toda chave de `updateProfileSchema.shape` precisa estar em `OWN_PROFILE_COLUMNS`, em `MENTOR_EDITABLE_FIELDS` ou em `MENTEE_EDITABLE_FIELDS` (`cv_url` explicitamente fora). É o teste que teria pego o bug de 15/10. Só lê os arquivos de mentors/auth, não os altera.
 - Risco: baixo. Se o contrato achar um campo hoje divergente, é bug real: registro no relatório em vez de corrigir calado.
 
@@ -218,14 +218,9 @@ Dois PRs, ambos só com cliente de usuário (sem `service_role`):
   - Não crio repository em `lib/repositories/appointments*` (é do domínio appointments, regra de posse); o nome `me-notifications` evita conflito e o comentário do arquivo diz para fundir quando o de appointments existir.
 - Risco: baixo (favoritos), médio-baixo (notificações, é regra de data; os testes com `now` fixo cobrem).
 
-## Grupo 7 · `me/organizations` (camadas 5-8)
+## Grupo 7 · `me/organizations` · movido para a linha org
 
-- `lib/repositories/org-membership.repository.ts` (listar, achar organização por slug, achar membership, criar/atualizar/apagar), `lib/services/me/org-membership.service.ts` (`list`, `join`, `leave`), `lib/ports/org-notifier.ts` + adapter Brevo para `sendOrgJoinRequestToAdmin`. A leitura de e-mail dos admins é a única que usa `service_role`, isolada num repository `org-admin-contacts.repository.ts` criado em `org-membership.composition.ts` (ADR 0008; trocar por RPC na D3).
-- `DELETE`: `organizationIdParamSchema` (UUID). Hoje um id inválido vira 500 do Postgres (`22P02`); passa a ser 400 com a mesma `VALIDATION_ERROR`. Único ajuste de comportamento deste grupo, e só em entrada que o app nunca envia.
-- Os `as any` (`join_policy`, `profiles.email`) saem com tipo correto.
-- Não toca em `lib/services/organizations/**` (domínio org, outra linha).
-- Testes: service (já ativo é no-op, convidado vira ativo, `invite_only` 403, solicitação cria e avisa), rota.
-- Risco: baixo-médio.
+Decisão do orquestrador (2026-10-19): a linha org já é dona de `app/api/me/organizations` e de `lib/services/organizations/**` (PR 5 do plano dela, com o port `OrgDirectory`). Esta linha **não toca** nessa rota. Fica registrado aqui só o que a linha org precisa saber: o achado do `service_role` para ler o e-mail dos admins (tabela de inventário acima), o `organizationId` do `DELETE` sem validação de UUID (hoje vira 500 `22P02`) e o ADR 0008 (D2) como lugar da exceção.
 
 ## Grupo 8 · Contrato (camada 9)
 
@@ -250,7 +245,7 @@ Nada a fazer: decisão registrada é **não expor** perfil, favoritos nem notifi
 ## Pontos de parada que este plano vai tocar
 
 1. **D1** (apagar `profile/update`, tirar `Bearer`) antes do grupo 4.
-2. **D2** (ADR 0008 de `service_role`) antes dos grupos 5 e 7; o ADR é do orquestrador.
+2. **D2** (ADR 0008 de `service_role`) antes do grupo 5 (o uso em organizações é da linha org); o ADR é do orquestrador.
 3. **D3** (migration futura) não bloqueia nada aqui; o grupo 4 para sozinho se o pgTAP mostrar policy faltando.
 4. **D4** (mudança de resposta) só afeta o trecho marcado do grupo 5.
 5. O grupo 9 muda a UI: você valida antes de eu seguir.
