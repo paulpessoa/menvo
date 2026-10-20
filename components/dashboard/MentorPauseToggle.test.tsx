@@ -1,10 +1,18 @@
 import "@testing-library/jest-dom"
-import { render, screen, waitFor } from "@testing-library/react"
+import { render as rtlRender, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import type { ReactElement } from "react"
 import { MentorPauseToggle } from "./MentorPauseToggle"
 import { MentorPausedBanner } from "./MentorPausedBanner"
 
 const mockRefreshProfile = jest.fn()
+
+/** O hook de salvar o perfil usa TanStack Query: precisa do provider. */
+const render = (ui: ReactElement) =>
+  rtlRender(
+    <QueryClientProvider client={new QueryClient({ defaultOptions: { mutations: { retry: false } } })}>{ui}</QueryClientProvider>
+  )
 
 jest.mock("@/lib/auth", () => ({
   useAuth: () => ({

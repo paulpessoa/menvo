@@ -47,10 +47,18 @@ export function getJson<T>(url: string, schema: ResponseSchema<T>): Promise<T> {
 }
 
 export function postJson<T>(url: string, body: unknown, schema: ResponseSchema<T>): Promise<T> {
+  return sendJson("POST", url, body, schema)
+}
+
+export function putJson<T>(url: string, body: unknown, schema: ResponseSchema<T>): Promise<T> {
+  return sendJson("PUT", url, body, schema)
+}
+
+function sendJson<T>(method: "POST" | "PUT", url: string, body: unknown, schema: ResponseSchema<T>): Promise<T> {
   return request(
     url,
     {
-      method: "POST",
+      method,
       headers: { "Content-Type": "application/json" },
       body: body === undefined ? undefined : JSON.stringify(body),
     },

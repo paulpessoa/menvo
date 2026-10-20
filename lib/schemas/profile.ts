@@ -1,4 +1,5 @@
 import { z } from "zod"
+import type { OwnProfile } from "@/lib/domain/profile/profile.entity"
 import { toPlainText } from "./plain-text"
 
 /**
@@ -221,3 +222,15 @@ export const deleteAccountResponseSchema = z.object({ success: z.literal(true), 
 
 /** Erro de `/api/profile`: `details` traz a mensagem crua do banco (decisão D4 pendente). */
 export const profileErrorSchema = z.object({ error: z.string(), details: z.string().optional() })
+
+// ---------------------------------------------------------------------------
+// Envelopes que o CLIENTE lê (hooks/profile). Frouxos de propósito: só exigem
+// um objeto em `profile`. Validar campo a campo com `ownProfileSchema` faria uma
+// linha antiga com valor inesperado derrubar a tela de perfil inteira.
+// ---------------------------------------------------------------------------
+
+const profileObject = z.custom<OwnProfile>((value) => typeof value === "object" && value !== null)
+
+export const ownProfileEnvelopeSchema = z.object({ profile: profileObject })
+/** `profile` é opcional no PUT: quem só liga/desliga o perfil público não depende dele. */
+export const updatedProfileEnvelopeSchema = z.object({ profile: profileObject.optional() })
