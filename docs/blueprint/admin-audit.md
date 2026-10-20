@@ -215,3 +215,10 @@ PATCH antes de mexer). O resto é baixo.
 
 > Seção para o orquestrador e as linhas preencherem a cada merge (o que entrou, o que
 > ficou, o que o próximo grupo precisa saber).
+
+**PR 0 (feito, sem migration).**
+- Decisões: D1 sim, D2 sim (6 rotas), D3 só admin, D4 adiada (M-A1/M-A2 sem migration).
+- Apagadas: `users/actions`, `users/manage`, `notify-verification`, `stats`, `audit-logs/stats`, `resolve-migration-conflict`. L1-1 e L2-1 já estão feitos; `audit-logs` fica.
+- `moderator` saiu de `AdminRole` e de `emails/preview`, `feature-flags` GET e `users` GET. O enum de papéis em `users/[id]` (atribuir `moderator`) não mudou: é da L1-2.
+- Helper: `lib/services/admin/assert-admin.ts` (`assertAdmin(db)` com a sessão, `AdminForbiddenError`, `adminForbiddenResponse` para o 403). Ainda não usado em nenhum service: cada grupo chama no seu (teste modelo: "não-admin recusado").
+- ADR: `docs/governance/adr/0009-admin-service-role.md`. Próximo: L1-2 e L2-2.
