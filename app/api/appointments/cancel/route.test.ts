@@ -102,6 +102,39 @@ describe('POST /api/appointments/cancel', () => {
     expect(data.error).toBe('Agendamento não encontrado');
   });
 
+  it('should return 404 and not cancel when the user is not a participant', async () => {
+    mockServerSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'stranger-1' } },
+      error: null,
+    });
+
+    const mockUpdate = jest.fn();
+    const mockSelect = jest.fn().mockReturnValue({
+      eq: jest.fn().mockReturnValue({
+        single: jest.fn().mockResolvedValue({
+          data: {
+            id: 'app-1',
+            mentor_id: 'mentor-1',
+            mentee_id: 'mentee-1',
+            status: 'confirmed',
+            mentor: { id: 'mentor-1', full_name: 'Mentor Silva', email: 'mentor@menvo.com.br' },
+            mentee: { id: 'mentee-1', full_name: 'Mentorado Souza', email: 'mentee@menvo.com.br' },
+          },
+          error: null,
+        }),
+      }),
+    });
+
+    mockAdminSupabase.from.mockReturnValue({ select: mockSelect, update: mockUpdate });
+
+    const req = createMockRequest({ appointmentId: 'app-1', reason: 'Tentativa indevida' });
+    const response = await POST(req);
+
+    expect(response.status).toBe(404);
+    expect(mockUpdate).not.toHaveBeenCalled();
+    expect(sendAppointmentCancellation).not.toHaveBeenCalled();
+  });
+
   it('should return 400 when appointment is already cancelled', async () => {
     mockServerSupabase.auth.getUser.mockResolvedValue({
       data: { user: { id: 'mentor-1' } },
@@ -113,6 +146,8 @@ describe('POST /api/appointments/cancel', () => {
         single: jest.fn().mockResolvedValue({
           data: {
             id: 'app-1',
+            mentor_id: 'mentor-1',
+            mentee_id: 'mentee-1',
             status: 'cancelled',
             mentor: { id: 'mentor-1', full_name: 'Mentor Silva', email: 'mentor@menvo.com.br' },
             mentee: { id: 'mentee-1', full_name: 'Mentorado Souza', email: 'mentee@menvo.com.br' },
@@ -142,6 +177,8 @@ describe('POST /api/appointments/cancel', () => {
 
     const mockAppointment = {
       id: 'app-1',
+      mentor_id: 'mentor-1',
+      mentee_id: 'mentee-1',
       status: 'confirmed',
       scheduled_at: '2026-09-15T14:00:00Z',
       mentor: { id: 'mentor-1', full_name: 'Dr. Mentor', email: 'mentor@menvo.com.br' },
@@ -193,6 +230,8 @@ describe('POST /api/appointments/cancel', () => {
 
     const mockAppointment = {
       id: 'app-with-cal',
+      mentor_id: 'mentor-1',
+      mentee_id: 'mentee-1',
       status: 'confirmed',
       scheduled_at: '2026-09-15T14:00:00Z',
       google_event_id: 'g-event-123',
@@ -233,6 +272,8 @@ describe('POST /api/appointments/cancel', () => {
 
     const mockAppointment = {
       id: 'app-error-cal',
+      mentor_id: 'mentor-1',
+      mentee_id: 'mentee-1',
       status: 'confirmed',
       scheduled_at: '2026-09-15T14:00:00Z',
       google_event_id: 'g-event-fail',
