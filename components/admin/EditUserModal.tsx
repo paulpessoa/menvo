@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {  Save, Shield, User, Camera, Upload, GraduationCap, ExternalLink, MailCheck, Trash2, Info , Loader2 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
-import { type AdminUserUpdate } from "@/lib/services/admin/admin.service"
+import type { AdminUserUpdate } from "@/lib/domain/admin/user.entity"
 import { MentorApplicationPanel } from "@/components/admin/MentorApplicationPanel"
 import { useSimpleImageUpload } from "@/hooks/useSimpleUpload"
 import { toast } from "sonner"
