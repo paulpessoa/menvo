@@ -1,112 +1,186 @@
-import { getOrgDashboard, getPlatformRole } from "./org-dashboard.service"
+import type { SupabaseClient } from "@supabase/supabase-js"
+import type { Database, Tables } from "@/lib/types/supabase"
+import type { OrgAppointment } from "@/lib/domain/organizations/organization.entity"
+import type { OrganizationsRepository, OrgMemberRow } from "@/lib/repositories/organizations.repository"
+import { buildOrgDashboard, getPlatformRole } from "./org-dashboard.service"
 
-describe("org-dashboard service", () => {
-  function createFakeSupabase(overrides?: {
-    org?: any
-    members?: any[]
-    booked?: any[]
-    given?: any[]
-    feedbacks?: any[]
-    roles?: any[]
-  }) {
-    const org = overrides?.org !== undefined ? overrides.org : { id: "org-1", name: "Giral", slug: "giral" }
-    const members = overrides?.members ?? [
-      { user_id: "u1", role: "admin", status: "active", created_at: "2026-01-01", profiles: { id: "u1", full_name: "Admin User", email: "admin@giral.org" } },
-      { user_id: "u2", role: "member", status: "active", created_at: "2026-02-01", profiles: { id: "u2", full_name: "Mentor User", email: "mentor@giral.org" } },
+const ORG = { id: "org-1", name: "Giral", slug: "giral" } as Tables<"organizations">
+
+function member(userId: string, role: "admin" | "member", status: OrgMemberRow["status"], n: number): OrgMemberRow {
+  return {
+    user_id: userId,
+    role,
+    status,
+    created_at: `2026-01-0${n}`,
+    profile: { id: userId, full_name: `Name ${userId}`, email: `${userId}@x.org` },
+  }
+}
+
+function appt(over: Partial<OrgAppointment> & Pick<OrgAppointment, "id">): OrgAppointment {
+  return { mentee_id: "-", mentor_id: "-", status: "completed", duration_minutes: 45, ratings: [], ...over }
+}
+
+/** Fake repository: only what the dashboard reads, with call capture. */
+function fakeRepo(over: Partial<OrganizationsRepository> = {}) {
+  const repo = {
+    findById: jest.fn().mockResolvedValue(ORG),
+    listMembers: jest.fn().mockResolvedValue([]),
+    listAppointments: jest.fn().mockResolvedValue([]),
+    listUserRoleNames: jest.fn().mockResolvedValue(new Map()),
+    quizDoneEmails: jest.fn().mockResolvedValue([]),
+    ...over,
+  }
+  return repo as unknown as OrganizationsRepository & typeof repo
+}
+
+describe("buildOrgDashboard", () => {
+  /**
+   * Regression fixture: these are the numbers the PREVIOUS implementation
+   * (client-side counting, separate feedback query) produced for this exact
+   * data, checked before the refactor. The overlap a7 (u3 mentee / u2 mentor)
+   * must count once; the invited and cancelled sessions must not move the
+   * completed totals; ratings come only from completed sessions.
+   */
+  function goldenRepo() {
+    const members = [
+      member("u1", "admin", "active", 1),
+      member("u2", "member", "active", 2),
+      member("u3", "member", "active", 3),
+      member("u4", "member", "invited", 4),
+      member("u5", "member", "requested", 5),
     ]
-    const booked = overrides?.booked ?? [
-      { id: "a1", mentee_id: "u1", status: "completed", duration_minutes: 45, scheduled_at: "2026-10-01" },
+    const booked = [
+      appt({ id: "a1", mentee_id: "u1", ratings: [5] }),
+      appt({ id: "a2", mentee_id: "u3", duration_minutes: null }),
+      appt({ id: "a3", mentee_id: "u3", status: "cancelled", duration_minutes: 30, ratings: [1] }),
+      appt({ id: "a4", mentee_id: "u4", duration_minutes: 60 }),
+      appt({ id: "a7", mentee_id: "u3", mentor_id: "u2", duration_minutes: 30, ratings: [3] }),
     ]
-    const given = overrides?.given ?? [
-      { id: "a2", mentor_id: "u2", status: "completed", duration_minutes: 60, scheduled_at: "2026-10-05" },
+    const given = [
+      appt({ id: "a5", mentor_id: "u2", duration_minutes: 60, ratings: [4] }),
+      appt({ id: "a6", mentor_id: "u5", status: "pending" }),
+      appt({ id: "a7", mentee_id: "u3", mentor_id: "u2", duration_minutes: 30, ratings: [3] }),
     ]
-    const feedbacks = overrides?.feedbacks ?? [{ rating: 5 }, { rating: 4 }]
-    const roles = overrides?.roles ?? [{ user_id: "u2", roles: { name: "mentor" } }]
-
-    const gteMock = jest.fn().mockReturnThis()
-    const inMock = jest.fn().mockImplementation(() => ({
-      gte: gteMock,
-      then: (resolve: any) => Promise.resolve({ data: booked }).then(resolve),
-    }))
-
-    const client: any = {
-      from: jest.fn((table: string) => {
-        if (table === "organizations") {
-          return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            maybeSingle: jest.fn().mockResolvedValue({ data: org, error: null }),
-          }
-        }
-        if (table === "organization_members") {
-          return {
-            select: jest.fn().mockReturnThis(),
-            eq: jest.fn().mockReturnThis(),
-            order: jest.fn().mockResolvedValue({ data: members, error: null }),
-          }
-        }
-        if (table === "appointments") {
-          return {
-            select: jest.fn().mockReturnThis(),
-            in: jest.fn((col: string) => {
-              const list = col === "mentee_id" ? booked : given
-              const obj: any = {
-                gte: jest.fn().mockImplementation(() => obj),
-                then: (resolve: any) => Promise.resolve({ data: list }).then(resolve),
-              }
-              return obj
-            }),
-          }
-        }
-        if (table === "appointment_feedbacks") {
-          return {
-            select: jest.fn().mockReturnThis(),
-            in: jest.fn().mockReturnThis(),
-            not: jest.fn().mockResolvedValue({ data: feedbacks, error: null }),
-          }
-        }
-        if (table === "user_roles") {
-          return {
-            select: jest.fn().mockReturnThis(),
-            in: jest.fn().mockResolvedValue({ data: roles, error: null }),
-            eq: jest.fn().mockReturnThis(),
-            returns: jest.fn().mockResolvedValue({ data: roles }),
-          }
-        }
-        return {
-          select: jest.fn().mockReturnThis(),
-        }
-      }),
-      rpc: jest.fn().mockResolvedValue({ data: [{ email: "admin@giral.org" }] }),
-    }
-
-    return { client }
+    const roles = new Map([
+      ["u1", ["mentee"]],
+      ["u2", ["mentee", "mentor"]],
+      ["u3", ["mentee"]],
+      ["u5", ["mentor"]],
+    ])
+    return fakeRepo({
+      listMembers: jest.fn().mockResolvedValue(members),
+      listAppointments: jest.fn().mockImplementation((_ids, as) => Promise.resolve(as === "mentee" ? booked : given)),
+      listUserRoleNames: jest.fn().mockResolvedValue(roles),
+      quizDoneEmails: jest.fn().mockResolvedValue(["u1@x.org", "u3@x.org"]),
+    })
   }
 
-  it("calculates summary impact metrics for organization dashboard", async () => {
-    const { client } = createFakeSupabase()
-    const res = await getOrgDashboard(client, "org-1", "all")
+  it("matches the numbers the previous implementation produced for the same data", async () => {
+    const res = await buildOrgDashboard(goldenRepo(), "org-1", "all")
 
-    expect(res).not.toBeNull()
-    expect(res?.organization).toEqual({ id: "org-1", name: "Giral", slug: "giral" })
-    expect(res?.summary.impact.period).toBe("all")
-    expect(res?.summary.impact.totalSessionsCompleted).toBe(2)
-    // 45 + 60 = 105 min = 1.8h
-    expect(res?.summary.impact.totalHoursCompleted).toBe(1.8)
-    expect(res?.summary.impact.averageRating).toBe(4.5)
-    expect(res?.summary.impact.totalDiagnosticsDone).toBe(1)
+    expect(res?.summary).toEqual({
+      beneficiaries: 2,
+      mentors: 1,
+      pendingRequests: 1,
+      pendingInvites: 1,
+      sessionsBookedByBeneficiaries: 4,
+      sessionsGivenByOrgMentors: 2,
+      impact: {
+        period: "all",
+        totalSessionsCompleted: 5,
+        totalHoursCompleted: 4,
+        totalDiagnosticsDone: 2,
+        averageRating: 4,
+      },
+    })
+    expect(res?.members.map(m => [m.userId, m.platformRole, m.sessionsBooked, m.sessionsGiven, m.quizDone])).toEqual([
+      ["u1", "mentee", 1, 0, true],
+      ["u2", "mentor", 0, 2, false],
+      ["u3", "mentee", 3, 0, true],
+      ["u4", null, 1, 0, false],
+      ["u5", "mentor", 0, 1, false],
+    ])
+    expect(res?.organization).toBe(ORG)
   })
 
-  it("filters by period (30d)", async () => {
-    const { client } = createFakeSupabase()
-    const res = await getOrgDashboard(client, "org-1", "30d")
+  it("maps member rows to the dashboard shape (profile columns, joinedAt)", async () => {
+    const repo = fakeRepo({ listMembers: jest.fn().mockResolvedValue([member("u1", "admin", "active", 1)]) })
+    const res = await buildOrgDashboard(repo, "org-1")
+    expect(res?.members[0]).toMatchObject({
+      userId: "u1",
+      role: "admin",
+      status: "active",
+      joinedAt: "2026-01-01",
+      fullName: "Name u1",
+      email: "u1@x.org",
+    })
+  })
+
+  it("passes the period window to both appointment queries (30d)", async () => {
+    const repo = fakeRepo({ listMembers: jest.fn().mockResolvedValue([member("u1", "admin", "active", 1)]) })
+    const now = new Date("2026-10-19T12:00:00.000Z")
+    const res = await buildOrgDashboard(repo, "org-1", "30d", now)
 
     expect(res?.summary.impact.period).toBe("30d")
+    expect(repo.listAppointments).toHaveBeenCalledWith(["u1"], "mentee", "2026-09-19T12:00:00.000Z")
+    expect(repo.listAppointments).toHaveBeenCalledWith(["u1"], "mentor", "2026-09-19T12:00:00.000Z")
   })
 
-  it("resolves platform roles correctly in getPlatformRole", async () => {
-    const { client } = createFakeSupabase({ roles: [{ user_id: "u2", roles: { name: "mentor" } }] })
-    const role = await getPlatformRole(client, "u2")
-    expect(role).toBe("mentor")
+  it("has no time filter for the whole period", async () => {
+    const repo = fakeRepo({ listMembers: jest.fn().mockResolvedValue([member("u1", "admin", "active", 1)]) })
+    await buildOrgDashboard(repo, "org-1", "all")
+    expect(repo.listAppointments).toHaveBeenCalledWith(["u1"], "mentee", null)
+  })
+
+  it("returns null when the org does not exist and reads nothing else", async () => {
+    const repo = fakeRepo({ findById: jest.fn().mockResolvedValue(null) })
+    expect(await buildOrgDashboard(repo, "nope")).toBeNull()
+    expect(repo.listMembers).not.toHaveBeenCalled()
+  })
+
+  it("handles an org with no members (zeros, null rating)", async () => {
+    const res = await buildOrgDashboard(fakeRepo(), "org-1")
+    expect(res?.members).toEqual([])
+    expect(res?.summary).toMatchObject({
+      beneficiaries: 0,
+      mentors: 0,
+      impact: { totalSessionsCompleted: 0, totalHoursCompleted: 0, totalDiagnosticsDone: 0, averageRating: null },
+    })
+  })
+
+  it("skips the quiz RPC when no member has an e-mail", async () => {
+    const noEmail: OrgMemberRow = { ...member("u1", "admin", "active", 1), profile: null }
+    const repo = fakeRepo({ listMembers: jest.fn().mockResolvedValue([noEmail]) })
+    const res = await buildOrgDashboard(repo, "org-1")
+    expect(repo.quizDoneEmails).not.toHaveBeenCalled()
+    expect(res?.members[0]).toMatchObject({ fullName: null, email: null, quizDone: false })
+  })
+})
+
+describe("getPlatformRole", () => {
+  function clientWithRoles(result: { data: unknown; error: unknown }) {
+    const chain = { select: jest.fn().mockReturnThis(), in: jest.fn().mockResolvedValue(result) }
+    return { from: jest.fn(() => chain) } as unknown as SupabaseClient<Database>
+  }
+
+  it("resolves mentor over mentee", async () => {
+    const client = clientWithRoles({
+      data: [
+        { user_id: "u2", roles: { name: "mentee" } },
+        { user_id: "u2", roles: { name: "mentor" } },
+      ],
+      error: null,
+    })
+    expect(await getPlatformRole(client, "u2")).toBe("mentor")
+  })
+
+  it("is null when the person has neither role", async () => {
+    expect(await getPlatformRole(clientWithRoles({ data: [], error: null }), "u9")).toBeNull()
+  })
+
+  it("is null (not an exception) when the lookup fails", async () => {
+    jest.spyOn(console, "warn").mockImplementation(() => {})
+    expect(await getPlatformRole(clientWithRoles({ data: null, error: { message: "boom" } }), "u2")).toBeNull()
+    jest.restoreAllMocks()
   })
 })
