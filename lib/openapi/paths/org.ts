@@ -92,7 +92,7 @@ registry.registerPath({
   tags: ["org"],
   summary: "Convida uma conta existente por e-mail",
   description:
-    "Se a pessoa já tinha pedido para entrar, aprova o pedido. Reenviar convite a quem já foi convidado só reenvia o e-mail. Busca a conta por e-mail com `service_role` (a RLS não deixa o admin ver quem ainda não é membro); sem ADR ainda.",
+    "Se a pessoa já tinha pedido para entrar, aprova o pedido. Reenviar convite a quem já foi convidado só reenvia o e-mail. Busca a conta por e-mail com `service_role` (a RLS não deixa o admin ver quem ainda não é membro; ADR 0008, E4). A resposta 404 revela se o e-mail tem conta: risco aceito.",
   request: { params: orgPathParamsSchema, body: { content: json(inviteMemberSchema) } },
   responses: {
     200: { description: "Estado final do vínculo", content: json(orgEnvelope(membershipResultSchema)) },
@@ -155,7 +155,7 @@ registry.registerPath({
   tags: ["org"],
   summary: "Pede para entrar numa organização ou aceita um convite",
   description:
-    "Idempotente: já ativa ou já solicitada devolve o estado atual. Convite vira ativo. Org `invite_only` sem convite dá 403. Ao pedir, avisa os admins por e-mail (lê os e-mails deles com `service_role`; sem ADR ainda).",
+    "Idempotente: já ativa ou já solicitada devolve o estado atual. Convite vira ativo. Org `invite_only` sem convite dá 403. Ao pedir, avisa os admins por e-mail (lê os e-mails deles com `service_role`, ADR 0008 E3; o e-mail nunca volta na resposta).",
   request: { body: { content: json(joinOrganizationSchema) } },
   responses: {
     200: { description: "Estado final do vínculo", content: json(orgEnvelope(membershipResultSchema)) },

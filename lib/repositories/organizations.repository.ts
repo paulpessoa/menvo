@@ -60,6 +60,22 @@ export interface OrgMemberRow {
   profile: { id: string; full_name: string | null; email: string | null } | null
 }
 
+/** O que decide se uma pessoa pode pedir para entrar numa org. */
+export interface JoinTarget {
+  id: string
+  name: string
+  join_policy: JoinPolicy
+}
+
+/** Um vínculo da própria pessoa, com a org embutida (pode vir `null` se a RLS a esconder). */
+export interface PersonMembership {
+  organization_id: string
+  role: OrgMemberRole
+  status: MembershipStatus
+  created_at: string
+  organizations: { id: string; slug: string; name: string; type: string; status: string } | null
+}
+
 /** Uma org que a pessoa administra (o seletor de `/dashboard/org`). */
 export interface AdminOrganization {
   id: string
@@ -99,6 +115,20 @@ export interface OrganizationsRepository {
   quizDoneEmails(organizationId: string): Promise<string[]>
   /** Orgs em que a pessoa é admin ativo. */
   listAdminOrganizations(userId: string): Promise<AdminOrganization[]>
+  /** Org ativa pelo slug com o que decide se alguém pode entrar. */
+  findJoinTargetBySlug(slug: string): Promise<JoinTarget | null>
+  /** Estado do vínculo da pessoa com a org, ou `null` se não há. */
+  findMembershipStatus(organizationId: string, userId: string): Promise<MembershipStatus | null>
+  /** Todos os vínculos da pessoa (convites, pedidos e participações), do mais novo ao mais antigo. */
+  listMembershipsOf(userId: string): Promise<PersonMembership[]>
+  /** Registra o pedido para entrar (`member` + `requested`); a RLS exige org ativa e aberta. */
+  requestMembership(organizationId: string, userId: string): Promise<void>
+  /** A própria pessoa aceita o convite (`invited` vira `active`); a RLS não deixa mudar o papel. */
+  acceptInvite(organizationId: string, userId: string): Promise<void>
+  /** Apaga o vínculo da pessoa: sair, recusar convite ou cancelar pedido. */
+  removeMembership(organizationId: string, userId: string): Promise<void>
+  /** Nome e e-mail do próprio perfil (a RLS deixa cada um ler o seu). */
+  findOwnContact(userId: string): Promise<{ full_name: string | null; email: string | null } | null>
 }
 
 export function createOrganizationsRepository(db: SupabaseClient<Database>): OrganizationsRepository {
@@ -231,6 +261,77 @@ export function createOrganizationsRepository(db: SupabaseClient<Database>): Org
         if (org) orgs.push({ id: org.id, slug: org.slug, name: org.name })
       }
       return orgs
+    },
+
+    async findJoinTargetBySlug(slug) {
+      const { data, error } = await db
+        .from("organizations")
+        .select("id, name, join_policy")
+        .eq("slug", slug)
+        .eq("status", "active")
+        .maybeSingle()
+      if (error) throw new RepositoryError("organizations.findJoinTargetBySlug", error)
+      if (!data) return null
+      return { ...data, join_policy: data.join_policy === "invite_only" ? "invite_only" : "open" }
+    },
+
+    async findMembershipStatus(organizationId, userId) {
+      const { data, error } = await db
+        .from("organization_members")
+        .select("status")
+        .eq("organization_id", organizationId)
+        .eq("user_id", userId)
+        .maybeSingle()
+      if (error) throw new RepositoryError("organizations.findMembershipStatus", error)
+      return data ? (data.status as MembershipStatus) : null
+    },
+
+    async listMembershipsOf(userId) {
+      const { data, error } = await db
+        .from("organization_members")
+        .select("organization_id, role, status, created_at, organizations(id, slug, name, type, status)")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+      if (error) throw new RepositoryError("organizations.listMembershipsOf", error)
+
+      return (data ?? []).map(row => ({
+        organization_id: row.organization_id,
+        role: row.role as OrgMemberRole,
+        status: row.status as MembershipStatus,
+        created_at: row.created_at,
+        organizations: Array.isArray(row.organizations) ? (row.organizations[0] ?? null) : row.organizations,
+      }))
+    },
+
+    async requestMembership(organizationId, userId) {
+      const { error } = await db
+        .from("organization_members")
+        .insert({ organization_id: organizationId, user_id: userId, role: "member", status: "requested" })
+      if (error) throw new RepositoryError("organizations.requestMembership", error)
+    },
+
+    async acceptInvite(organizationId, userId) {
+      const { error } = await db
+        .from("organization_members")
+        .update({ status: "active" })
+        .eq("organization_id", organizationId)
+        .eq("user_id", userId)
+      if (error) throw new RepositoryError("organizations.acceptInvite", error)
+    },
+
+    async removeMembership(organizationId, userId) {
+      const { error } = await db
+        .from("organization_members")
+        .delete()
+        .eq("organization_id", organizationId)
+        .eq("user_id", userId)
+      if (error) throw new RepositoryError("organizations.removeMembership", error)
+    },
+
+    async findOwnContact(userId) {
+      const { data, error } = await db.from("profiles").select("full_name, email").eq("id", userId).maybeSingle()
+      if (error) throw new RepositoryError("organizations.findOwnContact", error)
+      return data
     },
   }
 }
