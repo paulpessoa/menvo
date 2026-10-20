@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
     const { appointmentId, rating, privateNotes, publicFeedback } = parsed.data
 
-    const result = await buildAppointmentsService().evaluate(appointmentId, user.id, {
+    const result = await buildAppointmentsService(serverSupabase).evaluate(appointmentId, user.id, {
       rating,
       privateNotes,
       publicFeedback,

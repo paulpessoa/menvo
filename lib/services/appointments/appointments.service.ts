@@ -42,8 +42,16 @@ import type {
 import { RepositoryError } from "@/lib/repositories/repository-error"
 
 export interface AppointmentsServiceDeps {
+  /** Client da SESSÃO do usuário (RLS + trigger). Usado onde o ADR 0008 §4 tirou o `service_role`. */
   repo: AppointmentsRepository
   feedbacks: AppointmentFeedbacksRepository
+  /**
+   * Repositories com `service_role`, criados só quando pedidos (o build roda sem
+   * segredos). Quem chama precisa já ter conferido o ator (ADR 0008 §2.3).
+   * Exceções: E3 contato da outra parte, E5 token do e-mail, leituras de lista
+   * com embed de `profiles`, e apagar avaliações no no-show.
+   */
+  admin: () => { repo: AppointmentsRepository; feedbacks: AppointmentFeedbacksRepository }
   mailer: AppointmentMailer
   calendar: AppointmentCalendar
   now?: () => Date
@@ -190,7 +198,10 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
      * O aviso é `best effort`: falha de e-mail não desfaz o registro.
      */
     async registerNoShow(appointmentId: string, userId: string, notes?: string | null): Promise<NoShowResult> {
-      const appointment = await deps.repo.findWithParties(appointmentId)
+      // Privilegiado de ponta a ponta (ADR 0008): lê o e-mail do mentorado (E3) e
+      // apaga avaliações, que o mentor não tem policy para apagar.
+      const { repo, feedbacks } = deps.admin()
+      const appointment = await repo.findWithParties(appointmentId)
       if (!appointment) return { kind: "not_found" }
       if (appointment.mentor_id !== userId) return { kind: "forbidden" }
       if (new Date(appointment.scheduled_at).getTime() > now().getTime()) return { kind: "in_future" }
@@ -202,7 +213,7 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
         : "Mentorado não compareceu à sessão"
       const nowIso = now().toISOString()
 
-      const result = await transition(deps.repo, {
+      const result = await transition(repo, {
         appointment,
         to: "cancelled",
         actor: "mentor",
@@ -219,7 +230,7 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
       // Avaliação de uma sessão em que o mentorado faltou não faz sentido (e uma
       // prematura pode ter sido enviada antes). Se falhar, o registro vale mesmo assim.
       try {
-        await deps.feedbacks.deleteByAppointment(appointmentId)
+        await feedbacks.deleteByAppointment(appointmentId)
       } catch (error) {
         console.error("[appointments] não foi possível apagar avaliações do no-show:", (error as Error).message)
       }
@@ -248,7 +259,9 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
      * avisa a outra parte; as duas coisas são `best effort`.
      */
     async cancel(appointmentId: string, userId: string, reason: string): Promise<CancelResult> {
-      const appointment = await deps.repo.findWithParties(appointmentId)
+      // A leitura é privilegiada só pelo contato da outra parte (E3). Como ela
+      // enxerga qualquer sessão, o participante é conferido antes de qualquer efeito.
+      const appointment = await deps.admin().repo.findWithParties(appointmentId)
       if (!appointment) return { kind: "not_found" }
 
       const role = participantRole(appointment, userId)
@@ -256,6 +269,8 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
       if (appointment.status === "cancelled") return { kind: "already_cancelled" }
       if (!canTransition(appointment.status, "cancelled", role)) return { kind: "forbidden" }
 
+      // A escrita volta para a sessão do usuário (ADR 0008 §4): RLS de UPDATE do
+      // participante + trigger `appointments_guard_update` como segunda barreira.
       const result = await transition(deps.repo, {
         appointment,
         to: "cancelled",
@@ -337,7 +352,7 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
 
     /** Sessões do usuário (como mentor, mentorado ou ambos), com a outra parte e as avaliações. */
     listMine(input: ListForUserInput): Promise<AppointmentListItem[]> {
-      return deps.repo.listForUser(input)
+      return deps.admin().repo.listForUser(input)
     },
 
     /**
@@ -353,10 +368,13 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
      */
     async confirm(input: ConfirmInput): Promise<ConfirmResult> {
       const { token, appointmentId, mentorNotes, sessionUserId } = input
+      // Privilegiado (ADR 0008 E3 e E5): quem clica no e-mail não tem sessão, e o
+      // e-mail das duas partes vem do perfil.
+      const { repo } = deps.admin()
       const appointment = token
-        ? await deps.repo.findWithPartiesByActionToken(token)
+        ? await repo.findWithPartiesByActionToken(token)
         : appointmentId
-          ? await deps.repo.findWithParties(appointmentId)
+          ? await repo.findWithParties(appointmentId)
           : null
       if (!appointment) return { kind: "not_found" }
 
@@ -366,7 +384,7 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
       if (appointment.status === "confirmed") return { kind: "already_confirmed" }
       if (appointment.status !== "pending") return { kind: "wrong_status", status: appointment.status }
 
-      const result = await transition(deps.repo, {
+      const result = await transition(repo, {
         appointment,
         to: "confirmed",
         actor: "mentor",
@@ -409,7 +427,7 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
 
       if (googleEventId || googleMeetLink || calendarLink) {
         try {
-          await deps.repo.setFields(appointment.id, {
+          await repo.setFields(appointment.id, {
             google_event_id: googleEventId,
             google_meet_link: googleMeetLink,
             google_calendar_link: calendarLink,
@@ -444,7 +462,7 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
 
     /** Avaliações que o usuário recebeu (como mentor) ou enviou (como mentorado). */
     listFeedbacks(userId: string, type: "sent" | "received"): Promise<FeedbackListItem[]> {
-      return deps.feedbacks.listForUser({ userId, type })
+      return deps.admin().feedbacks.listForUser({ userId, type })
     },
 
     /**
@@ -453,10 +471,13 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
      * comentário; o `reviewer_id` conferido aqui é essa correção.
      */
     async updateOwnFeedback(feedbackId: string, userId: string, publicFeedback: string): Promise<UpdateFeedbackResult> {
-      const feedback = await deps.feedbacks.findOwner(feedbackId)
+      // Privilegiado enquanto não houver policy de UPDATE do `reviewer_id` em
+      // `appointment_feedbacks` (a tabela não está em nenhuma migration; ADR 0008 §4).
+      const { feedbacks } = deps.admin()
+      const feedback = await feedbacks.findOwner(feedbackId)
       if (!feedback) return { kind: "not_found" }
       if (feedback.reviewer_id !== userId) return { kind: "forbidden" }
-      await deps.feedbacks.updatePublicFeedback(feedbackId, publicFeedback)
+      await feedbacks.updatePublicFeedback(feedbackId, publicFeedback)
       return { kind: "ok" }
     },
   }

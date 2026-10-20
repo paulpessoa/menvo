@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Parâmetros inválidos' }, { status: 400 });
         }
 
-        const appointments = await buildAppointmentsService().listMine({ userId: user.id, ...query.data });
+        const appointments = await buildAppointmentsService(serverSupabase).listMine({ userId: user.id, ...query.data });
 
         return NextResponse.json({ appointments, count: appointments.length });
     } catch (error) {

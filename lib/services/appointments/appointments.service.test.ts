@@ -59,7 +59,8 @@ function setup(opts: { found?: Appointment | AppointmentWithParties | null; tran
     createEvent: jest.fn().mockResolvedValue({ eventId: "evt-9", meetLink: "https://meet/x", calendarLink: "https://cal/x" }),
     deleteEvent: jest.fn().mockResolvedValue(undefined),
   }
-  const service = createAppointmentsService({ repo, feedbacks, mailer, calendar, now: () => NOW })
+  // Aqui as duas "pontas" são os mesmos mocks; "client split" abaixo separa e prova quem usa qual.
+  const service = createAppointmentsService({ repo, feedbacks, admin: () => ({ repo, feedbacks }), mailer, calendar, now: () => NOW })
   return { service, repo, feedbacks, mailer, calendar }
 }
 
@@ -479,6 +480,85 @@ describe("feedbacks", () => {
     feedbacks.findOwner.mockResolvedValue(null)
     expect(await service.updateOwnFeedback("nope", "mentee-1", "x")).toEqual({ kind: "not_found" })
     expect(feedbacks.updatePublicFeedback).not.toHaveBeenCalled()
+  })
+})
+
+// ADR 0008 §4: concluir, avaliar e a escrita do cancelar usam a SESSÃO; o privilégio
+// fica só para o contato da outra parte e para o que ainda não tem policy.
+describe("client split (session x admin)", () => {
+  function split(found: AppointmentWithParties | Appointment | null) {
+    const mk = (label: string) =>
+      ({
+        label,
+        findById: jest.fn().mockResolvedValue(found),
+        findWithParties: jest.fn().mockResolvedValue(found),
+        findWithPartiesByActionToken: jest.fn().mockResolvedValue(found),
+        listForUser: jest.fn().mockResolvedValue([]),
+        setFields: jest.fn().mockResolvedValue(undefined),
+        transitionStatus: jest.fn().mockResolvedValue(base({ status: "cancelled" })),
+      }) as unknown as jest.Mocked<AppointmentsRepository>
+    const mkFb = () =>
+      ({
+        findByReviewer: jest.fn().mockResolvedValue(null),
+        insert: jest.fn().mockResolvedValue(undefined),
+        deleteByAppointment: jest.fn().mockResolvedValue(undefined),
+        listForUser: jest.fn().mockResolvedValue([]),
+        findOwner: jest.fn().mockResolvedValue({ id: "f1", reviewer_id: "mentee-1" }),
+        updatePublicFeedback: jest.fn().mockResolvedValue(undefined),
+      }) as unknown as jest.Mocked<AppointmentFeedbacksRepository>
+    const session = { repo: mk("session"), feedbacks: mkFb() }
+    const adminPair = { repo: mk("admin"), feedbacks: mkFb() }
+    const admin = jest.fn(() => adminPair)
+    const service = createAppointmentsService({
+      repo: session.repo,
+      feedbacks: session.feedbacks,
+      admin,
+      mailer: { sendCancellation: jest.fn().mockResolvedValue(undefined), sendConfirmation: jest.fn().mockResolvedValue(undefined) },
+      calendar: {
+        availability: jest.fn().mockResolvedValue({ configured: false, missing: [] }),
+        createEvent: jest.fn(),
+        deleteEvent: jest.fn().mockResolvedValue(undefined),
+      },
+      now: () => NOW,
+    })
+    return { service, session, adminPair, admin }
+  }
+
+  it("markCompleted and evaluate never ask for the privileged client", async () => {
+    const { service, session, admin } = split(base())
+    await service.markCompleted("apt-1", "mentor-1")
+    await service.evaluate("apt-1", "mentee-1", { rating: 5 })
+    expect(admin).not.toHaveBeenCalled()
+    expect(session.repo.transitionStatus).toHaveBeenCalledTimes(2)
+    expect(session.feedbacks.insert).toHaveBeenCalledTimes(1)
+  })
+
+  it("cancel reads the parties with the privileged client but writes the status with the session", async () => {
+    const { service, session, adminPair } = split(withParties({ status: "confirmed" }))
+    expect(await service.cancel("apt-1", "mentor-1", "motivo")).toEqual({ kind: "ok" })
+    expect(adminPair.repo.findWithParties).toHaveBeenCalledWith("apt-1")
+    expect(adminPair.repo.transitionStatus).not.toHaveBeenCalled()
+    expect(session.repo.transitionStatus).toHaveBeenCalledTimes(1)
+  })
+
+  it("cancel does not write anything when the reader is not a participant", async () => {
+    const { service, session, adminPair } = split(withParties({ status: "confirmed" }))
+    expect(await service.cancel("apt-1", "stranger", "motivo")).toEqual({ kind: "not_found" })
+    expect(session.repo.transitionStatus).not.toHaveBeenCalled()
+    expect(adminPair.repo.transitionStatus).not.toHaveBeenCalled()
+  })
+
+  it("no-show, list and feedback edits stay on the privileged client (confirm too, covered above)", async () => {
+    const { service, session, adminPair } = split(withParties({ status: "confirmed" }))
+    await service.registerNoShow("apt-1", "mentor-1")
+    await service.listMine({ userId: "mentor-1", limit: 10 })
+    await service.updateOwnFeedback("f1", "mentee-1", "x")
+    expect(adminPair.repo.transitionStatus).toHaveBeenCalled()
+    expect(adminPair.feedbacks.deleteByAppointment).toHaveBeenCalled()
+    expect(adminPair.repo.listForUser).toHaveBeenCalled()
+    expect(adminPair.feedbacks.updatePublicFeedback).toHaveBeenCalled()
+    expect(session.repo.transitionStatus).not.toHaveBeenCalled()
+    expect(session.feedbacks.updatePublicFeedback).not.toHaveBeenCalled()
   })
 })
 

@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     const type = request.nextUrl.searchParams.get("type") === "sent" ? "sent" : "received"
-    const feedbacks = await buildAppointmentsService().listFeedbacks(user.id, type)
+    const feedbacks = await buildAppointmentsService(serverSupabase).listFeedbacks(user.id, type)
     return NextResponse.json({ feedbacks })
   } catch (error) {
     console.error("[APPOINTMENTS/FEEDBACK] Erro ao buscar avaliações:", error)
@@ -54,7 +54,7 @@ export async function PATCH(request: NextRequest) {
     }
     const { feedbackId, publicFeedback } = parsed.data
 
-    const result = await buildAppointmentsService().updateOwnFeedback(feedbackId, user.id, publicFeedback)
+    const result = await buildAppointmentsService(serverSupabase).updateOwnFeedback(feedbackId, user.id, publicFeedback)
     switch (result.kind) {
       case "ok":
         return NextResponse.json({ success: true })

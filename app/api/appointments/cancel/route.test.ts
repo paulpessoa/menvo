@@ -21,10 +21,11 @@ describe('POST /api/appointments/cancel', () => {
     (buildAppointmentsService as jest.Mock).mockReturnValue({ cancel });
   });
 
+  const sessionClient = { auth: { getUser: jest.fn() } };
+
   function asUser(id: string | null) {
-    (createServerClient as jest.Mock).mockResolvedValue({
-      auth: { getUser: jest.fn().mockResolvedValue({ data: { user: id ? { id } : null }, error: null }) },
-    });
+    sessionClient.auth.getUser.mockResolvedValue({ data: { user: id ? { id } : null }, error: null });
+    (createServerClient as jest.Mock).mockResolvedValue(sessionClient);
   }
 
   function createMockRequest(body: Record<string, unknown>) {
@@ -57,6 +58,8 @@ describe('POST /api/appointments/cancel', () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ success: true, message: 'Agendamento cancelado com sucesso' });
     expect(cancel).toHaveBeenCalledWith('app-1', 'mentor-1', 'Imprevisto');
+    // A escrita roda com a sessão do usuário (ADR 0008 §4), não com um client da rota.
+    expect(buildAppointmentsService).toHaveBeenCalledWith(sessionClient);
   });
 
   // PR #109: quem não participa recebe o mesmo 404 de um id que não existe.
