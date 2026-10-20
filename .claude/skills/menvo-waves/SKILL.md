@@ -99,7 +99,14 @@ e devolve a pergunta.
    - Abra PRs pequenas (um grupo de camadas por PR), encadeadas pela base,
      para o Paul revisar e mergear pelo celular. Depois de cada merge,
      `git merge origin/main` na próxima (ou o botão "Update branch").
-6. **Registrar.** Atualize `docs/blueprint/waves.md` (registro) e
+6. **Limpar worktrees com cuidado.** O `node_modules` de cada worktree é um
+   junction para o do repositório principal, e `git worktree remove` segue o
+   junction e **apaga o `node_modules` principal** (aconteceu em 2026-10-20,
+   resolvido com `npm ci`). Antes de remover um worktree, desfaça o junction
+   pela ferramenta PowerShell:
+   `(Get-Item "<worktree>\node_modules").Delete()` (apaga só o link). Só
+   depois rode `git worktree remove "<worktree>"`.
+7. **Registrar.** Atualize `docs/blueprint/waves.md` (registro) e
    `docs/STATUS.md` (journal) e diga ao Paul qual modelo usar na próxima etapa.
 
 ## Prompt do agente de linha
@@ -112,6 +119,9 @@ Você é o agente da linha <domínio> na onda <N> da modernização do MENVO.
 Fase: <audit+plan | apply grupos X-Y>.
 
 Antes de tudo:
+0. `git fetch origin && git reset --hard origin/main` (ou a ponta da pilha
+   indicada no briefing). O worktree pode nascer num commit antigo: em
+   2026-10-20 três agentes começaram sem o código da onda anterior.
 1. Leia AGENTS.md, .claude/skills/menvo-blueprint/SKILL.md (e as references
    dele), .claude/skills/menvo-waves/SKILL.md (seção "Regras contra conflito")
    e docs/blueprint/quiz-audit.md como exemplo de auditoria e plano.
