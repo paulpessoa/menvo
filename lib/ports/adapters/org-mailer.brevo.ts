@@ -12,4 +12,12 @@ export const brevoOrgMailer: OrgMailer = {
     const { sendOrgJoinRequestToAdmin } = await import("@/lib/email/brevo")
     await sendOrgJoinRequestToAdmin(notice).catch(() => null)
   },
+  async sendInvite(notice) {
+    const { sendOrgInvite } = await import("@/lib/email/brevo")
+    await sendOrgInvite(notice).catch(() => null)
+  },
+  async sendApproved(notice) {
+    const { sendOrgMembershipApproved } = await import("@/lib/email/brevo")
+    await sendOrgMembershipApproved(notice).catch(() => null)
+  },
 }

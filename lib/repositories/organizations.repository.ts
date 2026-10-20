@@ -129,6 +129,30 @@ export interface OrganizationsRepository {
   removeMembership(organizationId: string, userId: string): Promise<void>
   /** Nome e e-mail do próprio perfil (a RLS deixa cada um ler o seu). */
   findOwnContact(userId: string): Promise<{ full_name: string | null; email: string | null } | null>
+  /** Se quem chama é admin ATIVO da org, pela RPC `is_org_admin` (security definer, usa a sessão). */
+  isOrgAdmin(organizationId: string): Promise<boolean>
+  /** Papel e estado do vínculo de qualquer pessoa com a org (o admin enxerga os da própria org), ou `null`. */
+  findMemberState(organizationId: string, userId: string): Promise<MemberState | null>
+  /** Quantos admins ATIVOS a org tem (regra do último admin). */
+  countActiveAdmins(organizationId: string): Promise<number>
+  /** Convida: cria o vínculo `member` + `invited`; a RLS exige admin da org. */
+  inviteMember(organizationId: string, userId: string): Promise<void>
+  /**
+   * Aprova um pedido (`requested` vira `active`). Devolve o contato da pessoa
+   * para o aviso, ou `null` se não havia pedido (o filtro por `status` evita corrida).
+   */
+  approveRequest(
+    organizationId: string,
+    userId: string
+  ): Promise<{ full_name: string | null; email: string | null } | null>
+  /** Muda a política de entrada e devolve a linha atualizada da org. */
+  updateJoinPolicy(organizationId: string, joinPolicy: JoinPolicy): Promise<Tables<"organizations">>
+}
+
+/** Papel e estado de um vínculo, para o admin decidir o que fazer com ele. */
+export interface MemberState {
+  role: OrgMemberRole
+  status: MembershipStatus
 }
 
 export function createOrganizationsRepository(db: SupabaseClient<Database>): OrganizationsRepository {
@@ -331,6 +355,67 @@ export function createOrganizationsRepository(db: SupabaseClient<Database>): Org
     async findOwnContact(userId) {
       const { data, error } = await db.from("profiles").select("full_name, email").eq("id", userId).maybeSingle()
       if (error) throw new RepositoryError("organizations.findOwnContact", error)
+      return data
+    },
+
+    async isOrgAdmin(organizationId) {
+      const { data, error } = await db.rpc("is_org_admin", { p_organization_id: organizationId })
+      if (error) throw new RepositoryError("organizations.isOrgAdmin", error)
+      return data === true
+    },
+
+    async findMemberState(organizationId, userId) {
+      const { data, error } = await db
+        .from("organization_members")
+        .select("role, status")
+        .eq("organization_id", organizationId)
+        .eq("user_id", userId)
+        .maybeSingle()
+      if (error) throw new RepositoryError("organizations.findMemberState", error)
+      return data ? { role: data.role as OrgMemberRole, status: data.status as MembershipStatus } : null
+    },
+
+    async countActiveAdmins(organizationId) {
+      const { count, error } = await db
+        .from("organization_members")
+        .select("user_id", { count: "exact", head: true })
+        .eq("organization_id", organizationId)
+        .eq("role", "admin")
+        .eq("status", "active")
+      if (error) throw new RepositoryError("organizations.countActiveAdmins", error)
+      return count ?? 0
+    },
+
+    async inviteMember(organizationId, userId) {
+      const { error } = await db
+        .from("organization_members")
+        .insert({ organization_id: organizationId, user_id: userId, role: "member", status: "invited" })
+      if (error) throw new RepositoryError("organizations.inviteMember", error)
+    },
+
+    async approveRequest(organizationId, userId) {
+      const { data, error } = await db
+        .from("organization_members")
+        .update({ status: "active" })
+        .eq("organization_id", organizationId)
+        .eq("user_id", userId)
+        .eq("status", "requested")
+        .select("user_id, profiles(full_name, email)")
+        .maybeSingle()
+      if (error) throw new RepositoryError("organizations.approveRequest", error)
+      if (!data) return null
+      const profile = Array.isArray(data.profiles) ? data.profiles[0] : data.profiles
+      return { full_name: profile?.full_name ?? null, email: profile?.email ?? null }
+    },
+
+    async updateJoinPolicy(organizationId, joinPolicy) {
+      const { data, error } = await db
+        .from("organizations")
+        .update({ join_policy: joinPolicy })
+        .eq("id", organizationId)
+        .select()
+        .single()
+      if (error) throw new RepositoryError("organizations.updateJoinPolicy", error)
       return data
     },
   }

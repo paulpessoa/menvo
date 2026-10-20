@@ -31,8 +31,8 @@ function setup(over: {
   const mailer = { sendJoinRequest: jest.fn().mockResolvedValue(undefined) }
   const service = createMembershipService({
     repo: repo as unknown as OrganizationsRepository,
-    directory: directory as OrgDirectory,
-    mailer: mailer as OrgMailer,
+    directory: directory as unknown as OrgDirectory,
+    mailer: mailer as unknown as OrgMailer,
     platformRoleOf: jest.fn().mockResolvedValue(over.role === undefined ? "mentee" : over.role),
   })
   return { service, repo, directory, mailer }
