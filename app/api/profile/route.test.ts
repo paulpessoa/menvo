@@ -212,10 +212,13 @@ describe("PUT /api/profile", () => {
     expect((await res.json()).error).toContain("slug")
   })
 
-  it("answers 500 with the current error format on a database failure", async () => {
+  it("answers 500 with a generic error and keeps the database message out of the body (D4a)", async () => {
+    const logSpy = jest.spyOn(console, "error").mockImplementation(() => {})
     mockTables({ updateError: { message: "boom" } })
     const res = await put({ bio: "x" })
     expect(res.status).toBe(500)
-    expect(await res.json()).toEqual({ error: "Erro ao atualizar perfil", details: "boom" })
+    expect(await res.json()).toEqual({ error: "Erro ao atualizar perfil" })
+    expect(logSpy.mock.calls.flat().join(" ")).toContain("boom")
+    logSpy.mockRestore()
   })
 })

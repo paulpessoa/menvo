@@ -7,9 +7,9 @@
  * Não faz: regra de negócio (ordem das escritas, 409 de slug, e-mail) nem criar
  * client; quem escolhe o client é a composição.
  * Tradeoff: o erro do driver vira `ProfileRepositoryError`, que guarda também o
- * `code` e a mensagem crua. A rota ainda devolve `details` ao cliente (formato
- * atual, mudar é a decisão D4 do Paul) e o service precisa do `code` (`23505`,
- * `PGRST116`); por isso não usamos só o `RepositoryError` genérico.
+ * `code` e a mensagem crua. A rota só a loga (nunca devolve ao cliente, D4a) e
+ * o service precisa do `code` (`23505`, `PGRST116`); por isso não usamos só o
+ * `RepositoryError` genérico.
  */
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type { Database, Json, TablesInsert, TablesUpdate } from "@/lib/types/supabase"
@@ -48,7 +48,7 @@ export class ProfileRepositoryError extends RepositoryError {
     return this.dbError?.code
   }
 
-  /** Mensagem crua do banco, como a rota a devolve em `details`. */
+  /** Mensagem crua do banco, só para log do servidor. */
   get dbMessage(): string | undefined {
     return this.dbError?.message
   }

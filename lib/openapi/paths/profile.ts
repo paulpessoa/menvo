@@ -2,8 +2,8 @@
  * Camada 9 · Contrato OpenAPI (profile)
  * Regra: descreve as rotas de `/api/profile/**` com os mesmos schemas que elas
  * usam para validar (lib/schemas/profile.ts). Os status são os que o código
- * devolve hoje, inclusive `details` com a mensagem crua do banco em
- * `/api/profile` (decisão D4 pendente do Paul).
+ * devolve hoje. Os 500 de `/api/profile` não trazem mais a mensagem do banco
+ * (decisão D4a).
  * Não faz: registrar rotas de outro domínio. Todas exigem sessão (cookie); o
  * `Authorization: Bearer` deixou de ser aceito (decisão D1) e `/api/profile/update`
  * foi removida.
@@ -40,7 +40,7 @@ registry.registerPath({
   responses: {
     200: { description: "Perfil", content: json(getProfileResponseSchema) },
     401: profileError("Sem sessão"),
-    500: profileError("Erro ao buscar ou criar o perfil (`details` traz a mensagem do banco)"),
+    500: profileError("Erro ao buscar ou criar o perfil (só `error` genérico; a causa fica no log do servidor)"),
   },
 })
 
@@ -57,7 +57,7 @@ registry.registerPath({
     400: profileError("Dados inválidos (mensagem do primeiro erro do Zod)"),
     401: profileError("Sem sessão"),
     409: profileError("Slug já em uso"),
-    500: profileError("Erro ao atualizar (`details` traz a mensagem do banco)"),
+    500: profileError("Erro ao atualizar (só `error` genérico; a causa fica no log do servidor)"),
   },
 })
 

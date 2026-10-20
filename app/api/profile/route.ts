@@ -27,16 +27,15 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Esse endereço de perfil (slug) já está em uso" }, { status: 409 })
     }
     if (outcome.kind === "failed") {
-      return NextResponse.json({ error: "Erro ao atualizar perfil", details: outcome.message }, { status: 500 })
+      // A mensagem do banco fica no log do servidor; o cliente só recebe o erro genérico (D4a).
+      console.error("❌ Profile update failed:", outcome.message)
+      return NextResponse.json({ error: "Erro ao atualizar perfil" }, { status: 500 })
     }
 
     return NextResponse.json({ message: "Perfil atualizado com sucesso", profile: outcome.profile })
   } catch (error) {
     console.error("❌ Unexpected profile update error:", error)
-    return NextResponse.json(
-      { error: "Erro interno do servidor", details: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
 
@@ -49,15 +48,13 @@ export async function GET() {
 
     if (outcome.kind === "failed") {
       const error = outcome.stage === "create" ? "Erro ao criar perfil" : "Erro ao buscar perfil"
-      return NextResponse.json({ error, details: outcome.message }, { status: 500 })
+      console.error(`❌ Profile ${outcome.stage} failed:`, outcome.message)
+      return NextResponse.json({ error }, { status: 500 })
     }
 
     return NextResponse.json({ profile: outcome.profile })
   } catch (error) {
     console.error("❌ Unexpected profile fetch error:", error)
-    return NextResponse.json(
-      { error: "Erro interno do servidor", details: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }
