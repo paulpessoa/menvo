@@ -17,6 +17,7 @@ jest.mock('@/lib/services/appointments/checkin-responses.service', () => ({
 
 jest.mock('@/lib/email/brevo', () => ({
   sendAppointmentRequest: jest.fn().mockResolvedValue({ success: true }),
+  sendAdminNewAppointmentNotification: jest.fn().mockResolvedValue({ success: true }),
 }))
 
 const VALID_REASON = 'Quero orientação sobre transição de carreira para a área de dados'
@@ -217,8 +218,8 @@ describe('POST /api/appointments/schedule', () => {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           in: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({
-            data: { id: 'existing-conflict-appt-id' },
+          limit: jest.fn().mockResolvedValue({
+            data: [{ id: 'existing-conflict-appt-id' }],
             error: null,
           }),
         }
@@ -268,7 +269,7 @@ describe('POST /api/appointments/schedule', () => {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           in: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+          limit: jest.fn().mockResolvedValue({ data: [], error: null }),
           insert: jest.fn().mockReturnThis(),
           single: jest.fn().mockResolvedValue({ data: mockCreatedAppt, error: null }),
         }
@@ -325,7 +326,7 @@ describe('POST /api/appointments/schedule', () => {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           in: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+          limit: jest.fn().mockResolvedValue({ data: [], error: null }),
           insert: jest.fn().mockReturnThis(),
           single: jest.fn().mockResolvedValue({ data: mockCreatedAppt, error: null }),
         }
@@ -368,9 +369,9 @@ describe('POST /api/appointments/schedule', () => {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           in: jest.fn().mockReturnThis(),
-          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+          limit: jest.fn().mockResolvedValue({ data: [], error: null }),
           insert,
-          single: jest.fn().mockResolvedValue({ data: { id: 'new-appt-789' }, error: null }),
+          single: jest.fn().mockResolvedValue({ data: { id: 'new-appt-789', status: 'pending' }, error: null }),
         }
       }
       return {}

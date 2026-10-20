@@ -31,7 +31,31 @@ export interface AppointmentConfirmationEmail {
   mentorNotes?: string
 }
 
+/** Pedido novo para o mentor, com o link de confirmação (`token`). */
+export interface AppointmentRequestEmail {
+  mentorEmail: string
+  mentorName: string
+  menteeName: string
+  scheduledAt: string
+  message: string
+  token: string
+}
+
+/** Aviso à equipe Menvo de que um pedido entrou. */
+export interface AppointmentRequestAdminNotice {
+  mentorName: string
+  mentorEmail: string
+  menteeName: string
+  menteeEmail: string
+  scheduledAt: string
+  notes: string
+}
+
 export interface AppointmentMailer {
+  /** Avisa o mentor de um pedido novo, com o link para confirmar. */
+  sendRequest(message: AppointmentRequestEmail): Promise<void>
+  /** Avisa a equipe Menvo de um pedido novo. */
+  notifyAdminOfRequest(notice: AppointmentRequestAdminNotice): Promise<void>
   /** Avisa uma das partes que a sessão foi cancelada, com o motivo. */
   sendCancellation(message: AppointmentCancellationEmail): Promise<void>
   /** Avisa mentor e mentorado que a sessão foi confirmada, com o link do Meet. */
