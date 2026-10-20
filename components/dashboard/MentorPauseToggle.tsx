@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { useAuth } from "@/lib/auth"
+import { useUpdateProfile } from "@/hooks/profile/useUpdateProfile"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 
@@ -28,25 +28,13 @@ interface MentorPauseToggleProps {
  * catálogo público (is_public: false) sem ter que apagar seus horários configurados.
  */
 export function MentorPauseToggle({ isPublic = true, className }: MentorPauseToggleProps) {
-  const { refreshProfile } = useAuth()
-  const [loading, setLoading] = useState(false)
+  const { mutateAsync: updateProfile, isPending: loading } = useUpdateProfile()
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const handleToggle = async (newStatus: boolean) => {
     try {
-      setLoading(true)
-      const res = await fetch("/api/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_public: newStatus }),
-      })
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || "Erro ao atualizar status das mentorias")
-      }
-
-      await refreshProfile()
+      // Salvar, invalidar o catálogo e recarregar o perfil da sessão: tudo no hook.
+      await updateProfile({ is_public: newStatus })
 
       if (newStatus) {
         toast.success("Pronto! Seu perfil já aparece no catálogo de mentores.")
@@ -57,8 +45,6 @@ export function MentorPauseToggle({ isPublic = true, className }: MentorPauseTog
     } catch (err) {
       console.error("[MentorPauseToggle] Erro:", err)
       toast.error(err instanceof Error ? err.message : "Erro ao alterar visibilidade")
-    } finally {
-      setLoading(false)
     }
   }
 

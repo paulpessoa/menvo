@@ -8,7 +8,8 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAuth } from "@/lib/auth"
-import { useProfile } from "@/hooks/useProfile"
+import { useOwnProfile } from "@/hooks/profile/useOwnProfile"
+import { useUpdateProfile } from "@/hooks/profile/useUpdateProfile"
 import { useOnboarding } from "@/hooks/useOnboarding"
 import { Link, useRouter } from "@/i18n/routing"
 import { OrganizationsTab } from "@/components/profile/OrganizationsTab"
@@ -44,7 +45,8 @@ function FullPageSpinner() {
 
 function ProfilePageContent() {
   const { user, refreshProfile, role, loading: authLoading } = useAuth()
-  const { profile, loading: profileLoading, isUpdating, updateProfile, refetch } = useProfile()
+  const { profile, loading: profileLoading, refetch } = useOwnProfile()
+  const { mutateAsync: updateProfile, isPending: isUpdating } = useUpdateProfile()
   const router = useRouter()
   const tabParam = useSearchParams().get("tab")
   const [activeTab, setActiveTab] = useState<ProfileTab>(TAB_ALIASES[tabParam ?? ""] ?? "basic")
@@ -84,13 +86,13 @@ function ProfilePageContent() {
       return
     }
 
-    const result = await updateProfile(form)
-    if (result.success) {
+    try {
+      // O hook já recarrega o perfil da sessão e invalida perfil e catálogo.
+      const saved = await updateProfile(form)
       toast.success("Perfil salvo com sucesso!")
-      if (result.data) setForm(profileToForm(result.data))
-      await refreshProfile()
-    } else {
-      toast.error(result.error || "Erro ao salvar perfil")
+      if (saved) setForm(profileToForm(saved))
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao salvar perfil")
     }
   }
 

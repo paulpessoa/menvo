@@ -2,13 +2,16 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { favoritesService } from '@/lib/services/favorites/favorites.service';
+import { effects, runEffects } from '@/lib/query/effects';
+import { qk } from '@/lib/query/keys';
 import { toast } from 'sonner';
 
 export function useFavorites(userId?: string) {
   const queryClient = useQueryClient();
+  const favoritesKey = qk.me.favorites(userId ?? '');
 
   const { data: favorites = [], isLoading: loading } = useQuery<string[]>({
-    queryKey: ['favorites', userId],
+    queryKey: favoritesKey,
     queryFn: async () => {
       if (!userId) return [];
       return favoritesService.getFavorites(userId);
@@ -24,20 +27,20 @@ export function useFavorites(userId?: string) {
       return { mentorId, isFavorite };
     },
     onMutate: async ({ mentorId, isFavorite }) => {
-      await queryClient.cancelQueries({ queryKey: ['favorites', userId] });
-      const previousFavorites = queryClient.getQueryData<string[]>(['favorites', userId]) || [];
+      await queryClient.cancelQueries({ queryKey: favoritesKey });
+      const previousFavorites = queryClient.getQueryData<string[]>(favoritesKey) || [];
 
       // Optimistic update para feedback instantâneo
       const updatedFavorites = isFavorite
         ? previousFavorites.filter(id => id !== mentorId)
         : [...previousFavorites, mentorId];
 
-      queryClient.setQueryData(['favorites', userId], updatedFavorites);
+      queryClient.setQueryData(favoritesKey, updatedFavorites);
       return { previousFavorites };
     },
     onError: (_err, _variables, context) => {
       if (context?.previousFavorites) {
-        queryClient.setQueryData(['favorites', userId], context.previousFavorites);
+        queryClient.setQueryData(favoritesKey, context.previousFavorites);
       }
       toast.error('Erro ao atualizar favoritos');
     },
@@ -45,7 +48,7 @@ export function useFavorites(userId?: string) {
       toast.success(isFavorite ? 'Removido dos favoritos' : 'Adicionado aos favoritos');
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['favorites', userId] });
+      if (userId) return runEffects(queryClient, effects['me.favorites.toggle']({ userId }));
     }
   });
 
@@ -62,6 +65,6 @@ export function useFavorites(userId?: string) {
     favorites,
     loading,
     toggleFavorite,
-    refreshFavorites: () => queryClient.invalidateQueries({ queryKey: ['favorites', userId] })
+    refreshFavorites: () => queryClient.invalidateQueries({ queryKey: favoritesKey })
   };
 }

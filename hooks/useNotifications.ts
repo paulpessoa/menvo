@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { qk } from '@/lib/query/keys';
 import {
   notificationsService,
   type InAppNotification
@@ -46,7 +47,7 @@ export function useNotifications(userId?: string, role?: string | null) {
     isLoading,
     refetch
   } = useQuery<InAppNotification[]>({
-    queryKey: ['notifications', userId, role],
+    queryKey: qk.me.notifications(userId ?? '', role),
     queryFn: async () => {
       if (!userId) return [];
       return notificationsService.getUserNotifications(userId, role);

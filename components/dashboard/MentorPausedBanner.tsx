@@ -1,8 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useAuth } from "@/lib/auth"
-import { useState } from "react"
+import { useUpdateProfile } from "@/hooks/profile/useUpdateProfile"
 import { toast } from "sonner"
 import { Loader2, PauseCircle } from "lucide-react"
 
@@ -17,32 +16,17 @@ interface MentorPausedBannerProps {
  * o perfil público, e dizer "pausadas" para quem não pausou confundia.
  */
 export function MentorPausedBanner({ isPublic }: MentorPausedBannerProps) {
-  const { refreshProfile } = useAuth()
-  const [loading, setLoading] = useState(false)
+  const { mutateAsync: updateProfile, isPending: loading } = useUpdateProfile()
 
   if (isPublic) return null
 
   const handleReactivate = async () => {
     try {
-      setLoading(true)
-      const res = await fetch("/api/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_public: true }),
-      })
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || "Erro ao reativar mentorias")
-      }
-
-      await refreshProfile()
+      await updateProfile({ is_public: true })
       toast.success("Pronto! Seu perfil já aparece no catálogo de mentores.")
     } catch (err) {
       console.error("[MentorPausedBanner] Erro:", err)
       toast.error(err instanceof Error ? err.message : "Erro ao reativar mentorias")
-    } finally {
-      setLoading(false)
     }
   }
 
