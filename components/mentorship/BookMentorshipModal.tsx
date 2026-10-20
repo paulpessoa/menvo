@@ -1,8 +1,7 @@
 "use client"
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
-import { useState, useEffect } from "react"
-import {  X, Calendar, Clock, Plus, CheckCircle, AlertCircle, Check , Loader2 } from "lucide-react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -11,25 +10,13 @@ import {
   DialogTitle,
   DialogDescription
 } from "@/components/ui/dialog"
-import { useAuth } from "@/lib/auth"
 import { useLocale, useTranslations } from "next-intl"
-import { Link } from "@/i18n/routing"
-import { trackBookingConfirmed } from "@/lib/utils/google-analytics/events"
-import { AvailabilityAlertButton } from "./AvailabilityAlertButton"
 import { PendingCheckinPrompt } from "./PendingCheckinPrompt"
-import { ApiClientError } from "@/lib/query/http"
-import { useRequestAppointment } from "@/hooks/appointments/useRequestAppointment"
-import { getMyPendingCheckinAction } from "@/app/actions/session-checkin"
-import type { PendingCheckin } from "@/lib/services/appointments/checkin-responses.service"
-
-interface TimeSlot {
-  day_of_week: number
-  start_time: string
-  end_time: string
-  date: Date
-  formatted_date: string
-  formatted_time: string
-}
+import { BookMentorshipSlotList } from "./BookMentorshipSlotList"
+import { BookMentorshipConfirmStep } from "./BookMentorshipConfirmStep"
+import { useBookMentorshipSubmit } from "./useBookMentorshipSubmit"
+import { useBookMentorshipFlow } from "./useBookMentorshipFlow"
+import { toIntlLocale, type TimeSlot } from "./book-mentorship-slots"
 
 interface BookMentorshipModalProps {
   isOpen: boolean
@@ -38,185 +25,43 @@ interface BookMentorshipModalProps {
   mentorName: string
 }
 
+/**
+ * Booking dialog: pending check-in gate -> slot list -> message + confirm.
+ * Holds the flow state; each step is its own component and the submit/error
+ * mapping lives in `useBookMentorshipSubmit`.
+ */
 export function BookMentorshipModal({
   isOpen,
   onClose,
   mentorId,
   mentorName
 }: BookMentorshipModalProps) {
-  const locale = useLocale()
-  const intlLocale = locale === "en" ? "en-US" : locale === "es" ? "es-ES" : "pt-BR"
+  const intlLocale = toIntlLocale(useLocale())
   const t = useTranslations("mentorship.booking")
-  const { user } = useAuth()
-  const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([])
-  const [loading, setLoading] = useState(false)
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null)
   const [message, setMessage] = useState("")
-  const schedule = useRequestAppointment().schedule
-  const isSubmitting = schedule.isPending
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
-  const [pendingCheckin, setPendingCheckin] = useState<PendingCheckin | null>(null)
+  const flow = useBookMentorshipFlow(isOpen, mentorId, intlLocale)
+  const loadError = flow.hasError ? t("noSlotsDesc") : ""
 
-  useEffect(() => {
-    if (isOpen) {
-      loadAvailability()
+  const booking = useBookMentorshipSubmit({
+    mentorId,
+    selectedSlot,
+    message,
+    onClose,
+    onPendingCheckin: flow.restart,
+    onSlotTaken: () => {
+      flow.restart()
+      setSelectedSlot(null)
+    },
+    onReset: () => {
+      setSelectedSlot(null)
+      setMessage("")
     }
-  }, [isOpen, mentorId])
+  })
 
-  const loadAvailability = async () => {
-    try {
-      setLoading(true)
-      setError("")
-      setPendingCheckin(null)
-      setAvailableSlots([])
-
-      // Antes de agendar de novo, o mentorado diz se a última sessão
-      // aconteceu (1 clique; avaliar é opcional). Ver docs/domains/session-checkin.md §4.
-      if (user?.id) {
-        const pending = await getMyPendingCheckinAction()
-        if (pending) {
-          setPendingCheckin(pending)
-          setLoading(false)
-          return
-        }
-      }
-
-      const startDate = new Date().toISOString().split("T")[0]
-      const endDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0]
-
-      const response = await fetch(
-        `/api/appointments/availability?mentor_id=${mentorId}&start_date=${startDate}&end_date=${endDate}`
-      )
-
-      if (!response.ok) {
-        throw new Error(t("noSlotsDesc"))
-      }
-
-      const data = await response.json()
-
-      const formattedSlots: TimeSlot[] = []
-
-      data.availableSlots?.forEach((slot: any) => {
-        if (!slot?.date) return
-        const [year, month, day] = String(slot.date).split("-").map(Number)
-        if (!year || !month || !day) return
-        const date = new Date(year, month - 1, day)
-
-        const startTime = String(slot.start_time || slot.time || "00:00")
-        const endTime = String(slot.end_time || (slot.time ? `${slot.time}:45` : "00:45"))
-        const startShort = startTime.length >= 5 ? startTime.substring(0, 5) : startTime
-        const endShort = endTime.length >= 5 ? endTime.substring(0, 5) : endTime
-
-        formattedSlots.push({
-          day_of_week: slot.day_of_week ?? date.getDay(),
-          start_time: startTime,
-          end_time: endTime,
-          date,
-          formatted_date: date.toLocaleDateString(intlLocale, {
-            day: "numeric",
-            month: "short"
-          }),
-          formatted_time: `${startShort} - ${endShort}`
-        })
-      })
-
-      setAvailableSlots(formattedSlots)
-    } catch (err: any) {
-      setError(err.message || t("noSlotsDesc"))
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleBookSlot = (slot: TimeSlot) => {
+  const handleSelectSlot = (slot: TimeSlot) => {
     setSelectedSlot(slot)
-    setError("")
-  }
-
-  const handleConfirmBooking = async () => {
-    if (!selectedSlot) return
-
-    setError("")
-
-    try {
-      const year = selectedSlot.date.getFullYear()
-      const month = String(selectedSlot.date.getMonth() + 1).padStart(2, "0")
-      const day = String(selectedSlot.date.getDate()).padStart(2, "0")
-      const requestedDate = `${year}-${month}-${day}`
-      const requestedStartTime = selectedSlot.start_time
-      const requestedEndTime = selectedSlot.end_time
-      const scheduledAt =
-        (selectedSlot as any).datetime ||
-        new Date(
-          `${requestedDate}T${requestedStartTime.length === 5 ? requestedStartTime + ":00" : requestedStartTime}-03:00`
-        ).toISOString()
-
-      const payload = {
-        mentorId,
-        mentor_id: mentorId,
-        scheduledAt,
-        scheduled_at: scheduledAt,
-        requestedDate,
-        requested_date: requestedDate,
-        requestedStartTime,
-        requested_start_time: requestedStartTime,
-        requestedEndTime,
-        requested_end_time: requestedEndTime,
-        durationMinutes: 45,
-        duration_minutes: 45,
-        message: message.trim()
-      }
-
-      try {
-        await schedule.mutateAsync(payload)
-      } catch (err) {
-        if (err instanceof ApiClientError && err.status === 409) {
-          const details = err.body?.details as { reason?: string } | undefined
-          if (details?.reason === "pending_checkin") {
-            loadAvailability()
-            return
-          }
-          throw new Error(
-            (typeof err.body?.message === "string" && err.body.message) ||
-              "Este horário acabou de ser agendado por outro participante. Por favor, escolha outro horário."
-          )
-        }
-        if (err instanceof ApiClientError) {
-          const { error, message } = err.body ?? {}
-          throw new Error(
-            (typeof error === "string" && error) ||
-              (typeof message === "string" && message) ||
-              "Erro ao agendar mentoria"
-          )
-        }
-        throw err
-      }
-
-      trackBookingConfirmed({
-        mentorId,
-        requestedDate,
-        requestedTime: requestedStartTime,
-        isFirstBooking: true,
-      })
-
-      setSuccess(true)
-      setTimeout(() => {
-        onClose()
-        setSuccess(false)
-        setSelectedSlot(null)
-        setMessage("")
-        window.location.href = `/${locale}/mentorship/mentee#upcoming`
-      }, 1500)
-    } catch (err: any) {
-      setError(err.message || "Falha ao confirmar o agendamento.")
-      if (err.message?.includes("acabou de ser agendado")) {
-        loadAvailability()
-        setSelectedSlot(null)
-      }
-    }
+    booking.clearError()
   }
 
   return (
@@ -224,14 +69,11 @@ export function BookMentorshipModal({
       <DialogContent className="w-[95vw] sm:w-full max-w-2xl p-0 overflow-hidden bg-white rounded-3xl border-0 shadow-2xl">
         <DialogHeader className="sr-only">
           <DialogTitle>{t("modalTitle")}</DialogTitle>
-          <DialogDescription>
-            {t("standardDuration", { name: mentorName })}
-          </DialogDescription>
+          <DialogDescription>{t("standardDuration", { name: mentorName })}</DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col max-h-[90vh]">
           <div className="p-6 bg-gradient-to-r from-primary to-primary-700 text-white relative">
-            
             <span className="text-xs font-bold uppercase tracking-wider text-white/80">
               {t("modalTitle")}
             </span>
@@ -239,183 +81,46 @@ export function BookMentorshipModal({
           </div>
 
           <div className="p-6 flex-1 overflow-y-auto">
-            {loading ? (
+            {flow.loading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4">
                 <MenvoDots />
                 <p className="text-sm text-muted-foreground animate-pulse text-center">
                   Buscando horários disponíveis...
                 </p>
               </div>
-            ) : pendingCheckin ? (
-              <PendingCheckinPrompt pending={pendingCheckin} onAnswered={loadAvailability} />
-            ) : error && !selectedSlot ? (
+            ) : flow.pendingCheckin ? (
+              <PendingCheckinPrompt pending={flow.pendingCheckin} onAnswered={flow.restart} />
+            ) : loadError && !selectedSlot ? (
               <div className="py-12 text-center space-y-4">
                 <div className="bg-red-50 text-red-700 p-4 rounded-xl inline-block text-sm">
-                  {error}
+                  {loadError}
                 </div>
                 <div>
-                  <Button variant="outline" onClick={loadAvailability} className="rounded-xl">
+                  <Button variant="outline" onClick={flow.restart} className="rounded-xl">
                     Tentar novamente
                   </Button>
                 </div>
               </div>
             ) : !selectedSlot ? (
-              <div className="space-y-4">
-                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4 flex items-start gap-3">
-                  <div className="bg-primary text-white rounded-full p-1 mt-0.5 shadow-sm">
-                    <Clock className="w-3.5 h-3.5" />
-                  </div>
-                  <p className="text-sm text-foreground leading-relaxed">
-                    {t("standardDuration", { name: mentorName })}
-                  </p>
-                </div>
-
-                {availableSlots.length === 0 ? (
-                  <div className="text-center py-16 bg-muted/30 rounded-2xl border-2 border-dashed border-border/70 space-y-3">
-                    <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mx-auto text-muted-foreground">
-                      <Calendar className="w-7 h-7" />
-                    </div>
-                    <h3 className="text-lg font-bold text-foreground">
-                      {t("noSlotsTitle")}
-                    </h3>
-                    <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
-                      {t("noSlotsDesc")}
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-2 justify-center items-center pt-2">
-                      <AvailabilityAlertButton mentorId={mentorId} mentorName={mentorName} />
-                      <Button asChild variant="outline" className="rounded-xl">
-                        <Link href="/mentors">Explorar Outros Mentores</Link>
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                    {availableSlots.map((slot, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() => handleBookSlot(slot)}
-                        className="flex items-center justify-between p-4 border border-border rounded-2xl hover:border-primary hover:bg-primary/[0.03] hover:shadow-md transition-all text-left group bg-card"
-                      >
-                        <div className="flex items-center gap-3.5">
-                          <div className="flex flex-col items-center justify-center w-12 h-12 bg-primary/10 rounded-xl group-hover:bg-primary text-primary group-hover:text-white transition-all shadow-xs">
-                            <span className="text-[10px] uppercase font-extrabold tracking-wider">
-                              {slot.date.toLocaleDateString(intlLocale, { month: "short" }).replace(".", "")}
-                            </span>
-                            <span className="text-lg font-black leading-none mt-0.5">
-                              {slot.date.getDate()}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-bold text-foreground text-sm capitalize">
-                              {slot.date.toLocaleDateString(intlLocale, { weekday: "long" })}
-                            </p>
-                            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                              <Clock className="w-3 h-3" />
-                              {slot.formatted_time}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="h-8 w-8 rounded-full border border-border flex items-center justify-center group-hover:border-primary group-hover:bg-primary group-hover:text-white transition-all text-muted-foreground">
-                          <Plus className="w-4 h-4" />
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <BookMentorshipSlotList
+                slots={flow.slots}
+                intlLocale={intlLocale}
+                mentorId={mentorId}
+                mentorName={mentorName}
+                onSelect={handleSelectSlot}
+              />
             ) : (
-              <div className="space-y-6">
-                <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-5 rounded-2xl border border-primary/20 relative overflow-hidden">
-                  <p className="text-xs font-bold text-primary uppercase tracking-wider mb-2">
-                    {t("selectedSlot")}
-                  </p>
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-11 h-11 bg-primary text-white rounded-xl flex items-center justify-center shadow-md shadow-primary/20">
-                      <Calendar className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-foreground text-base capitalize">
-                        {selectedSlot.date.toLocaleDateString(intlLocale, { weekday: "long" })},{" "}
-                        {selectedSlot.formatted_date}
-                      </p>
-                      <p className="text-xs text-primary font-semibold mt-0.5">
-                        {t("atTime", { time: selectedSlot.formatted_time })}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2.5">
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-semibold text-foreground"
-                  >
-                    {t("messageLabel")} *
-                  </label>
-                  <textarea
-                    id="message"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder={t("messagePlaceholder")}
-                    rows={4}
-                    className="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none text-sm bg-background text-foreground placeholder:text-muted-foreground"
-                  />
-                  <div className="flex justify-between items-center px-1">
-                    <p
-                      className={`text-xs font-medium transition-colors ${
-                        message.length < 20 ? "text-amber-600" : "text-emerald-600 font-semibold"
-                      }`}
-                    >
-                      {message.length >= 20 && <Check className="inline-block h-3.5 w-3.5 mr-1" />}
-                      {t("charCounter", { count: message.length })}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground">
-                      {t("requiredNote")}
-                    </p>
-                  </div>
-                </div>
-
-                {error && (
-                  <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-xl text-sm font-medium">
-                    ⚠️ {error}
-                  </div>
-                )}
-
-                {success && (
-                  <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-emerald-600" />
-                    {t("successMessage")}
-                  </div>
-                )}
-
-                <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setSelectedSlot(null)}
-                    disabled={isSubmitting}
-                    className="flex-1 h-12 rounded-xl font-medium"
-                  >
-                    {t("chooseOtherSlot")}
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={handleConfirmBooking}
-                    disabled={isSubmitting || message.length < 20}
-                    className="flex-1 h-12 rounded-xl font-bold bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 animate-spin h-4 w-4" />
-                        {t("submitting")}
-                      </>
-                    ) : (
-                      t("confirmButton")
-                    )}
-                  </Button>
-                </div>
-              </div>
+              <BookMentorshipConfirmStep
+                slot={selectedSlot}
+                intlLocale={intlLocale}
+                message={message}
+                onMessageChange={setMessage}
+                error={booking.error}
+                success={booking.success}
+                isSubmitting={booking.isSubmitting}
+                onBack={() => setSelectedSlot(null)}
+                onConfirm={booking.submit}
+              />
             )}
           </div>
         </div>

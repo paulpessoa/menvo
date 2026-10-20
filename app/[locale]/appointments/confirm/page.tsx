@@ -1,57 +1,50 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { MenvoDots } from "@/components/ui/menvo-loader";
+import { ApiClientError } from '@/lib/query/http';
+import { useConfirmAppointment } from '@/hooks/appointments/useConfirmAppointment';
 
-
+/**
+ * Landing page of the "confirm" link in the mentor's e-mail. Confirms by token on
+ * mount; the server's message (including 410 "Este link expirou...") is shown as is.
+ */
 export default function ConfirmAppointmentPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const t = useTranslations('appointments.confirm');
     const token = searchParams.get('token');
-
-    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-    const [message, setMessage] = useState('');
+    const confirm = useConfirmAppointment();
+    const requestedToken = useRef<string | null>(null);
 
     useEffect(() => {
-        if (!token) {
-            setStatus('error');
-            setMessage(t('invalidToken'));
-            return;
-        }
+        // One request per token, even when React re-runs the effect (Strict Mode).
+        if (!token || requestedToken.current === token) return;
+        requestedToken.current = token;
+        confirm.mutate({ token });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token]);
 
-        confirmAppointment();
-    }, [token, t]);
+    const status: 'loading' | 'success' | 'error' = !token
+        ? 'error'
+        : confirm.isSuccess
+          ? 'success'
+          : confirm.isError
+            ? 'error'
+            : 'loading';
 
-    async function confirmAppointment() {
-        try {
-            const response = await fetch('/api/appointments/confirm', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    token: token,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setStatus('error');
-                setMessage(data.error || t('errorTitle'));
-                return;
-            }
-
-            setStatus('success');
-            setMessage(data.message || t('successTitle'));
-        } catch (error) {
-            console.error('[CONFIRM] Erro inesperado:', error);
-            setStatus('error');
-            setMessage(t('networkError'));
-        }
+    let message = '';
+    if (!token) {
+        message = t('invalidToken');
+    } else if (confirm.isSuccess) {
+        message = confirm.data.message || t('successTitle');
+    } else if (confirm.error instanceof ApiClientError) {
+        const serverError = confirm.error.body?.error;
+        message = (typeof serverError === 'string' && serverError) || t('errorTitle');
+    } else if (confirm.isError) {
+        message = t('networkError');
     }
 
     return (
