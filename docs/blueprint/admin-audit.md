@@ -237,3 +237,7 @@ PATCH antes de mexer). O resto é baixo.
 - L1-3: `admin-users.repository.ts` (lista pela sessao; leitura de `cv_url` privilegiada), `lib/services/admin/users/users.service.ts` (`assertAdmin` primeiro) e `users.composition.ts` (primeiro `service_role` da L1 em composition). `users` GET fino, com teste de rota.
 - Para o L1-4: `users.composition.ts` ja existe, so acrescentar o repository privilegiado de `profiles`. `fetchCvUrls` segue vivo para `verification-list.service` e `ai-menvo/mentor-review/draft` (L1-6/L1-7).
 - Pedido ao orquestrador: nenhum arquivo compartilhado editado ate aqui.
+**L1-4 e L1-5 (feitos, sem migration).**
+- L1-4: `users.service.updateUser` (`assertAdmin`, bloqueia retirar o proprio `admin` com 400, auditoria `user_updated`/`user_role_changed`); `profiles` pelo privilegiado, `mentee_profiles` e `user_roles` pela sessao; 500 com mensagem fixa; erro de escrita em papel agora falha (antes era ignorado). Novo `self-action.error.ts`.
+- L1-5: `delete-user.service.ts` sem criar client (`deleteUserWithClient` + `createAdminDeleteUser`); `delete-user.composition.ts` cria o client. Sobrou o wrapper `@deprecated deleteUserCompletely` para `profile/delete`, `invites/delete` e `retention/*` (migrar para a composition e apagar o wrapper).
+- Pedido ao orquestrador: nenhum arquivo compartilhado editado. DELETE segue sem auditoria (a acao `user_deleted` existe; fora do escopo do L1-5).
