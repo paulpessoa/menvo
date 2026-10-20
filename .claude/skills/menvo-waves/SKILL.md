@@ -101,8 +101,9 @@ Antes de tudo:
 1. Leia AGENTS.md, .claude/skills/menvo-blueprint/SKILL.md (e as references
    dele), .claude/skills/menvo-waves/SKILL.md (seção "Regras contra conflito")
    e docs/blueprint/quiz-audit.md como exemplo de auditoria e plano.
-2. Seu worktree não tem node_modules. Rode, a partir da raiz do worktree:
-   cmd //c mklink /J node_modules "<raiz do repo principal>\node_modules"
+2. Seu worktree não tem node_modules. Na raiz do worktree, pela ferramenta
+   PowerShell (o `cmd //c mklink` é bloqueado no worktree):
+   New-Item -ItemType Junction -Path node_modules -Target "<raiz do repo principal>\node_modules"
    (você não pode mudar package.json, então as dependências são as mesmas).
 
 Escopo: domínio <domínio>. Arquivos de partida: <lista de rotas, services,
