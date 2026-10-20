@@ -1,17 +1,12 @@
-export type NotificationType =
-  | "booking_request"
-  | "booking_confirmed"
-  | "booking_cancelled"
-  | "pending_evaluation"
-  | "session_starting_soon"
+import type {
+  InAppNotification as ServerNotification,
+  NotificationType,
+} from "@/lib/domain/profile/notification.entity"
 
-export interface InAppNotification {
-  id: string
-  type: NotificationType
-  title: string
-  message: string
-  timestamp: string
-  actionUrl: string
+export type { NotificationType }
+
+/** A notificação que a rota devolve, mais o estado de leitura que só existe no navegador. */
+export interface InAppNotification extends ServerNotification {
   isRead?: boolean
 }
 
