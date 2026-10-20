@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     const { appointmentId, reason } = parseResult.data;
 
-    const result = await buildAppointmentsService().cancel(appointmentId, user.id, reason);
+    const result = await buildAppointmentsService(serverSupabase).cancel(appointmentId, user.id, reason);
     switch (result.kind) {
       case 'ok':
         return NextResponse.json({ success: true, message: 'Agendamento cancelado com sucesso' });

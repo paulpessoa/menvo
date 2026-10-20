@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "ID do agendamento inválido" }, { status: 400 })
     }
 
-    const result = await buildAppointmentsService().markCompleted(parsed.data.appointmentId, user.id)
+    const result = await buildAppointmentsService(serverSupabase).markCompleted(parsed.data.appointmentId, user.id)
     switch (result.kind) {
       case "ok":
         return NextResponse.json({ success: true })

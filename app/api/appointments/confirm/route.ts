@@ -27,15 +27,15 @@ export async function POST(request: NextRequest) {
     }
     const { appointmentId, token, mentorNotes } = validation.data
 
-    // A sessão só é consultada no caminho sem token.
+    // O usuário da sessão só é lido no caminho sem token.
+    const sessionClient = await createServerClient()
     let sessionUserId: string | null = null
     if (!token && appointmentId) {
-      const sessionClient = await createServerClient()
       const { data: { user } } = await sessionClient.auth.getUser()
       sessionUserId = user?.id ?? null
     }
 
-    const result = await buildAppointmentsService().confirm({ token, appointmentId, mentorNotes, sessionUserId })
+    const result = await buildAppointmentsService(sessionClient).confirm({ token, appointmentId, mentorNotes, sessionUserId })
     switch (result.kind) {
       case "ok":
         return NextResponse.json({

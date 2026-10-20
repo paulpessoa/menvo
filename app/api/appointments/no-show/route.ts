@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     }
     const { appointmentId, notes } = parsed.data
 
-    const result = await buildAppointmentsService().registerNoShow(appointmentId, user.id, notes)
+    const result = await buildAppointmentsService(serverSupabase).registerNoShow(appointmentId, user.id, notes)
     switch (result.kind) {
       case "ok":
         return NextResponse.json({ success: true })
