@@ -53,6 +53,30 @@ describe("profile repository", () => {
     expect(query.single).toHaveBeenCalled()
   })
 
+  it("reads onboarding flags as an object, empty when missing or malformed", async () => {
+    const ok = fakeClient({ data: { onboarding_flags: { ob_m1: "x" } }, error: null })
+    expect(await createProfileRepository(ok.client).findOnboardingFlags("u1")).toEqual({ ob_m1: "x" })
+    expect(ok.query.select).toHaveBeenCalledWith("onboarding_flags")
+
+    const missing = fakeClient({ data: null, error: { message: "no rows", code: "PGRST116" } })
+    expect(await createProfileRepository(missing.client).findOnboardingFlags("u1")).toEqual({})
+
+    const malformed = fakeClient({ data: { onboarding_flags: ["x"] }, error: null })
+    expect(await createProfileRepository(malformed.client).findOnboardingFlags("u1")).toEqual({})
+
+    const broken = fakeClient({ data: null, error: { message: "boom" } })
+    await expect(createProfileRepository(broken.client).findOnboardingFlags("u1")).rejects.toBeInstanceOf(
+      ProfileRepositoryError
+    )
+  })
+
+  it("writes onboarding flags on the caller's row only", async () => {
+    const { client, query } = fakeClient({ data: null, error: null })
+    await createProfileRepository(client).setOnboardingFlags("u1", { ob_m1: "x" })
+    expect(query.update).toHaveBeenCalledWith({ onboarding_flags: { ob_m1: "x" } })
+    expect(query.eq).toHaveBeenCalledWith("id", "u1")
+  })
+
   it("updates mentor fields by user_id and upserts mentee fields keyed on user_id", async () => {
     const { client, query } = fakeClient({ data: null, error: null })
     const repo = createProfileRepository(client)

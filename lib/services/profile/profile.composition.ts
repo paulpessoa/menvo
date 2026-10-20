@@ -2,7 +2,7 @@
  * Camada 7 · Composição do perfil próprio
  * Regra: o único lugar que escolhe o client do banco e como a requisição é
  * autenticada para `/api/profile` e `/api/profile/onboarding`. As rotas só
- * chamam `authenticateRequest` e `buildProfileService`.
+ * chamam `authenticateRequest`, `buildProfileService` e `buildOnboardingService`.
  * Tradeoff TEMPORÁRIO: o client é `service_role`, como as rotas já eram. Está
  * isolado aqui para o grupo seguinte trocar por RLS (client da sessão) mexendo
  * em um arquivo, depois que o pgTAP provar as policies de escrita própria
@@ -17,6 +17,7 @@ import type { Database } from "@/lib/types/supabase"
 import { createClient as createSessionClient } from "@/lib/utils/supabase/server"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { createProfileRepository } from "@/lib/repositories/profile.repository"
+import { createOnboardingService } from "./onboarding.service"
 import { createProfileService } from "./profile.service"
 
 let adminClient: SupabaseClient<Database> | null = null
@@ -53,4 +54,8 @@ export async function authenticateRequest(request: NextRequest): Promise<Authent
 
 export function buildProfileService() {
   return createProfileService({ repo: createProfileRepository(getProfileDbClient()) })
+}
+
+export function buildOnboardingService() {
+  return createOnboardingService({ repo: createProfileRepository(getProfileDbClient()) })
 }
