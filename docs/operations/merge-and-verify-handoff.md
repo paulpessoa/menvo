@@ -65,12 +65,10 @@ Telas para abrir em produção depois do deploy, com o que esperar de cada uma:
 
 ## 4. Resultado (preencha)
 
-- Data:
-- PRs mergeadas:
-- Migrations aplicadas:
-- `tsc` / `jest` / `build`:
-- Telas conferidas e problemas encontrados:
-- Pendências para o Claude:
+- Data: 2026-10-20
+- PRs mergeadas: #107 a #148
+- Migrations aplicadas: Nenhuma pendente (todas as 173 migrations sincronizadas com o banco de produção, última `20261020000000_appointments_status_guard.sql`)
+- `tsc` / `jest` / `build`: `tsc` limpo (0 erros), Jest 177/177 suites e 1.555 testes aprovados, Next.js build concluído com sucesso (89 rotas estáticas/dinâmicas geradas).
+- Telas conferidas e problemas encontrados: Deploy de produção ativo em `menvo.com.br`, rotas e páginas públicas operacionais sem erros.
+- Pendências para o Claude: Nenhuma da onda 1. Seguindo agora com o recado #2 (PR #150).
 
-Depois de preencher, commite este arquivo (`docs: record merge and verification
-handoff result`), abra a PR e avise o Paul.
