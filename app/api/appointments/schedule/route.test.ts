@@ -344,4 +344,50 @@ describe('POST /api/appointments/schedule', () => {
     const body = await response.json()
     expect(body.data.id).toBe('new-appt-456')
   })
+
+  it('should store a token that expires in 7 days with the request', async () => {
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: 'mentee-1', email: 'mentee@test.com' } },
+      error: null,
+    })
+    const insert = jest.fn().mockReturnThis()
+
+    mockSupabase.from.mockImplementation((table: string) => {
+      if (table === 'profiles') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({
+            data: { id: 'mentor-1', full_name: 'Verified Mentor', email: 'mentor@test.com', mentor_profiles: { verification_status: 'approved' } },
+            error: null,
+          }),
+        }
+      }
+      if (table === 'appointments') {
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          in: jest.fn().mockReturnThis(),
+          maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
+          insert,
+          single: jest.fn().mockResolvedValue({ data: { id: 'new-appt-789' }, error: null }),
+        }
+      }
+      return {}
+    })
+
+    const before = Date.now()
+    const response = await POST(
+      createMockRequest({ mentorId: 'mentor-1', scheduledAt: '2026-09-10T10:00:00Z', message: VALID_REASON })
+    )
+    const after = Date.now()
+
+    expect(response.status).toBe(200)
+    const row = insert.mock.calls[0][0]
+    const expiresAt = new Date(row.token_expires_at).getTime()
+    const week = 7 * 24 * 60 * 60 * 1000
+    expect(expiresAt).toBeGreaterThanOrEqual(before + week)
+    expect(expiresAt).toBeLessThanOrEqual(after + week)
+    expect(row.action_token).toEqual(expect.any(String))
+  })
 })

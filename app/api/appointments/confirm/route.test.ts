@@ -82,6 +82,15 @@ describe('POST /api/appointments/confirm', () => {
     expect((await res.json()).error).toBe(message)
   })
 
+  it('answers 410 with a clear message when the e-mail link has expired', async () => {
+    confirm.mockResolvedValue({ kind: 'token_expired' })
+    const res = await POST(createMockRequest({ token: 't' }))
+    const data = await res.json()
+    expect(res.status).toBe(410)
+    expect(data.code).toBe('token_expired')
+    expect(data.error).toMatch(/^Este link expirou/)
+  })
+
   it('answers 200 with alreadyConfirmed for a repeated click', async () => {
     confirm.mockResolvedValue({ kind: 'already_confirmed' })
     const res = await POST(createMockRequest({ token: 't' }))

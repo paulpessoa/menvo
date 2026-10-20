@@ -411,6 +411,38 @@ describe("confirm", () => {
     expect(await setup({ found: null }).service.confirm({ sessionUserId: "mentor-1" })).toEqual({ kind: "not_found" })
   })
 
+  describe("token expiry (NOW = 2026-10-20T12:00Z)", () => {
+    const withExpiry = (token_expires_at: string | null, over: Partial<Appointment> = {}) =>
+      withParties({ status: "pending", token_expires_at, ...over })
+
+    it("refuses an expired token without touching status, calendar or e-mail", async () => {
+      const { service, repo, calendar, mailer } = setup({ found: withExpiry("2026-10-20T11:59:59.000Z"), transition: confirmed() })
+      expect(await service.confirm({ token: "t", sessionUserId: null })).toEqual({ kind: "token_expired" })
+      expect(repo.transitionStatus).not.toHaveBeenCalled()
+      expect(calendar.createEvent).not.toHaveBeenCalled()
+      expect(mailer.sendConfirmation).not.toHaveBeenCalled()
+    })
+
+    it("accepts a token that has not expired yet, and one with no deadline (old rows)", async () => {
+      for (const expiry of ["2026-10-20T12:00:01.000Z", null]) {
+        const { service } = setup({ found: withExpiry(expiry), transition: confirmed() })
+        expect(await service.confirm({ token: "t", sessionUserId: null })).toMatchObject({ kind: "ok" })
+      }
+    })
+
+    it("does not apply to the mentor's panel button (session credential)", async () => {
+      const { service } = setup({ found: withExpiry("2026-10-01T00:00:00.000Z"), transition: confirmed() })
+      expect(await service.confirm({ appointmentId: "apt-1", sessionUserId: "mentor-1" })).toMatchObject({ kind: "ok" })
+    })
+
+    it("keeps the usual answer for an already processed request even if the link expired", async () => {
+      const done = setup({ found: withExpiry("2026-10-01T00:00:00.000Z", { status: "confirmed" }) })
+      expect(await done.service.confirm({ token: "t", sessionUserId: null })).toEqual({ kind: "already_confirmed" })
+      const gone = setup({ found: withExpiry("2026-10-01T00:00:00.000Z", { status: "cancelled" }) })
+      expect(await gone.service.confirm({ token: "t", sessionUserId: null })).toEqual({ kind: "wrong_status", status: "cancelled" })
+    })
+  })
+
   it("answers already_confirmed for a repeated click and wrong_status for the rest", async () => {
     expect(await setup({ found: withParties({ status: "confirmed" }) }).service.confirm({ token: "t", sessionUserId: null })).toEqual({
       kind: "already_confirmed",

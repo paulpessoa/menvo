@@ -56,6 +56,14 @@ export async function POST(request: NextRequest) {
           { success: true, message: "Este agendamento já foi confirmado anteriormente!", alreadyConfirmed: true },
           { status: 200 }
         )
+      case "token_expired":
+        return NextResponse.json(
+          {
+            error: "Este link expirou. Entre na sua conta e confirme pelo painel, ou peça à equipe MENVO para reenviar o convite.",
+            code: "token_expired"
+          },
+          { status: 410 }
+        )
       case "wrong_status":
         return NextResponse.json({ error: `Este agendamento está com status: ${result.status}` }, { status: 400 })
       default:

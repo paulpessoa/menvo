@@ -124,6 +124,7 @@ registry.registerPath({
     403: error("`appointmentId` sem sessão ou por quem não é o mentor"),
     404: error("Agendamento não encontrado ou token inválido"),
     409: statusConflict,
+    410: error("O link do e-mail passou de 7 dias (`code`: `token_expired`); o botão do painel continua valendo"),
     500: serverError,
   },
 })

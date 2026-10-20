@@ -350,3 +350,10 @@ select tgname, pg_get_triggerdef(oid) from pg_trigger where tgrelid='public.appo
 | 9 | 8 · `availability` | 5–8 | opcional `20261020000200` | idem |
 | 10 | 9 · remoções e demais escritores | 5, 7 | não | só apaga o que não tem chamador |
 | 11–14 | 10–13 · OpenAPI, query layer, componentes, agentes | 9–11, 14 | não | um PR por camada |
+## Handoff (Grupo 9 remoções + D4 validade do token)
+
+- Apagados (D3): `PATCH/DELETE /api/appointments/[id]`, `GET /api/appointments/schedule` (o POST ficou), `POST /api/appointments/action` e a página `app/[locale]/appointments/action`. Nenhum e-mail apontava para eles (`brevo.ts:346` usa `/appointments/confirm`).
+- `mentorship.service.ts`: saem `requestSession`, `respondToSession`, `getMentorSessions`, `getMenteeSessions`, `completeSession`, `cancelSession`, `getSession`, `getMentorStats` e os tipos `SessionRequest`/`SessionResponse`. Saem também as entradas do OpenAPI (agora 11 operações) e os schemas Zod `actionAppointmentSchema`, `actionResponseSchema`, `scheduleListQuerySchema`, `patchAppointmentBodySchema`, `appointmentIdPathSchema`.
+- D4: `create` e `schedule` gravam `token_expires_at = agora + 7 dias` (`actionTokenExpiry` na entity; `create` não gravava). `appointments.service.confirm` devolve `token_expired` para link vencido, só no caminho por token e só com o pedido `pending`; nulo = válido. A rota responde 410 `code: token_expired` com "Este link expirou...". O botão do painel não é afetado.
+- Sem migration. Arquivos compartilhados: nenhuma alteração pedida (`messages/*.json`: a página de confirmação mostra `data.error` do servidor, sem chave nova).
+- Falta: o grupo ainda deixa `admin-appointments.service` e os `.update` de `renewActionToken`/`pending_reminder` fora do repository.

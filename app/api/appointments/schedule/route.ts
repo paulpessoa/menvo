@@ -11,6 +11,7 @@ import {
   mentorshipReasonSchema
 } from "@/lib/schemas/appointment"
 import { randomUUID } from "crypto"
+import { actionTokenExpiry } from "@/lib/domain/appointments/appointment.entity"
 import { withMentorFields } from "@/lib/services/mentors/mentor-profile-fields"
 import { findPendingMenteeCheckin } from "@/lib/services/appointments/checkin-responses.service"
 
@@ -147,7 +148,7 @@ export async function POST(request: NextRequest) {
     // 3. Criar agendamento com token de confirmação por email
     // Colunas reais validadas via: supabase gen types (lib/types/supabase.ts)
     const actionToken = randomUUID()
-    const tokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 dias
+    const tokenExpiresAt = actionTokenExpiry() // 7 dias
 
     const { data: appointment, error: insertError } = await (supabase
       .from("appointments")

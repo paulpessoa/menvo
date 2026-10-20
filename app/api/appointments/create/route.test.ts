@@ -86,6 +86,19 @@ describe('POST /api/appointments/create', () => {
     )
   })
 
+  it('should store a token that expires in 7 days with the request', async () => {
+    const before = Date.now()
+    const response = await POST(createMockRequest({ ...base, message: VALID_REASON }))
+    const after = Date.now()
+
+    expect(response.status).toBe(201)
+    const row = insertMock.mock.calls[0][0]
+    const expiresAt = new Date(row.token_expires_at).getTime()
+    const week = 7 * 24 * 60 * 60 * 1000
+    expect(expiresAt).toBeGreaterThanOrEqual(before + week)
+    expect(expiresAt).toBeLessThanOrEqual(after + week)
+  })
+
   it('should store topics in the existing `topic` column, never in the missing `mentorship_topics`', async () => {
     const response = await POST(
       createMockRequest({ ...base, message: VALID_REASON, mentorship_topics: ['Carreira', 'Entrevistas'] })
