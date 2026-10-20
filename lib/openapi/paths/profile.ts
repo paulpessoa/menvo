@@ -5,8 +5,8 @@
  * devolve hoje, inclusive `details` com a mensagem crua do banco em
  * `/api/profile` (decisão D4 pendente do Paul).
  * Não faz: registrar rotas de outro domínio. Todas exigem sessão (cookie); o
- * `Bearer` ainda é aceito em `/api/profile`, `/onboarding` e `/update` até a
- * decisão D1 e por isso aparece só como nota nas descrições.
+ * `Authorization: Bearer` deixou de ser aceito (decisão D1) e `/api/profile/update`
+ * foi removida.
  */
 import { z } from "zod"
 import { registry } from "../registry"
@@ -36,10 +36,10 @@ registry.registerPath({
   tags: ["profile"],
   summary: "Perfil de quem está logado",
   description:
-    "Achata `profiles`, `mentor_profiles` e `mentee_profiles`. `cv_url` volta como link da Menvo (`/api/cv/...`). Se a conta ainda não tem linha em `profiles`, ela é criada com o nome do provedor de login. Aceita também `Authorization: Bearer` (decisão D1 pendente).",
+    "Achata `profiles`, `mentor_profiles` e `mentee_profiles`. `cv_url` volta como link da Menvo (`/api/cv/...`). Se a conta ainda não tem linha em `profiles`, ela é criada com o nome do provedor de login.",
   responses: {
     200: { description: "Perfil", content: json(getProfileResponseSchema) },
-    401: profileError("Sem sessão nem token"),
+    401: profileError("Sem sessão"),
     500: profileError("Erro ao buscar ou criar o perfil (`details` traz a mensagem do banco)"),
   },
 })
@@ -55,7 +55,7 @@ registry.registerPath({
   responses: {
     200: { description: "Perfil atualizado", content: json(updateProfileResponseSchema) },
     400: profileError("Dados inválidos (mensagem do primeiro erro do Zod)"),
-    401: profileError("Sem sessão nem token"),
+    401: profileError("Sem sessão"),
     409: profileError("Slug já em uso"),
     500: profileError("Erro ao atualizar (`details` traz a mensagem do banco)"),
   },
@@ -145,36 +145,5 @@ registry.registerPath({
     200: { description: "Conta apagada", content: json(deleteAccountResponseSchema) },
     401: error("Não autenticado"),
     500: error("Falha ao apagar"),
-  },
-})
-
-registry.registerPath({
-  method: "get",
-  path: "/api/profile/update",
-  tags: ["profile"],
-  deprecated: true,
-  summary: "Perfil (rota antiga)",
-  description:
-    "Sem chamador no app; só aceita `Authorization: Bearer`. Devolve `profile` com as colunas de `profiles`, o mentorado achatado e `roles`. Use `GET /api/profile`. Pode ser removida (decisão D1).",
-  responses: {
-    200: { description: "Perfil mais papéis", content: json(z.object({ profile: z.record(z.unknown()) })) },
-    401: error("Sem token válido"),
-    500: error("Falha ao buscar"),
-  },
-})
-
-registry.registerPath({
-  method: "put",
-  path: "/api/profile/update",
-  tags: ["profile"],
-  deprecated: true,
-  summary: "Salva o perfil (rota antiga)",
-  description:
-    "Sem chamador no app; só aceita `Authorization: Bearer`; não passa por Zod e ignora campos de mentor. Use `PUT /api/profile`. Pode ser removida (decisão D1).",
-  request: { body: { content: json(z.record(z.unknown())) } },
-  responses: {
-    200: { description: "Perfil atualizado", content: json(updateProfileResponseSchema.partial({ profile: true })) },
-    401: error("Sem token válido"),
-    500: error("Falha ao salvar"),
   },
 })

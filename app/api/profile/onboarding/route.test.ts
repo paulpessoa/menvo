@@ -6,23 +6,18 @@ import { NextRequest } from "next/server"
 const mockFrom = jest.fn()
 const mockGetSessionUser = jest.fn()
 
-jest.mock("@supabase/supabase-js", () => ({
-  createClient: jest.fn(() => ({
-    auth: { getUser: jest.fn() },
+// O client é o da sessão (RLS do dono): nenhum client com service_role entra na rota.
+jest.mock("@/lib/utils/supabase/server", () => ({
+  createClient: jest.fn(async () => ({
+    auth: { getUser: mockGetSessionUser },
     from: (...args: unknown[]) => mockFrom(...args),
   })),
-}))
-
-jest.mock("@/lib/utils/supabase/server", () => ({
-  createClient: jest.fn(async () => ({ auth: { getUser: mockGetSessionUser } })),
 }))
 
 let POST: (request: NextRequest) => Promise<Response>
 let DELETE: (request: NextRequest) => Promise<Response>
 
 beforeAll(() => {
-  process.env.NEXT_PUBLIC_SUPABASE_URL = "http://localhost:54321"
-  process.env.SUPABASE_SERVICE_ROLE_KEY = "service-role-test-key"
   ;({ POST, DELETE } = require("./route"))
 })
 

@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { updateProfileSchema } from "@/lib/schemas/profile"
 import { authenticateRequest, buildProfileService } from "@/lib/services/profile/profile.composition"
 
@@ -10,9 +10,9 @@ import { authenticateRequest, buildProfileService } from "@/lib/services/profile
 const unauthorized = (details?: string) =>
   NextResponse.json({ error: "Token ou sessão de autorização necessária", details }, { status: 401 })
 
-export async function PUT(request: NextRequest) {
+export async function PUT(request: Request) {
   try {
-    const { user, error: authError } = await authenticateRequest(request)
+    const { user, error: authError, db } = await authenticateRequest()
     if (authError || !user) return unauthorized(authError?.message)
 
     const parsed = updateProfileSchema.safeParse(await request.json())
@@ -21,7 +21,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: errorMessage }, { status: 400 })
     }
 
-    const outcome = await buildProfileService().updateOwn(user.id, parsed.data)
+    const outcome = await buildProfileService(db).updateOwn(user.id, parsed.data)
 
     if (outcome.kind === "slug_taken") {
       return NextResponse.json({ error: "Esse endereço de perfil (slug) já está em uso" }, { status: 409 })
@@ -40,12 +40,12 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { user, error: authError } = await authenticateRequest(request)
+    const { user, error: authError, db } = await authenticateRequest()
     if (authError || !user) return unauthorized(authError?.message)
 
-    const outcome = await buildProfileService().getOwn(user)
+    const outcome = await buildProfileService(db).getOwn(user)
 
     if (outcome.kind === "failed") {
       const error = outcome.stage === "create" ? "Erro ao criar perfil" : "Erro ao buscar perfil"

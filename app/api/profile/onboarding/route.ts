@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { onboardingFlagSchema } from "@/lib/schemas/profile"
 import { authenticateRequest, buildOnboardingService } from "@/lib/services/profile/profile.composition"
 
@@ -6,9 +6,9 @@ import { authenticateRequest, buildOnboardingService } from "@/lib/services/prof
  * POST/DELETE /api/profile/onboarding - flags dos tours guiados do próprio
  * usuário. Fina: auth, Zod, service, status.
  */
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { user } = await authenticateRequest(request)
+    const { user, db } = await authenticateRequest()
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
     const body = await request.json()
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const outcome = await buildOnboardingService().markSeen(user.id, parsed.data)
+    const outcome = await buildOnboardingService(db).markSeen(user.id, parsed.data)
     if (outcome.kind === "failed") return NextResponse.json({ error: outcome.message }, { status: 500 })
 
     return NextResponse.json({ success: true, onboarding_flags: outcome.flags })
@@ -31,12 +31,12 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE() {
   try {
-    const { user } = await authenticateRequest(request)
+    const { user, db } = await authenticateRequest()
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    const outcome = await buildOnboardingService().clear(user.id)
+    const outcome = await buildOnboardingService(db).clear(user.id)
     if (outcome.kind === "failed") return NextResponse.json({ error: outcome.message }, { status: 500 })
 
     return NextResponse.json({ success: true, onboarding_flags: {} })
