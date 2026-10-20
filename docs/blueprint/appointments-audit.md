@@ -14,11 +14,30 @@ Escopo lido: `app/api/appointments/**` (12 rotas), `lib/services/appointments/`,
 `app/api/cron/appointments`, as 4 migrations que criam ou alteram objetos de
 `appointments` e os testes.
 
-**Limite desta auditoria:** o MCP do Supabase não autenticou nesta sessão
-(`Unauthorized`), então as policies, o CHECK de `status` e os triggers que existem
-hoje no banco **não foram lidos**. O que se afirma sobre RLS abaixo vem do código
-(comentários e testes) e está marcado como "a confirmar". O primeiro passo do
-plano é uma consulta de 3 linhas que fecha isso (Grupo 0).
+## Fatos do banco de produção (consulta do orquestrador, 2026-10-19)
+
+O MCP do Supabase não autenticou na sessão da auditoria; estes fatos vieram da
+CLI e **substituem** as suposições "a confirmar" que o texto abaixo ainda cita.
+
+- **Policies** (duplicadas, 2 de cada): `INSERT` para `authenticated` com
+  `with_check auth.uid() = mentee_id`; `SELECT` e `UPDATE` com
+  `auth.uid() = mentor_id OR auth.uid() = mentee_id`. O `UPDATE` **não tem
+  `with_check` nem restrição de coluna**: o participante muda qualquer coluna,
+  inclusive `status`, `mentor_id`, `scheduled_at` e `action_token`, direto pelo
+  PostgREST. Não existe policy de `DELETE` (então o `DELETE /[id]` com a sessão
+  do usuário nunca apaga nada; só um `service_role` apagaria).
+- **Constraints:** `CHECK status in ('pending','confirmed','cancelled','completed')`
+  (**`rejected` não é um valor possível**), `UNIQUE(action_token)`, `CHECK video_service`.
+- **Triggers:** `update_appointments_updated_at` (BEFORE UPDATE) e `trg_log_activity`
+  (AFTER I/U/D). Nenhum de transição.
+- **Dados:** 6 linhas (3 `completed`, 3 `cancelled`). Não existe `rejected`,
+  nem `pending`/`confirmed` hoje.
+- **Colunas:** não existe `mentorship_topics` (a coluna é `topic`).
+
+Já resolvido fora desta linha: cancel exige participante (PR #109) e `create`
+grava em `topic` (PR #110). O trigger de transição, a limpeza das policies
+duplicadas e a restrição de colunas no UPDATE (antigo Grupo 2) o orquestrador
+escreve, por ser SQL de segurança.
 
 ## A regra de status vive em 13 lugares
 
@@ -52,8 +71,9 @@ Transições que o código aceita hoje e que a tabela da Tarefa 3 deve decidir:
 - `cancelled → completed` e `cancelled → confirmed` via `PATCH /[id]` (nenhuma guarda).
 - `pending → completed` via `PATCH /[id]` (pula a confirmação do mentor).
 - `rejected`: existe no tipo (`lib/types/models/mentorship.ts`), no Zod do hook
-  e na UI, mas **nenhum código grava `rejected`**; só o `respondToSession` morto.
-  O cron cancela pedido expirado em vez de rejeitar, e `expired` é só rótulo de UI.
+  e na UI, mas **o CHECK do banco não o aceita** e nenhum código ativo o grava;
+  só o `respondToSession` morto. O cron cancela pedido expirado em vez de
+  rejeitar, e `expired` é só rótulo de UI. A entity tem os 4 estados do banco.
 
 ## Camada × estado
 
@@ -111,7 +131,8 @@ Transições que o código aceita hoje e que a tabela da Tarefa 3 deve decidir:
    o `PostgREST` direto faz o mesmo (`from("appointments").update({status})`
    com a sessão do usuário, que é exatamente o que `evaluateMentorshipSession` faz).
    Por isso o trigger do Grupo 2 é a defesa que importa, não só apagar a rota.
-4. **`/api/appointments/create` provavelmente falha em produção.** Insere
+4. **`/api/appointments/create` falhava em produção (confirmado; corrigido no
+   PR #110).** Inseria
    `mentorship_topics`, coluna que **não existe** na `Row` (`lib/types/supabase.ts`
    tem `topic: string | null`); o `as any` esconde o erro de tipo e o teste usa
    mock do Supabase. A rota é usada por `BookingForm` em `/appointments/book/[mentorId]`,
@@ -213,7 +234,7 @@ select conname, pg_get_constraintdef(oid) from pg_constraint where conrelid='pub
 select status, count(*) from appointments group by 1;
 select tgname, pg_get_triggerdef(oid) from pg_trigger where tgrelid='public.appointments'::regclass and not tgisinternal;
 ```
-O resultado define: (i) se o participante pode dar `update` (e em que colunas), (ii) se já existe CHECK de `status`, (iii) se há linhas `rejected`/`expired` que o trigger precisa tolerar, (iv) se `create` insere (a coluna `mentorship_topics` existe de fato).
+**Resolvido (ver "Fatos do banco de produção" no topo):** o participante pode dar `update` em qualquer coluna; já existe CHECK de 4 estados; não há linha `rejected`; `mentorship_topics` não existe. **Estado dos PRs:** 1 = PR #109 (feito); o bug do `create` = PR #110 (feito); o PR 3 (trigger + policies + colunas) é do orquestrador; esta linha segue com os PRs 2 e 4.
 
 ### Grupo 1 · Entity e Zod do status (camadas 3–4) · sem migration
 - `lib/domain/appointments/appointment-status.entity.ts`: `APPOINTMENT_STATUSES`, `type AppointmentStatus`, `type TransitionActor = "mentor" | "mentee" | "admin" | "system"`, tabela `TRANSITIONS` (de → para → quem pode), `canTransition(from, to, actor)` e `assertTransition(...)` puras que lançam `InvalidTransitionError` com `code` estável. `from === to` não é transição (idempotente).
@@ -227,7 +248,7 @@ O resultado define: (i) se o participante pode dar `update` (e em que colunas), 
   | confirmed → cancelled | sim | sim | sim | sim (check-in) |
   | completed → cancelled | sim (**só** no-show) | não | sim | não |
   | cancelled → qualquer | não (terminal) | não | não | não |
-  | `rejected` | sem entrada nova; linhas legadas ficam como estão (terminal) | | | |
+  | `rejected` | fora da tabela: o CHECK do banco não o aceita e não há linha com esse valor | | | |
 
   Muda comportamento hoje: `completed → cancelled` pelo mentorado (hoje a rota `cancel` deixa) passa a ser recusado a partir do Grupo 4/5. `pending → completed` e `cancelled → *` do `PATCH /[id]` deixam de existir.
 - `lib/schemas/appointment.ts`: `appointmentStatusSchema = z.enum(APPOINTMENT_STATUSES)`, `appointmentIdSchema` (string UUID; **não** aplicado às rotas ainda, para não trocar 404 por 400 sem avisar), `markCompletedAppointmentSchema` (sai da rota), `listAppointmentsQuerySchema` (role/status/limit com default e teto), `availabilityQuerySchema`, `actionAppointmentSchema`.
