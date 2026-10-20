@@ -19,7 +19,21 @@ export interface AppointmentCancellationEmail {
   cancelledByName: string
 }
 
+export interface AppointmentConfirmationEmail {
+  mentorEmail: string
+  menteeEmail: string
+  mentorName: string
+  menteeName: string
+  scheduledAt: string
+  meetLink: string | null
+  calendarLink?: string | null
+  menteeNotes?: string
+  mentorNotes?: string
+}
+
 export interface AppointmentMailer {
   /** Avisa uma das partes que a sessão foi cancelada, com o motivo. */
   sendCancellation(message: AppointmentCancellationEmail): Promise<void>
+  /** Avisa mentor e mentorado que a sessão foi confirmada, com o link do Meet. */
+  sendConfirmation(message: AppointmentConfirmationEmail): Promise<void>
 }

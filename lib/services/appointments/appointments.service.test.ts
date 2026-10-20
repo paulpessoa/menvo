@@ -35,6 +35,8 @@ function setup(opts: { found?: Appointment | AppointmentWithParties | null; tran
   const repo = {
     findById: jest.fn().mockResolvedValue(found),
     findWithParties: jest.fn().mockResolvedValue(found),
+    findWithPartiesByActionToken: jest.fn().mockResolvedValue(found),
+    setFields: jest.fn().mockResolvedValue(undefined),
     transitionStatus: jest.fn(async () => {
       if (opts.transition instanceof Error) throw opts.transition
       return opts.transition === undefined ? base({ status: "completed" }) : opts.transition
@@ -44,9 +46,19 @@ function setup(opts: { found?: Appointment | AppointmentWithParties | null; tran
     deleteByAppointment: jest.fn().mockResolvedValue(undefined),
     findByReviewer: jest.fn().mockResolvedValue(null),
     insert: jest.fn().mockResolvedValue(undefined),
+    listForUser: jest.fn().mockResolvedValue([]),
+    findOwner: jest.fn().mockResolvedValue({ id: "f1", reviewer_id: "mentee-1" }),
+    updatePublicFeedback: jest.fn().mockResolvedValue(undefined),
   } as unknown as jest.Mocked<AppointmentFeedbacksRepository>
-  const mailer: jest.Mocked<AppointmentMailer> = { sendCancellation: jest.fn().mockResolvedValue(undefined) }
-  const calendar: jest.Mocked<AppointmentCalendar> = { deleteEvent: jest.fn().mockResolvedValue(undefined) }
+  const mailer: jest.Mocked<AppointmentMailer> = {
+    sendCancellation: jest.fn().mockResolvedValue(undefined),
+    sendConfirmation: jest.fn().mockResolvedValue(undefined),
+  }
+  const calendar: jest.Mocked<AppointmentCalendar> = {
+    availability: jest.fn().mockResolvedValue({ configured: false, missing: [] }),
+    createEvent: jest.fn().mockResolvedValue({ eventId: "evt-9", meetLink: "https://meet/x", calendarLink: "https://cal/x" }),
+    deleteEvent: jest.fn().mockResolvedValue(undefined),
+  }
   const service = createAppointmentsService({ repo, feedbacks, mailer, calendar, now: () => NOW })
   return { service, repo, feedbacks, mailer, calendar }
 }
@@ -340,6 +352,133 @@ describe("evaluate", () => {
     const { service, feedbacks } = setup()
     feedbacks.insert.mockRejectedValue(new RepositoryError("appointmentFeedbacks.insert", { message: "denied" }))
     expect(await service.evaluate("apt-1", "mentee-1", input)).toEqual({ kind: "feedback_failed" })
+  })
+})
+
+describe("confirm", () => {
+  const pending = () => withParties({ status: "pending", duration_minutes: 45, notes_mentee: "Quero orientação" })
+  const confirmed = () => base({ status: "confirmed" })
+
+  it("confirms by token without any session, creates the event, saves the links and e-mails both sides", async () => {
+    const { service, repo, calendar, mailer } = setup({ found: pending(), transition: confirmed() })
+    calendar.availability.mockResolvedValue({ configured: true, missing: [] })
+
+    const result = await service.confirm({ token: "secret", sessionUserId: null })
+
+    expect(result).toEqual({ kind: "ok", googleEventId: "evt-9", googleMeetLink: "https://meet/x", calendarError: null })
+    expect(repo.findWithPartiesByActionToken).toHaveBeenCalledWith("secret")
+    expect(repo.transitionStatus).toHaveBeenCalledWith({ id: "apt-1", from: "pending", to: "confirmed", patch: undefined })
+    expect(calendar.createEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ mentorEmail: "mentor@test.com", menteeEmail: "mentee@test.com", endTime: new Date(new Date(PAST).getTime() + 45 * 60000) })
+    )
+    expect(repo.setFields).toHaveBeenCalledWith("apt-1", {
+      google_event_id: "evt-9",
+      google_meet_link: "https://meet/x",
+      google_calendar_link: "https://cal/x",
+    })
+    expect(mailer.sendConfirmation).toHaveBeenCalledWith(
+      expect.objectContaining({ mentorEmail: "mentor@test.com", meetLink: "https://meet/x", calendarLink: "https://cal/x", menteeNotes: "Quero orientação" })
+    )
+  })
+
+  it("the status change comes before the calendar event, so a lost race leaves no orphan event", async () => {
+    const { service, calendar, mailer } = setup({ found: pending(), transition: null })
+    calendar.availability.mockResolvedValue({ configured: true, missing: [] })
+    expect(await service.confirm({ token: "secret", sessionUserId: null })).toEqual({ kind: "changed" })
+    expect(calendar.createEvent).not.toHaveBeenCalled()
+    expect(mailer.sendConfirmation).not.toHaveBeenCalled()
+  })
+
+  it("lets the session mentor confirm by id and stores the notes", async () => {
+    const { service, repo } = setup({ found: pending(), transition: confirmed() })
+    const result = await service.confirm({ appointmentId: "apt-1", mentorNotes: "Tudo certo", sessionUserId: "mentor-1" })
+    expect(result.kind).toBe("ok")
+    expect(repo.transitionStatus.mock.calls[0][0].patch).toEqual({ notes_mentor: "Tudo certo" })
+  })
+
+  it("refuses the id path without a session or for anyone but the mentor", async () => {
+    for (const sessionUserId of [null, "attacker-1", "mentee-1"]) {
+      const { service, repo, mailer } = setup({ found: pending(), transition: confirmed() })
+      expect(await service.confirm({ appointmentId: "apt-1", sessionUserId })).toEqual({ kind: "forbidden" })
+      expect(repo.transitionStatus).not.toHaveBeenCalled()
+      expect(mailer.sendConfirmation).not.toHaveBeenCalled()
+    }
+  })
+
+  it("is not_found for an unknown token or id", async () => {
+    expect(await setup({ found: null }).service.confirm({ token: "nope", sessionUserId: null })).toEqual({ kind: "not_found" })
+    expect(await setup({ found: null }).service.confirm({ sessionUserId: "mentor-1" })).toEqual({ kind: "not_found" })
+  })
+
+  it("answers already_confirmed for a repeated click and wrong_status for the rest", async () => {
+    expect(await setup({ found: withParties({ status: "confirmed" }) }).service.confirm({ token: "t", sessionUserId: null })).toEqual({
+      kind: "already_confirmed",
+    })
+    for (const status of ["completed", "cancelled"] as const) {
+      const { service, repo } = setup({ found: withParties({ status }) })
+      expect(await service.confirm({ token: "t", sessionUserId: null })).toEqual({ kind: "wrong_status", status })
+      expect(repo.transitionStatus).not.toHaveBeenCalled()
+    }
+  })
+
+  it("confirms anyway, reporting why, when the calendar is not configured or fails", async () => {
+    const off = setup({ found: pending(), transition: confirmed() })
+    off.calendar.availability.mockResolvedValue({ configured: false, missing: ["GOOGLE_CALENDAR_CLIENT_ID"] })
+    jest.spyOn(console, "warn").mockImplementation(() => {})
+    expect(await off.service.confirm({ token: "t", sessionUserId: null })).toEqual({
+      kind: "ok",
+      googleEventId: null,
+      googleMeetLink: null,
+      calendarError: "Google Calendar não configurado. Faltando: GOOGLE_CALENDAR_CLIENT_ID",
+    })
+    expect(off.mailer.sendConfirmation).toHaveBeenCalledWith(expect.objectContaining({ meetLink: null }))
+
+    const broken = setup({ found: pending(), transition: confirmed() })
+    broken.calendar.availability.mockResolvedValue({ configured: true, missing: [] })
+    broken.calendar.createEvent.mockRejectedValue(new Error("google down"))
+    expect(await broken.service.confirm({ token: "t", sessionUserId: null })).toMatchObject({ kind: "ok", calendarError: "google down" })
+    expect(broken.repo.setFields).not.toHaveBeenCalled()
+  })
+
+  it("keeps the confirmation when saving the links or sending the e-mail fails", async () => {
+    const { service, repo, calendar, mailer } = setup({ found: pending(), transition: confirmed() })
+    calendar.availability.mockResolvedValue({ configured: true, missing: [] })
+    repo.setFields.mockRejectedValue(new Error("db"))
+    mailer.sendConfirmation.mockRejectedValue(new Error("brevo down"))
+    expect(await service.confirm({ token: "t", sessionUserId: null })).toMatchObject({
+      kind: "ok",
+      googleEventId: "evt-9",
+      calendarError: expect.stringContaining("não foi possível guardar"),
+    })
+  })
+
+  it("turns the database guard rejection into invalid_transition", async () => {
+    const guard = new RepositoryError("appointments.transitionStatus", { message: "appointment_invalid_transition: cancelled -> confirmed" })
+    expect(await setup({ found: pending(), transition: guard }).service.confirm({ token: "t", sessionUserId: null })).toMatchObject({
+      kind: "invalid_transition",
+    })
+  })
+})
+
+describe("feedbacks", () => {
+  it("listFeedbacks delegates with the user and the direction", async () => {
+    const { service, feedbacks } = setup()
+    await service.listFeedbacks("mentee-1", "sent")
+    expect(feedbacks.listForUser).toHaveBeenCalledWith({ userId: "mentee-1", type: "sent" })
+  })
+
+  it("lets the author edit their comment, which goes back to moderation", async () => {
+    const { service, feedbacks } = setup()
+    expect(await service.updateOwnFeedback("f1", "mentee-1", "novo texto")).toEqual({ kind: "ok" })
+    expect(feedbacks.updatePublicFeedback).toHaveBeenCalledWith("f1", "novo texto")
+  })
+
+  it("refuses anyone else and an unknown feedback, without writing", async () => {
+    const { service, feedbacks } = setup()
+    expect(await service.updateOwnFeedback("f1", "intruder", "x")).toEqual({ kind: "forbidden" })
+    feedbacks.findOwner.mockResolvedValue(null)
+    expect(await service.updateOwnFeedback("nope", "mentee-1", "x")).toEqual({ kind: "not_found" })
+    expect(feedbacks.updatePublicFeedback).not.toHaveBeenCalled()
   })
 })
 

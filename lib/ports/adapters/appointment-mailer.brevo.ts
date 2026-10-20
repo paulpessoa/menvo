@@ -10,4 +10,9 @@ export const brevoAppointmentMailer: AppointmentMailer = {
     const { sendAppointmentCancellation } = await import("@/lib/email/brevo")
     await sendAppointmentCancellation(message)
   },
+
+  async sendConfirmation(message) {
+    const { sendAppointmentConfirmation } = await import("@/lib/email/brevo")
+    await sendAppointmentConfirmation(message)
+  },
 }

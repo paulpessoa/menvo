@@ -15,7 +15,11 @@
  * não sabe qual usuário está atrás de uma rota `service_role`, então esta
  * checagem é a única que existe para elas.
  */
-import type { Appointment, AppointmentListItem } from "@/lib/domain/appointments/appointment.entity"
+import type {
+  Appointment,
+  AppointmentListItem,
+  AppointmentWithParties,
+} from "@/lib/domain/appointments/appointment.entity"
 import { participantRole } from "@/lib/domain/appointments/appointment.entity"
 import {
   assertTransition,
@@ -31,7 +35,10 @@ import type {
   ListForUserInput,
   TransitionPatch,
 } from "@/lib/repositories/appointments.repository"
-import type { AppointmentFeedbacksRepository } from "@/lib/repositories/appointment-feedbacks.repository"
+import type {
+  AppointmentFeedbacksRepository,
+  FeedbackListItem,
+} from "@/lib/repositories/appointment-feedbacks.repository"
 import { RepositoryError } from "@/lib/repositories/repository-error"
 
 export interface AppointmentsServiceDeps {
@@ -87,6 +94,39 @@ export type EvaluateResult =
   /** A sessão foi concluída, mas gravar a avaliação falhou; repetir o envio funciona. */
   | { kind: "feedback_failed" }
   | TransitionBlock
+
+export interface ConfirmInput {
+  /** Link do e-mail do mentor. Quando vem, é a credencial e `sessionUserId` não conta. */
+  token?: string
+  /** Botão do painel. Exige `sessionUserId` igual ao mentor da sessão. */
+  appointmentId?: string
+  mentorNotes?: string
+  sessionUserId: string | null
+}
+
+export type ConfirmResult =
+  | { kind: "ok"; googleEventId: string | null; googleMeetLink: string | null; calendarError: string | null }
+  | { kind: "not_found" }
+  | { kind: "forbidden" }
+  | { kind: "already_confirmed" }
+  | { kind: "wrong_status"; status: AppointmentStatus }
+  | TransitionBlock
+
+export type UpdateFeedbackResult = { kind: "ok" } | { kind: "not_found" } | { kind: "forbidden" }
+
+/** Texto do convite do calendário; o mentor lê isto no evento. */
+function buildEventDescription(appointment: AppointmentWithParties, mentorNotes?: string): string {
+  let description = "Sessão de mentoria confirmada através da plataforma MENVO.\n\n"
+  description += `👤 Mentor: ${appointment.mentor?.full_name ?? ""}\n`
+  description += `👤 Mentee: ${appointment.mentee?.full_name ?? ""}\n`
+  description += `⏱️ Duração: ${appointment.duration_minutes} minutos\n\n`
+  if (appointment.notes_mentee) description += `📝 Mensagem do mentee:\n${appointment.notes_mentee}\n\n`
+  if (mentorNotes) description += `💬 Observações do mentor:\n${mentorNotes}\n\n`
+  description += "---\n"
+  description += "Plataforma: MENVO - Mentores Voluntários\n"
+  description += "🔗 Link do Meet será gerado automaticamente"
+  return description
+}
 
 /** Mensagens do trigger de `20261020000000_appointments_status_guard.sql`. */
 const GUARD_MESSAGE = /appointment_(invalid_transition|transition_forbidden|immutable_column)/
@@ -298,6 +338,126 @@ export function createAppointmentsService(deps: AppointmentsServiceDeps) {
     /** Sessões do usuário (como mentor, mentorado ou ambos), com a outra parte e as avaliações. */
     listMine(input: ListForUserInput): Promise<AppointmentListItem[]> {
       return deps.repo.listForUser(input)
+    },
+
+    /**
+     * O mentor confirma um pedido `pending`: pelo link do e-mail (o token é a
+     * credencial, ADR 0008 E5) ou pelo botão do painel (`sessionUserId` tem de ser
+     * o mentor da sessão).
+     * Ordem: primeiro o status (update condicional, então cron e confirmação não
+     * se atropelam), depois o evento do calendário, depois o e-mail. Antes o evento
+     * era criado antes do update e ficava órfão se o update falhasse. Calendário e
+     * e-mail são `best effort`: a sessão fica confirmada mesmo sem eles, e o aviso
+     * `calendarError` diz ao mentor o que faltou.
+     * Pendente (D4): `token_expires_at` ainda não é conferido aqui.
+     */
+    async confirm(input: ConfirmInput): Promise<ConfirmResult> {
+      const { token, appointmentId, mentorNotes, sessionUserId } = input
+      const appointment = token
+        ? await deps.repo.findWithPartiesByActionToken(token)
+        : appointmentId
+          ? await deps.repo.findWithParties(appointmentId)
+          : null
+      if (!appointment) return { kind: "not_found" }
+
+      // Sem token, o botão do painel não carrega segredo: só o mentor da sessão confirma.
+      if (!token && sessionUserId !== appointment.mentor_id) return { kind: "forbidden" }
+
+      if (appointment.status === "confirmed") return { kind: "already_confirmed" }
+      if (appointment.status !== "pending") return { kind: "wrong_status", status: appointment.status }
+
+      const result = await transition(deps.repo, {
+        appointment,
+        to: "confirmed",
+        actor: "mentor",
+        patch: mentorNotes ? { notes_mentor: mentorNotes } : undefined,
+      })
+      if (result.kind !== "done") return result
+
+      const { mentor, mentee } = appointment
+      let googleEventId: string | null = null
+      let googleMeetLink: string | null = null
+      let calendarLink: string | null = null
+      let calendarError: string | null = null
+
+      const availability = await deps.calendar.availability()
+      if (availability.configured) {
+        try {
+          const start = new Date(appointment.scheduled_at)
+          const created = await deps.calendar.createEvent({
+            summary: `Mentoria: ${mentor?.full_name ?? "Mentor"} & ${mentee?.full_name ?? "Mentorado"}`,
+            description: buildEventDescription(appointment, mentorNotes),
+            startTime: start,
+            endTime: new Date(start.getTime() + appointment.duration_minutes * 60 * 1000),
+            mentorEmail: mentor?.email ?? "",
+            mentorName: mentor?.full_name ?? "",
+            menteeEmail: mentee?.email ?? "",
+            menteeName: mentee?.full_name ?? "",
+          })
+          googleEventId = created.eventId
+          googleMeetLink = created.meetLink
+          calendarLink = created.calendarLink
+        } catch (error) {
+          console.error("[appointments] erro ao criar evento no calendário:", (error as Error).message)
+          calendarError = error instanceof Error ? error.message : "Erro desconhecido"
+        }
+      } else {
+        const missing = availability.missing.join(", ") || "Configuração incompleta"
+        console.warn("[appointments] Google Calendar não configurado. Faltando:", missing)
+        calendarError = `Google Calendar não configurado. Faltando: ${missing}`
+      }
+
+      if (googleEventId || googleMeetLink || calendarLink) {
+        try {
+          await deps.repo.setFields(appointment.id, {
+            google_event_id: googleEventId,
+            google_meet_link: googleMeetLink,
+            google_calendar_link: calendarLink,
+          })
+        } catch (error) {
+          // A sessão está confirmada e o convite já saiu; só o link não foi guardado.
+          console.error("[appointments] não foi possível guardar os links do evento:", (error as Error).message)
+          calendarError = "O evento foi criado, mas não foi possível guardar o link na sessão."
+        }
+      }
+
+      if (mentor?.email && mentee?.email) {
+        try {
+          await deps.mailer.sendConfirmation({
+            mentorEmail: mentor.email,
+            menteeEmail: mentee.email,
+            mentorName: mentor.full_name ?? "",
+            menteeName: mentee.full_name ?? "",
+            scheduledAt: appointment.scheduled_at,
+            meetLink: googleMeetLink,
+            calendarLink,
+            menteeNotes: appointment.notes_mentee ?? undefined,
+            mentorNotes,
+          })
+        } catch (error) {
+          console.error("[appointments] erro ao enviar a confirmação:", (error as Error).message)
+        }
+      }
+
+      return { kind: "ok", googleEventId, googleMeetLink, calendarError }
+    },
+
+    /** Avaliações que o usuário recebeu (como mentor) ou enviou (como mentorado). */
+    listFeedbacks(userId: string, type: "sent" | "received"): Promise<FeedbackListItem[]> {
+      return deps.feedbacks.listForUser({ userId, type })
+    },
+
+    /**
+     * O autor edita o próprio comentário público; ele volta para moderação.
+     * Antes de a rota existir, qualquer pessoa com o id editava qualquer
+     * comentário; o `reviewer_id` conferido aqui é essa correção.
+     */
+    async updateOwnFeedback(feedbackId: string, userId: string, publicFeedback: string): Promise<UpdateFeedbackResult> {
+      const feedback = await deps.feedbacks.findOwner(feedbackId)
+      if (!feedback) return { kind: "not_found" }
+      if (feedback.reviewer_id !== userId) return { kind: "forbidden" }
+      await deps.feedbacks.updatePublicFeedback(feedbackId, publicFeedback)
+      return { kind: "ok" }
     },
   }
 }
