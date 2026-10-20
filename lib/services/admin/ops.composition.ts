@@ -13,6 +13,9 @@ import {
   createAdminRetentionReadRepository,
   createAdminRetentionWriteRepository
 } from "@/lib/repositories/admin-ops.repository"
+import { brevoAppointmentMailer } from "@/lib/ports/adapters/appointment-mailer.brevo"
+import { googleAppointmentCalendar } from "@/lib/ports/adapters/appointment-calendar.google"
+import type { AdminAppointmentsDeps } from "@/lib/services/appointments/admin-appointments.service"
 import { getAdminOverview } from "./overview.service"
 import { createAdminRetentionService } from "./retention.service"
 
@@ -40,4 +43,20 @@ export function buildAdminRetentionService(sessionDb: SupabaseClient<Database>) 
     audit: (adminId, details, targetUserId) =>
       logAdminAction(adminId, "user_status_changed", details, targetUserId)
   })
+}
+
+/**
+ * Dependências do painel de sessões (L2-4): client privilegiado lazy (nasce
+ * só depois do `assertAdmin` do service) e os adapters de e-mail e Calendar
+ * que o módulo de appointments já usa.
+ */
+export function buildAdminAppointmentsDeps(
+  sessionDb: SupabaseClient<Database>
+): AdminAppointmentsDeps {
+  return {
+    sessionDb,
+    db: lazyPrivilegedClient(),
+    mailer: brevoAppointmentMailer,
+    calendar: googleAppointmentCalendar
+  }
 }
