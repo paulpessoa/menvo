@@ -94,19 +94,26 @@ export const orgDashboardSummarySchema = z.object({
 })
 
 /**
+ * A linha de `organizations` como o admin da org a recebe (`select *`), em
+ * `GET` e `PATCH /api/org/[id]`. `passthrough`: validamos o que a tela usa sem
+ * descartar as outras colunas.
+ */
+export const orgRowSchema = z
+  .object({
+    id: z.string(),
+    slug: z.string(),
+    name: z.string(),
+    join_policy: z.enum(["open", "invite_only"]).optional()
+  })
+  .passthrough()
+
+/**
  * `GET /api/org/[id]`. `organization` é a linha inteira (`select *`, só o admin
  * da org a recebe), por isso `passthrough`: validamos o que a tela usa sem
  * descartar as outras colunas.
  */
 export const orgDashboardSchema = z.object({
-  organization: z
-    .object({
-      id: z.string(),
-      slug: z.string(),
-      name: z.string(),
-      join_policy: z.enum(["open", "invite_only"]).optional()
-    })
-    .passthrough(),
+  organization: orgRowSchema,
   members: z.array(orgDashboardMemberSchema),
   summary: orgDashboardSummarySchema
 })
@@ -135,7 +142,28 @@ export const myMembershipSchema = z.object({
     .nullable()
 })
 
-export type InviteMemberInput = z.infer<typeof inviteMemberSchema>
+// --- Contrato HTTP (camada 9 lê estes; as rotas não os usam para validar) ---
+
+/** Todas as rotas de org respondem sucesso como `{ data, message? }` (`successResponse`). */
+export function orgEnvelope<T extends z.ZodTypeAny>(data: T) {
+  return z.object({ data, message: z.string().optional() })
+}
+
+/** `{id}` do path de `/api/org/{id}`. */
+export const orgPathParamsSchema = z.object({ id: orgIdParamSchema })
+
+/**
+ * `?period=` como a documentação o descreve. Não é o `orgPeriodSchema`: aquele
+ * normaliza valor desconhecido para "all"; este lista os valores que valem.
+ */
+export const orgPeriodQuerySchema = z.object({ period: z.enum(["all", "30d", "90d", "1y"]).optional() })
+
+/** Resultado das ações de membership: o estado em que a pessoa ficou. */
+export const membershipResultSchema = z.object({ status: membershipStatusSchema })
+export const removedMemberSchema = z.object({ userId: z.string() })
+export const leftOrganizationSchema = z.object({ organizationId: z.string() })
+
+export type InviteMemberInput =z.infer<typeof inviteMemberSchema>
 export type UpdateOrgSettingsInput = z.infer<typeof updateOrgSettingsSchema>
 export type OrgDashboardResponse = z.infer<typeof orgDashboardSchema>
 export type MyOrgOption = z.infer<typeof myOrgOptionSchema>

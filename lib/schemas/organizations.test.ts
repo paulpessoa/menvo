@@ -2,10 +2,14 @@ import {
   inviteMemberSchema,
   joinOrganizationSchema,
   leaveOrganizationQuerySchema,
+  membershipResultSchema,
   memberUserIdSchema,
   myMembershipSchema,
   orgDashboardSchema,
+  orgEnvelope,
   orgIdParamSchema,
+  orgPathParamsSchema,
+  orgPeriodQuerySchema,
   orgPeriodSchema,
   updateOrgSettingsSchema
 } from "./organizations"
@@ -45,6 +49,23 @@ describe("org input schemas", () => {
   it("joinOrganizationSchema trims the slug and rejects an empty one", () => {
     expect(joinOrganizationSchema.parse({ slug: " giral " }).slug).toBe("giral")
     expect(joinOrganizationSchema.safeParse({ slug: "   " }).success).toBe(false)
+  })
+})
+
+describe("org contract helpers", () => {
+  it("orgEnvelope wraps data with an optional message, like successResponse", () => {
+    const schema = orgEnvelope(membershipResultSchema)
+    expect(schema.safeParse({ data: { status: "invited" }, message: "Convite enviado" }).success).toBe(true)
+    expect(schema.safeParse({ data: { status: "invited" } }).success).toBe(true)
+    expect(schema.safeParse({ data: { status: "banned" } }).success).toBe(false)
+    expect(schema.safeParse({ status: "invited" }).success).toBe(false)
+  })
+
+  it("orgPathParamsSchema requires a UUID id and orgPeriodQuerySchema lists only valid periods", () => {
+    expect(orgPathParamsSchema.safeParse({ id: UUID }).success).toBe(true)
+    expect(orgPathParamsSchema.safeParse({ id: "x" }).success).toBe(false)
+    expect(orgPeriodQuerySchema.safeParse({}).success).toBe(true)
+    expect(orgPeriodQuerySchema.safeParse({ period: "forever" }).success).toBe(false)
   })
 })
 
