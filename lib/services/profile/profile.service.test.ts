@@ -31,6 +31,8 @@ function fakeRepo(overrides: Partial<ProfileRepository> = {}) {
     updateProfile: jest.fn(async () => void calls.push("updateProfile")),
     updateMentorFields: jest.fn(async () => void calls.push("updateMentorFields")),
     upsertMenteeFields: jest.fn(async () => void calls.push("upsertMenteeFields")),
+    findOnboardingFlags: jest.fn(async () => ({})),
+    setOnboardingFlags: jest.fn(async () => undefined),
     ...overrides,
   }
   return { repo, calls }

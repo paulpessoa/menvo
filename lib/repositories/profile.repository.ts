@@ -12,7 +12,7 @@
  * `PGRST116`); por isso não usamos só o `RepositoryError` genérico.
  */
 import type { SupabaseClient } from "@supabase/supabase-js"
-import type { Database, TablesInsert, TablesUpdate } from "@/lib/types/supabase"
+import type { Database, Json, TablesInsert, TablesUpdate } from "@/lib/types/supabase"
 import { OWN_PROFILE_COLUMNS } from "@/lib/services/auth/own-profile-columns"
 import { MENTOR_PROFILE_EMBED, type MentorEditableFields } from "@/lib/services/mentors/mentor-profile-fields"
 import { MENTEE_PROFILE_EMBED_WITH_CV, type MenteeEditableFields } from "@/lib/services/mentees/mentee-profile-fields"
@@ -60,7 +60,12 @@ export interface ProfileRepository {
   updateMentorFields(userId: string, fields: MentorEditableFields): Promise<void>
   /** Upsert: quem nunca preencheu dados acadêmicos não tem linha. */
   upsertMenteeFields(userId: string, fields: MenteeEditableFields): Promise<void>
+  /** Flags dos tours guiados. Perfil sem linha = nenhuma flag. */
+  findOnboardingFlags(userId: string): Promise<OnboardingFlags>
+  setOnboardingFlags(userId: string, flags: OnboardingFlags): Promise<void>
 }
+
+export type OnboardingFlags = Record<string, Json | undefined>
 
 export function createProfileRepository(db: SupabaseClient<Database>): ProfileRepository {
   return {
@@ -94,6 +99,21 @@ export function createProfileRepository(db: SupabaseClient<Database>): ProfileRe
         .from("mentee_profiles")
         .upsert({ user_id: userId, ...fields }, { onConflict: "user_id" })
       if (error) throw new ProfileRepositoryError("profile.upsertMenteeFields", error)
+    },
+
+    async findOnboardingFlags(userId) {
+      const { data, error } = await db.from("profiles").select("onboarding_flags").eq("id", userId).single()
+      if (error) {
+        if (error.code === "PGRST116") return {}
+        throw new ProfileRepositoryError("profile.findOnboardingFlags", error)
+      }
+      const flags = data?.onboarding_flags
+      return flags && typeof flags === "object" && !Array.isArray(flags) ? flags : {}
+    },
+
+    async setOnboardingFlags(userId, flags) {
+      const { error } = await db.from("profiles").update({ onboarding_flags: flags }).eq("id", userId)
+      if (error) throw new ProfileRepositoryError("profile.setOnboardingFlags", error)
     },
   }
 }
