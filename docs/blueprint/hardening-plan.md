@@ -226,4 +226,6 @@ formato nas respostas das rotas (testes existentes passam sem edição).
 
 | Data | Tarefa | PR/commit | Observações |
 |---|---|---|---|
-| | | | |
+| 2026-10-15 | 1 · pgTAP | PR #106 | Contratos de `profiles`, `mentor_public_stats` e `appointment_feedbacks`. Não rodam no CI (precisam de Docker). |
+| 2026-10-19 | 2 · Estatísticas no catálogo | `fix/catalog-public-stats` | `mentors_view` lê `mentor_public_stats`; mentor fora do catálogo cai no `mentor_stats` de antes. Aguardando aplicação da migration. |
+| | 3–6 | | Seguem pelas ondas em [`waves.md`](waves.md). |
