@@ -1,38 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
-
-export interface OrgDashboardMember {
-  userId: string
-  role: "admin" | "member"
-  status: "invited" | "requested" | "active"
-  /** Derived from user_roles - never a separate membership field (roadmap §6, Q1). */
-  platformRole: "mentor" | "mentee" | null
-  joinedAt: string
-  fullName: string | null
-  email: string | null
-  /** Sessions booked as a beneficiary (mentee_id match). */
-  sessionsBooked: number
-  /** Sessions given as an org mentor (mentor_id match). */
-  sessionsGiven: number
-  quizDone: boolean
-}
-
-export interface OrgDashboardImpact {
-  period: "all" | "30d" | "90d" | "1y"
-  totalSessionsCompleted: number
-  totalHoursCompleted: number
-  totalDiagnosticsDone: number
-  averageRating: number | null
-}
-
-export interface OrgDashboardSummary {
-  beneficiaries: number
-  mentors: number
-  pendingRequests: number
-  pendingInvites: number
-  sessionsBookedByBeneficiaries: number
-  sessionsGivenByOrgMentors: number
-  impact: OrgDashboardImpact
-}
+import type {
+  OrgDashboardMember,
+  OrgDashboardSummary,
+  OrgPeriod
+} from "@/lib/domain/organizations/organization.entity"
 
 export interface OrgDashboard {
   organization: Record<string, unknown>
@@ -50,7 +21,7 @@ export interface OrgDashboard {
 export async function getOrgDashboard(
   supabase: SupabaseClient,
   organizationId: string,
-  period: "all" | "30d" | "90d" | "1y" = "all"
+  period: OrgPeriod = "all"
 ): Promise<OrgDashboard | null> {
   const { data: organization, error: orgError } = await supabase
     .from("organizations" as any)
