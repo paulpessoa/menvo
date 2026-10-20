@@ -227,6 +227,11 @@ PATCH antes de mexer). O resto é baixo.
 - `retention` GET passou para a sessao (sem service_role); `retention/exempt` valida UUID, usa `assertAdmin`, grava auditoria (acao `user_status_changed` com `details.reason = "retention_exempt"`, falta um `AuditAction` proprio no `audit-logger`).
 - `overview`: fila de inativos pela sessao; `appointments` segue no client privilegiado, lazy, vindo de `lib/services/admin/ops.composition.ts` (agora com `loadAdminOverview` e `buildAdminRetentionService`). `getAdminOverview(db, getPrivilegedDb, now)` chama `assertAdmin`.
 - Novos: `lib/repositories/admin-ops.repository.ts`, `lib/schemas/admin.ts`, `lib/services/admin/retention.service.ts`. Proximos grupos da L2 somam neles e na composition.
+
+**L2-4 e L2-5 (feitos, sem migration).**
+- L2-4: `admin-appointments.service` recebe `AdminAppointmentsDeps` (sessao, `db()` lazy, mailer e calendar por port) e chama `assertAdmin` em cada funcao; `buildAdminAppointmentsDeps` em `ops.composition.ts`; as 3 rotas sem `service_role`.
+- L2-5: `feature-flags` com Zod (`lib/schemas/admin.ts`), `createAdminFeatureFlagsRepository`, `feature-flags.service.ts` (`assertAdmin`, auditoria em criar/ligar/apagar) e `buildAdminFeatureFlagsService`. Metodo segue `PUT` (nao PATCH). Erro de banco agora responde 500 generico; id inexistente 404; entrada invalida 400.
+- Pedido ao orquestrador: nenhum arquivo compartilhado editado.
 **L1-2 e L1-3 (feitos, sem migration).**
 - L1-2: `lib/schemas/admin-users.ts` (PATCH, query da lista com `limit` max 100, `verify` com UUID), `lib/domain/admin/user.entity.ts`; `admin.service.ts` apagado; `moderator` saiu do enum de `users/[id]`.
 - L1-3: `admin-users.repository.ts` (lista pela sessao; leitura de `cv_url` privilegiada), `lib/services/admin/users/users.service.ts` (`assertAdmin` primeiro) e `users.composition.ts` (primeiro `service_role` da L1 em composition). `users` GET fino, com teste de rota.
