@@ -68,7 +68,23 @@ export const emailSendTestBodySchema = z.object({
   template: z.string().min(1, "Template é obrigatório.")
 })
 
-export type InviteAudienceBody = z.infer<typeof inviteAudienceBodySchema>
+/** Body de `PATCH /api/admin/feedbacks`: decisão de moderação sobre uma avaliação. */
+export const feedbackModerationBodySchema = z.object({
+  feedbackId: z.string().uuid(),
+  status: z.enum(["approved", "rejected"]),
+  rejectionReason: z.string().trim().max(1000).nullish()
+})
+
+/** Query de `GET /api/admin/reports?since=`: data `YYYY-MM-DD`, padrão desde 2020. */
+export const reportsQuerySchema = z.object({
+  since: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .default("2020-01-01")
+})
+
+export type FeedbackModerationBody = z.infer<typeof feedbackModerationBodySchema>
+export type InviteAudienceBody =z.infer<typeof inviteAudienceBodySchema>
 export type InviteSendBody = z.infer<typeof inviteSendBodySchema>
 
 export type FeatureFlagCreateBody = z.infer<typeof featureFlagCreateBodySchema>

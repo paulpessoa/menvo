@@ -254,3 +254,6 @@ PATCH antes de mexer). O resto é baixo.
 **L1-8 (feito, sem migration).**
 - `lib/query/keys/admin-users.ts` (`adminUsersKeys`), `lib/query/effects/admin-users.ts` (`adminUsers.update|delete|verification.decide`), respostas em `lib/schemas/admin-users-responses.ts`, hooks em `hooks/admin-users/` (`useAdminUsers`, `useAdminUpdateUser`, `useAdminDeleteUser`, `useMentorVerifications`, `useDecideVerification`), sem uso ainda.
 - Pedido ao orquestrador: em `keys.ts` `import { adminUsersKeys } from "./keys/admin-users"` + `adminUsers: adminUsersKeys,`; em `effects.ts` `import { adminUsersEffects } from "./effects/admin-users"` + `...adminUsersEffects,`. A raiz `["mentors"]` esta fixa no effect (falta `qk.mentors.all`).
+**L2-8 (feito, sem migration).**
+- `feedbacks` (GET/PATCH), `reports`, `activity-logs` e `ai-usage` pela SESSAO (sem service_role): repositories em `admin-ops.repository.ts`, services com `assertAdmin` (`feedbacks.service.ts`, `admin-reports.service.ts`, `activity-logs.service.ts`, `ai-usage.service.ts`), Zod em `lib/schemas/admin.ts`, `buildAdminFeedbacksService` na composition. Sem `as any`.
+- PATCH de feedback audita (`bulk_action` com `details.reason = "feedback_moderation"`; falta `AuditAction` proprio) e id inexistente da 404; entrada invalida 400; erro de banco 500 fixo. Pedido ao orquestrador: nenhum arquivo compartilhado editado.
