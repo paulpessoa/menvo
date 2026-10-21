@@ -26,12 +26,9 @@ import { ChatInterface } from "@/components/ChatInterface"
 import { useFeatureFlag } from "@/lib/feature-flags"
 import { useAiQuota } from "@/hooks/useAiQuota"
 import { useOnboarding } from "@/hooks/useOnboarding"
-import {
-  communityService,
-  type CommunityProfile,
-} from "@/lib/services/community/community.service"
+import type { CommunityProfile } from "@/lib/schemas/community"
+import { useCommunityProfilesByIds } from "@/hooks/community/useCommunityProfilesByIds"
 import { searchCommunityAction } from "@/app/actions/community"
-import { mentorService } from "@/lib/services/mentors/mentors.service"
 import {
   Select,
   SelectContent,
@@ -74,6 +71,7 @@ export default function CommunityPage() {
   const [aiRecommendedProfiles, setAiRecommendedProfiles] = useState<CommunityProfile[]>([])
   const [aiLoading, setAiLoading] = useState(false)
   const { quota: aiQuota, setQuota: setAiQuota } = useAiQuota("match")
+  const { mutateAsync: fetchProfilesByIds } = useCommunityProfilesByIds()
 
 
   const { user, isMentor: authIsMentor, cachedRoles } = useAuth()
@@ -225,7 +223,7 @@ export default function CommunityPage() {
     setAiQuery(searchQuery)
 
     try {
-      const recommended = await communityService.getProfilesByIds(ids)
+      const recommended = await fetchProfilesByIds(ids)
       setAiRecommendedProfiles(recommended)
     } catch (err) {
       console.error("[CommunityPage] Erro ao carregar membros recomendados pela IA:", err)
