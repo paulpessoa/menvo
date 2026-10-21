@@ -1,11 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { MenvoLoader } from "@/components/ui/menvo-loader";
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/i18n/routing';
-import { mentorService } from '@/lib/services/mentors/mentors.service';
-import type { MentorProfile } from '@/lib/types/models/mentor';
+import { useMentor } from '@/hooks/mentors/useMentor';
 import BookingForm from '@/components/appointments/BookingForm';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,33 +15,8 @@ export default function BookAppointmentPage() {
     const router = useRouter();
     const mentorId = params.mentorId as string;
 
-    const [mentor, setMentor] = useState<MentorProfile | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchMentor = async () => {
-            try {
-                const mentorData = await mentorService.getMentorById(mentorId);
-
-                if (!mentorData) {
-                    setError('Mentor não encontrado');
-                    return;
-                }
-
-                setMentor(mentorData);
-            } catch (error) {
-                console.error('Error fetching mentor:', error);
-                setError('Mentor não encontrado');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (mentorId) {
-            fetchMentor();
-        }
-    }, [mentorId]);
+    const { data: mentor, isPending: loading, isError } = useMentor(mentorId);
+    const error = isError ? 'Mentor não encontrado' : null;
 
     const handleBookingSuccess = (appointmentId: string) => {
         toast.success('Agendamento criado com sucesso!');
@@ -107,7 +80,7 @@ export default function BookAppointmentPage() {
 
             {/* Booking Form */}
             <BookingForm
-                mentorId={mentor.id}
+                mentorId={mentor.id ?? mentorId}
                 mentorName={mentor.full_name || `${mentor.first_name} ${mentor.last_name}`}
                 onSuccess={handleBookingSuccess}
                 onCancel={handleCancel}

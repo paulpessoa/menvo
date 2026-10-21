@@ -44,6 +44,22 @@ describe("mentors repository", () => {
     expect(query.select).not.toHaveBeenCalled()
   })
 
+  it("fetches several mentors in one query with the directory filter", async () => {
+    const { client, query } = fakeClient({ data: [{ id: "a" }, { id: "b" }], error: null })
+    const result = await createMentorsRepository(client).findPublicByIds(["a", "b"])
+    expect(result).toHaveLength(2)
+    expect(client.from).toHaveBeenCalledTimes(1)
+    expect(query.eq).toHaveBeenCalledWith("verified", true)
+    expect(query.eq).toHaveBeenCalledWith("is_public", true)
+    expect(query.in).toHaveBeenCalledWith("id", ["a", "b"])
+  })
+
+  it("skips the query when there are no ids", async () => {
+    const { client, query } = fakeClient({ data: [], error: null })
+    expect(await createMentorsRepository(client).findPublicByIds([])).toEqual([])
+    expect(query.select).not.toHaveBeenCalled()
+  })
+
   it("wraps driver errors in RepositoryError", async () => {
     const { client } = fakeClient({ data: null, error: { message: "boom" } })
     await expect(createMentorsRepository(client).findPublicBySlugOrId("ana")).rejects.toBeInstanceOf(RepositoryError)

@@ -275,64 +275,6 @@ class MentorService {
     }
   }
 
-  async getMentorById(id: string): Promise<MentorProfile | null> {
-    const { data, error } = await this.supabase
-      .from("mentors_view")
-      .select(
-        `
-        id,
-        first_name,
-        last_name,
-        avatar_url,
-        bio,
-        job_title,
-        company,
-        location,
-        availability_status,
-        experience_years,
-        mentor_skills,
-        languages,
-        academic_level,
-        inclusive_tags,
-        average_rating,
-        total_sessions,
-        total_reviews
-      `
-      )
-      .eq("id", id)
-      .maybeSingle()
-
-    if (error) {
-      throw new Error(`Erro ao buscar mentor: ${error.message}`)
-    }
-
-    if (!data) return null
-
-    const row = data as unknown as MentorViewRow
-
-    return {
-      id: row.id || id,
-      first_name: row.first_name,
-      last_name: row.last_name,
-      avatar_url: row.avatar_url,
-      bio: row.bio,
-      job_title: row.job_title,
-      company: row.company,
-      location: row.location,
-      availability_status: (row.availability_status as MentorProfile["availability_status"]) || null,
-      availability: null,
-      experience_years: row.experience_years,
-      mentor_skills: row.mentor_skills,
-      languages: row.languages,
-      academic_level: row.academic_level,
-      inclusion_tags: row.inclusive_tags,
-      inclusive_tags: row.inclusive_tags,
-      average_rating: row.average_rating || 0,
-      total_sessions: row.total_sessions || 0,
-      total_reviews: row.total_reviews || 0
-    }
-  }
-
   /**
    * Busca mentores para o catálogo público com paginação e filtros.
    */
@@ -522,67 +464,6 @@ class MentorService {
 
     if (error) throw error
     return (data as any) || []
-  }
-
-  /**
-   * Busca os perfis de mentores favoritados pelo usuário.
-   */
-  async getFavoriteMentors(ids: string[]): Promise<any[]> {
-    if (!ids || ids.length === 0) return []
-    const { data, error } = await (this.supabase
-      .from("mentors_view") as any)
-      .select("id, full_name, avatar_url, job_title, company, average_rating, slug")
-      .in("id", ids)
-      .limit(4)
-
-    if (error) throw error
-    return data || []
-  }
-
-  /**
-   * Busca os perfis completos de mentores recomendados pela IA por seus IDs.
-   */
-  async getMentorsByIds(ids: string[]): Promise<any[]> {
-    // A IA às vezes "inventa" um mentor_id que não é o UUID real (ex: uma
-    // versão do nome tipo "nayane_prudencio"). Um único valor inválido faz
-    // o Postgres rejeitar a cláusula `.in()` inteira ("invalid input syntax
-    // for type uuid"), zerando os resultados de TODOS os IDs - inclusive os
-    // válidos. Filtramos aqui pra garantir que um ID alucinado nunca derrube
-    // os demais.
-    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-    const validIds = (ids || []).filter((id) => uuidPattern.test(id))
-    if (validIds.length === 0) return []
-    const { data, error } = await (this.supabase
-      .from("mentors_view") as any)
-      .select(`
-        id,
-        full_name,
-        avatar_url,
-        bio,
-        job_title,
-        company,
-        city,
-        state,
-        country,
-        languages,
-        mentorship_topics,
-        inclusive_tags,
-        expertise_areas,
-        availability_status,
-        average_rating,
-        total_reviews,
-        total_sessions,
-        experience_years,
-        slug,
-        created_at
-      `)
-      .in("id", validIds)
-
-    if (error) {
-      console.error("Error fetching mentors by IDs:", error)
-      return []
-    }
-    return data || []
   }
 }
 

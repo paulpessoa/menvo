@@ -10,10 +10,16 @@ const slot = { id: "s1", mentor_id: "m1" } as AvailabilitySlot
 /** Fakes em memória das duas interfaces; `broken` faz o método lançar. */
 function setup(opts: { mentor?: PublicMentor | null; broken?: "mentors" | "availability" } = {}) {
   const names: string[][] = []
+  const byIds: string[][] = []
   const mentors: MentorsRepository = {
     async findPublicBySlugOrId(slugOrId) {
       if (opts.broken === "mentors") throw new Error("db down")
       return slugOrId === "ana" ? (opts.mentor === undefined ? mentor : opts.mentor) : null
+    },
+    async findPublicByIds(ids) {
+      if (opts.broken === "mentors") throw new Error("db down")
+      byIds.push(ids)
+      return ids.map((id) => ({ ...mentor, id }))
     },
     async findApproachBySlugOrId(slugOrId) {
       if (opts.broken === "mentors") throw new Error("db down")
@@ -33,7 +39,7 @@ function setup(opts: { mentor?: PublicMentor | null; broken?: "mentors" | "avail
       return []
     },
   }
-  return { service: createMentorProfileService({ mentors, availability }), names }
+  return { service: createMentorProfileService({ mentors, availability }), names, byIds }
 }
 
 describe("mentor profile service", () => {
@@ -73,5 +79,18 @@ describe("mentor profile service", () => {
     await service.resolveSlugs([" Ana ", "Ana", "", ...many])
     expect(names[0][0]).toBe("Ana")
     expect(names[0]).toHaveLength(20)
+  })
+
+  it("lists mentors by id without repeating ids", async () => {
+    const { service, byIds } = setup()
+    const list = await service.listPublicMentors(["a", "b", "a"])
+    expect(list.map((m) => m.id)).toEqual(["a", "b"])
+    expect(byIds).toEqual([["a", "b"]])
+  })
+
+  it("lets database errors out of getPublicMentor and listPublicMentors", async () => {
+    const { service } = setup({ broken: "mentors" })
+    await expect(service.getPublicMentor("ana")).rejects.toThrow("db down")
+    await expect(service.listPublicMentors(["a"])).rejects.toThrow("db down")
   })
 })
