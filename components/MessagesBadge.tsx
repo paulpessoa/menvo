@@ -1,28 +1,29 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUnreadCount } from '@/hooks/chat/useUnreadCount';
+import { chatKeys } from '@/lib/query/keys/chat';
 import { Link } from '@/i18n/routing';
 import { MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/utils/supabase/client';
 import { useAuth } from '@/lib/auth';
-import { chatService } from '@/lib/services/chat/chat.service';
 
 export function MessagesBadge() {
     const { user, isAuthenticated } = useAuth();
-    const [unreadCount, setUnreadCount] = useState(0);
+    const unreadCount = useUnreadCount();
+    const queryClient = useQueryClient();
     const supabase = useMemo(() => createClient(), []);
 
-    const loadUnreadCount = useCallback(async () => {
+    // Realtime so avisa que algo mudou; quem conta e o servidor (GET /api/chat/unread-count).
+    const loadUnreadCount = useCallback(() => {
         if (!user?.id) return;
-        const count = await chatService.getUnreadCount(user.id);
-        setUnreadCount(count);
-    }, [user?.id]);
+        void queryClient.invalidateQueries({ queryKey: chatKeys.unreadCount(user.id) });
+    }, [user?.id, queryClient]);
 
     useEffect(() => {
         if (!isAuthenticated || !user?.id) return;
-
-        loadUnreadCount();
 
         // 3. Estratégia de Realtime Infalível:
         // Escutamos mudanças na tabela 'conversations' filtrando pelo ID do usuário.

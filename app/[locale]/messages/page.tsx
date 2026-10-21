@@ -1,6 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
+import { useQueryClient } from "@tanstack/react-query"
+import { useChatConversations } from "@/hooks/chat/useChatConversations"
+import { chatKeys } from "@/lib/query/keys/chat"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,7 +14,8 @@ import { useAuth } from "@/lib/auth"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ChatInterface } from "@/components/ChatInterface"
-import { chatService, type ChatConversationItem } from "@/lib/services/chat/chat.service"
+import { chatService } from "@/lib/services/chat/chat.service"
+import type { ChatConversationItem } from "@/lib/schemas/chat"
 import { useTranslations } from "next-intl"
 import { useFeatureFlags } from "@/lib/feature-flags"
 import { useRouter } from "@/i18n/routing"
@@ -27,9 +31,10 @@ type Conversation = ChatConversationItem
 function MessagesContent() {
   const t = useTranslations("messages")
   const { user, loading } = useAuth()
-  const [conversations, setConversations] = useState<Conversation[]>([])
+  const queryClient = useQueryClient()
+  const { data, isLoading } =useChatConversations()
+  const conversations: Conversation[] = data ?? []
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [archivedIds, setArchivedIds] = useState<Set<string>>(new Set())
 
@@ -57,35 +62,14 @@ function MessagesContent() {
     localStorage.setItem('menvo_archived_chats', JSON.stringify(Array.from(newSet)))
   }
 
-  const loadConversations = useCallback(async (isInitial = true) => {
-    if (!user) return
-
-    if (isInitial) setIsLoading(true)
-    try {
-      const items = await chatService.getConversations(user.id)
-      setConversations(items)
-    } catch (error) {
-      console.error("[Messages] Erro ao carregar conversas:", error)
-    } finally {
-      if (isInitial) setIsLoading(false)
-    }
-  }, [user])
-
-  useEffect(() => {
-    let mounted = true
-    if (user && mounted) {
-      loadConversations()
-    }
-    return () => { mounted = false }
-  }, [user, loadConversations])
-
+  // Realtime so avisa que algo mudou; quem busca e o servidor (GET /api/chat/conversations).
   useEffect(() => {
     if (!user) return
     const unsubscribe = chatService.subscribeToUserChats(user.id, () => {
-      loadConversations(false)
+      void queryClient.invalidateQueries({ queryKey: chatKeys.conversations(user.id) })
     })
     return unsubscribe
-  }, [user, loadConversations])
+  }, [user, queryClient])
 
   const filteredConversations = conversations
     .filter(conv => !archivedIds.has(conv.id))
