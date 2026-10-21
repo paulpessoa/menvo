@@ -77,5 +77,7 @@ export const adminVerifyBodySchema = z.object({
   notifyEmail: z.boolean().optional(),
 })
 
-export type AdminUsersQuery = z.infer<typeof adminUsersQuerySchema>
+/** Corpo do PATCH já validado (campos editáveis + papéis). */
+export type AdminUserPatchBody = z.infer<typeof adminUserPatchBodySchema>
+export type AdminUsersQuery= z.infer<typeof adminUsersQuerySchema>
 export type AdminVerifyBody = z.infer<typeof adminVerifyBodySchema>

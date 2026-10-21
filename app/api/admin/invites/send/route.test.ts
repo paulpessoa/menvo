@@ -14,6 +14,11 @@ jest.mock("@/lib/utils/supabase/service-role", () => ({ createServiceRoleClient:
 jest.mock("@/lib/services/invites/invite-token.service", () => ({ createInviteToken: jest.fn() }))
 jest.mock("@/lib/email/brevo", () => ({ sendReengagementInvite: jest.fn() }))
 jest.mock("@/lib/audit-logger", () => ({ logAdminAction: jest.fn().mockResolvedValue(undefined) }))
+// The service confirms the actor again with `is_admin()` through this session.
+const mockRpc = jest.fn()
+jest.mock("@/lib/utils/supabase/server", () => ({
+  createClient: jest.fn(async () => ({ rpc: mockRpc }))
+}))
 
 const mockRequireAdmin = requireAdmin as jest.MockedFunction<typeof requireAdmin>
 
@@ -30,6 +35,7 @@ describe("POST /api/admin/invites/send", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockRpc.mockResolvedValue({ data: true, error: null })
     mockRequireAdmin.mockResolvedValue({ ok: true, admin: { userId: "admin-1", role: "admin" } })
     ;(createInviteToken as jest.Mock).mockResolvedValue({ token: "plaintext-token", inviteId: "invite-1" })
     ;(sendReengagementInvite as jest.Mock).mockResolvedValue({ success: true })
@@ -38,8 +44,10 @@ describe("POST /api/admin/invites/send", () => {
     mockSupabase = {
       from: jest.fn().mockReturnValue({
         select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            maybeSingle: jest.fn().mockResolvedValue({ data: { id: "u1", email: "u1@example.com", full_name: "U1" }, error: null })
+          // One `.in()` read for the whole batch (no per-user lookup).
+          in: jest.fn().mockResolvedValue({
+            data: [{ id: "00000000-0000-0000-0000-000000000001", email: "u1@example.com", full_name: "U1" }],
+            error: null
           })
         }),
         upsert
@@ -52,6 +60,34 @@ describe("POST /api/admin/invites/send", () => {
     const userIds = Array.from({ length: 26 }, (_, i) => `00000000-0000-0000-0000-${String(i).padStart(12, "0")}`)
     const res = await POST(makeRequest({ campaign: "c1", subject: "s", body: "b", userIds }))
     expect(res.status).toBe(400)
+  })
+
+  it("rejects when is_admin() does not confirm, before any privileged work", async () => {
+    mockRpc.mockResolvedValue({ data: false, error: null })
+    const res = await POST(makeRequest({
+      campaign: "c1",
+      subject: "s",
+      body: "b",
+      userIds: ["00000000-0000-0000-0000-000000000001"]
+    }))
+    expect(res.status).toBe(403)
+    expect(createServiceRoleClient).not.toHaveBeenCalled()
+    expect(createInviteToken).not.toHaveBeenCalled()
+    expect(sendReengagementInvite).not.toHaveBeenCalled()
+  })
+
+  it("hides database messages of a failed token behind a fixed text", async () => {
+    ;(createInviteToken as jest.Mock).mockRejectedValue(new Error('duplicate key value violates "x_pkey"'))
+    jest.spyOn(console, "error").mockImplementation(() => undefined)
+    const res = await POST(makeRequest({
+      campaign: "c1",
+      subject: "s",
+      body: "b",
+      userIds: ["00000000-0000-0000-0000-000000000001"]
+    }))
+    const json = await res.json()
+    expect(json.failed).toBe(1)
+    expect(JSON.stringify(json)).not.toContain("duplicate key")
   })
 
   it("sends to every user in the batch and reports per-user success", async () => {

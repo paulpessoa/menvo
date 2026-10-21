@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { resolveAudience, fetchAllRows } from "./audience.service"
+import { resolveAudience as resolveAudienceWithDb, fetchAllRows } from "./audience.service"
 import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
 import { hashEmail } from "@/lib/services/invites/suppression.service"
 
@@ -9,6 +9,11 @@ jest.mock("@/lib/utils/supabase/service-role", () => ({
   createServiceRoleClient: jest.fn(),
   ensureServerSide: jest.fn()
 }))
+
+// The service receives the privileged client from the caller (the admin
+// composition); here the mocked factory stands in for that composition.
+const resolveAudience = (params: Parameters<typeof resolveAudienceWithDb>[0]) =>
+  resolveAudienceWithDb(params, (createServiceRoleClient as jest.Mock)())
 
 describe("resolveAudience", () => {
   const profiles = [
