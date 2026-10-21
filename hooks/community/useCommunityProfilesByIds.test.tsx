@@ -11,7 +11,10 @@ const profile = {
 
 function wrapper() {
   const qc = new QueryClient({ defaultOptions: { mutations: { retry: false } } })
-  return ({ children }: { children: ReactNode }) => <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  function Wrapper({ children }: { children: ReactNode }) {
+    return <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+  }
+  return Wrapper
 }
 
 describe("useCommunityProfilesByIds", () => {

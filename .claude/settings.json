@@ -3,5 +3,10 @@
     "commit": "",
     "pr": "",
     "sessionUrl": false
+  },
+  "permissions": {
+    "allow": [
+      "Bash(node *probe.mjs*)"
+    ]
   }
 }
