@@ -13,6 +13,9 @@ import "./paths/profile"
 import "./paths/me"
 import "./paths/org"
 import "./paths/appointments"
+import "./paths/chat"
+import "./paths/community"
+import "./paths/reports"
 
 export function buildOpenApiDocument() {
   return new OpenApiGeneratorV31(registry.definitions).generateDocument({
@@ -31,6 +34,9 @@ export function buildOpenApiDocument() {
       { name: "me", description: "Favoritos e notificações do próprio usuário" },
       { name: "org", description: "Organizações parceiras: dashboard do admin e vínculo de cada pessoa" },
       { name: "appointments", description: "Pedidos, confirmação, cancelamento, conclusão e avaliação de sessões de mentoria" },
+      { name: "chat", description: "Caixa de entrada do chat: conversas e contagem de não lidas" },
+      { name: "community", description: "Perfis do mural da comunidade" },
+      { name: "reports", description: "Denúncias e anexos de evidência" },
     ],
   })
 }
