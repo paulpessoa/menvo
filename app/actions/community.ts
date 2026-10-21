@@ -1,8 +1,14 @@
 "use server"
 
 import { createClient } from "@/lib/utils/supabase/server"
-import { communityService, type GetCommunityProfilesParams, type GetCommunityProfilesResult } from "@/lib/services/community/community.service"
+import type { GetCommunityProfilesParams, GetCommunityProfilesResult } from "@/lib/services/community/community.service"
+import { buildCommunityService } from "@/lib/services/community/community.composition"
 
+/**
+ * Busca do mural para mentor/admin. Usa o client de servidor (cookie) via
+ * service: antes o service usava o client anônimo do browser e o RLS devolvia
+ * o mural vazio.
+ */
 export async function searchCommunityAction(
   params: GetCommunityProfilesParams
 ): Promise<GetCommunityProfilesResult> {
@@ -29,8 +35,7 @@ export async function searchCommunityAction(
       throw new Error("Forbidden")
     }
 
-    const result = await communityService.getCommunityProfiles(supabase, params)
-    return result
+    return await buildCommunityService(supabase).getCommunityProfiles(params)
   } catch (error: any) {
     console.error("[searchCommunityAction Error]:", error)
     throw new Error("Failed to fetch community profiles")
