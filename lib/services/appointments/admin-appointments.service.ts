@@ -1,25 +1,32 @@
 import { randomUUID } from "crypto"
 import type { SupabaseClient } from "@supabase/supabase-js"
+import type { Database } from "@/lib/types/supabase"
 import { ACTION_TOKEN_TTL_MS } from "@/lib/domain/appointments/appointment.entity"
 import { isPlaceholderName } from "@/lib/utils/person-name"
-import {
-  sendAppointmentCancellation,
-  sendAppointmentConfirmation,
-  sendAppointmentRequest
-} from "@/lib/email/brevo"
-import {
-  deleteCalendarEvent,
-  isGoogleCalendarConfigured
-} from "@/lib/services/mentorship/google-calendar.service"
+import type { AppointmentMailer } from "@/lib/ports/appointment-mailer"
+import type { AppointmentCalendar } from "@/lib/ports/appointment-calendar"
+import { AdminForbiddenError, assertAdmin } from "@/lib/services/admin/assert-admin"
 
 /**
  * Gestão de sessões de mentoria pela equipe (/dashboard/admin/appointments).
  *
  * Toda a regra fica aqui; as rotas em app/api/admin/appointments/** só
  * autenticam (requireAdmin), validam o corpo e chamam estas funções.
- * O cliente recebido precisa ser o de service role: ele lê e altera sessões
- * de qualquer usuário, então NUNCA chame isto sem requireAdmin antes.
+ * O client privilegiado (`service_role`) lê e altera sessões de qualquer
+ * usuário e não sabe quem chama; por isso cada função começa com `assertAdmin`
+ * pela sessão e só então pede o client a `deps.db()` (lazy, vindo da
+ * composition, ADR 0009). E-mail e Calendar entram por port, não por import.
  */
+
+/** Dependências do painel de sessões, montadas em `ops.composition.ts`. */
+export interface AdminAppointmentsDeps {
+  /** Client da sessão de quem chama (nunca o `service_role`), para o `assertAdmin`. */
+  sessionDb: SupabaseClient<Database>
+  /** Lazy: o client privilegiado só nasce depois do `assertAdmin`. */
+  db: () => SupabaseClient<Database>
+  mailer: Pick<AppointmentMailer, "sendRequest" | "sendConfirmation" | "sendCancellation">
+  calendar: Pick<AppointmentCalendar, "availability" | "deleteEvent">
+}
 
 /** Acima disso um pedido pendente é destacado como "sem resposta". */
 export const PENDING_STALE_AFTER_HOURS = 48
@@ -309,10 +316,11 @@ export interface ListAdminAppointmentsOptions {
 }
 
 export async function listAdminAppointments(
-  client: AnyClient,
+  deps: AdminAppointmentsDeps,
   { status, q, now = new Date() }: ListAdminAppointmentsOptions = {}
 ): Promise<AdminAppointmentsResult> {
-  const { data, error } = await client
+  await assertAdmin(deps.sessionDb)
+  const { data, error } = await deps.db()
     .from("appointments")
     .select(LIST_SELECT)
     .order("created_at", { ascending: false })
@@ -369,10 +377,12 @@ async function fetchForAction(client: AnyClient, id: string): Promise<Appointmen
 
 /** Reenvia ao mentor o e-mail com o botão "Confirmar Agendamento". */
 export async function resendMentorRequest(
-  client: AnyClient,
+  deps: AdminAppointmentsDeps,
   id: string,
   now: Date = new Date()
 ): Promise<{ sentTo: string; tokenRenewed: boolean }> {
+  await assertAdmin(deps.sessionDb)
+  const client = deps.db()
   const row = await fetchForAction(client, id)
 
   if (row.status !== "pending") {
@@ -427,7 +437,7 @@ export async function resendMentorRequest(
     }
   }
 
-  await sendAppointmentRequest({
+  await deps.mailer.sendRequest({
     mentorEmail: mentor.email,
     mentorName: mentor.full_name?.trim() || "Mentor",
     menteeName: mentee?.full_name?.trim() || mentee?.email || "Mentorado",
@@ -441,11 +451,12 @@ export async function resendMentorRequest(
 
 /** Reenvia a confirmação (com link do Meet e do calendário) para mentor e mentorado. */
 export async function resendConfirmation(
-  client: AnyClient,
+  deps: AdminAppointmentsDeps,
   id: string,
   now: Date = new Date()
 ): Promise<{ sentTo: string[] }> {
-  const row = await fetchForAction(client, id)
+  await assertAdmin(deps.sessionDb)
+  const row = await fetchForAction(deps.db(), id)
 
   if (row.status !== "confirmed") {
     throw new AdminAppointmentError(
@@ -468,7 +479,7 @@ export async function resendConfirmation(
     )
   }
 
-  await sendAppointmentConfirmation({
+  await deps.mailer.sendConfirmation({
     mentorEmail: mentor.email,
     menteeEmail: mentee.email,
     mentorName: mentor.full_name?.trim() || "Mentor",
@@ -496,12 +507,14 @@ export interface AdminCancelResult {
  * Google Calendar para o convite sumir da agenda de todos.
  */
 export async function cancelAppointmentAsAdmin(
-  client: AnyClient,
+  deps: AdminAppointmentsDeps,
   id: string,
   adminUserId: string,
   reason: string,
   now: Date = new Date()
 ): Promise<AdminCancelResult> {
+  await assertAdmin(deps.sessionDb)
+  const client = deps.db()
   const row = await fetchForAction(client, id)
 
   if (row.status !== "pending" && row.status !== "confirmed") {
@@ -540,9 +553,9 @@ export async function cancelAppointmentAsAdmin(
   }
 
   let calendarEventRemoved: boolean | null = null
-  if (row.google_event_id && isGoogleCalendarConfigured()) {
+  if (row.google_event_id && (await deps.calendar.availability()).configured) {
     try {
-      await deleteCalendarEvent(adminUserId, row.google_event_id)
+      await deps.calendar.deleteEvent(adminUserId, row.google_event_id)
       calendarEventRemoved = true
     } catch (calendarError) {
       console.error("[ADMIN CANCEL] Falha ao remover evento do Google Calendar:", calendarError)
@@ -558,7 +571,7 @@ export async function cancelAppointmentAsAdmin(
   const send = async (recipient: PersonRow | null, recipientName: string, otherName: string) => {
     if (!recipient?.email) return false
     try {
-      await sendAppointmentCancellation({
+      await deps.mailer.sendCancellation({
         recipientEmail: recipient.email,
         recipientName,
         otherPersonName: otherName,
@@ -589,6 +602,9 @@ export function toAdminErrorResponse(error: unknown): {
   body: { error: string; code: string }
   status: number
 } {
+  if (error instanceof AdminForbiddenError) {
+    return { body: { error: error.message, code: error.code }, status: error.status }
+  }
   if (error instanceof AdminAppointmentError) {
     return { body: { error: error.message, code: error.code }, status: error.status }
   }

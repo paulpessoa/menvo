@@ -1,24 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
+import type { Database } from "@/lib/types/supabase"
+import { createAdminActivityLogsRepository } from "@/lib/repositories/admin-ops.repository"
+import { assertAdmin } from "./assert-admin"
 import type { ActivityLog, ActivityLogsPage } from "./activity-logs.types"
 
 const PAGE_SIZE = 50
-
-interface ActivityRow {
-  id: string
-  created_at: string
-  actor_id: string | null
-  subject_user_id: string | null
-  table_name: string
-  operation: "INSERT" | "UPDATE" | "DELETE"
-  record_id: string | null
-  changes: Record<string, unknown>
-}
-
-interface PersonRow {
-  id: string
-  full_name: string | null
-  email: string | null
-}
 
 /** Strips PostgREST filter syntax so user text can't break out of `.or()`. */
 function sanitizeTerm(term: string): string {
@@ -28,54 +14,32 @@ function sanitizeTerm(term: string): string {
 /**
  * Lists the user-activity trail, newest first. Search matches the changed
  * fields/values and, via one extra profiles lookup, the name or e-mail of
- * whoever did the change or whose data changed. Runs on the caller's
- * (admin) client, so RLS on `activity_logs` stays the real gate.
+ * whoever did the change or whose data changed. Confirms the caller is an
+ * admin first, then runs on that (session) client, so RLS on `activity_logs`
+ * stays the real gate.
+ *
+ * @throws {AdminForbiddenError} when the caller is not an admin.
  */
 export async function listActivityLogs(
-  supabase: SupabaseClient,
+  db: SupabaseClient<Database>,
   params: { search: string; table?: string; page: number }
 ): Promise<ActivityLogsPage> {
-  const term = sanitizeTerm(params.search)
-  const from = (params.page - 1) * PAGE_SIZE
+  await assertAdmin(db)
+  const repo = createAdminActivityLogsRepository(db)
 
-  let query = supabase
-    .from("activity_logs")
-    .select("id, created_at, actor_id, subject_user_id, table_name, operation, record_id, changes", {
-      count: "exact"
-    })
-    .order("created_at", { ascending: false })
-    .range(from, from + PAGE_SIZE - 1)
+  const { rows, total } = await repo.search({
+    term: sanitizeTerm(params.search),
+    table: params.table,
+    from: (params.page - 1) * PAGE_SIZE,
+    pageSize: PAGE_SIZE
+  })
 
-  if (params.table) query = query.eq("table_name", params.table)
-
-  if (term) {
-    const { data: people } = await supabase
-      .from("profiles")
-      .select("id")
-      .or(`full_name.ilike.%${term}%,email.ilike.%${term}%`)
-      .limit(50)
-    const ids = (people ?? []).map(p => p.id as string)
-    const filters = [`search_text.ilike.%${term.toLowerCase()}%`]
-    if (ids.length > 0) {
-      filters.push(`subject_user_id.in.(${ids.join(",")})`, `actor_id.in.(${ids.join(",")})`)
-    }
-    query = query.or(filters.join(","))
-  }
-
-  const { data, count, error } = await query.returns<ActivityRow[]>()
-  if (error) throw error
-
-  const rows = data ?? []
-  const personIds = [...new Set(rows.flatMap(r => [r.actor_id, r.subject_user_id]).filter((id): id is string => !!id))]
-  const people = new Map<string, PersonRow>()
-  if (personIds.length > 0) {
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, full_name, email")
-      .in("id", personIds)
-      .returns<PersonRow[]>()
-    for (const p of profiles ?? []) people.set(p.id, p)
-  }
+  const personIds = [
+    ...new Set(rows.flatMap(r => [r.actor_id, r.subject_user_id]).filter((id): id is string => !!id))
+  ]
+  const people = new Map((await repo.listPeople(personIds)).map(p => [p.id, p]))
+  const person = (id: string | null) =>
+    id ? (people.get(id) ?? { id, full_name: null, email: null }) : null
 
   const logs: ActivityLog[] = rows.map(r => ({
     id: r.id,
@@ -84,11 +48,9 @@ export async function listActivityLogs(
     operation: r.operation,
     record_id: r.record_id,
     changes: r.changes,
-    actor: r.actor_id ? (people.get(r.actor_id) ?? { id: r.actor_id, full_name: null, email: null }) : null,
-    subject: r.subject_user_id
-      ? (people.get(r.subject_user_id) ?? { id: r.subject_user_id, full_name: null, email: null })
-      : null
+    actor: person(r.actor_id),
+    subject: person(r.subject_user_id)
   }))
 
-  return { logs, total: count ?? 0, page: params.page, pageSize: PAGE_SIZE }
+  return { logs, total, page: params.page, pageSize: PAGE_SIZE }
 }

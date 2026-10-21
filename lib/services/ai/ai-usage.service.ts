@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { z } from "zod"
 import type { Database } from "@/lib/types/supabase"
+import { createAdminAiUsageRepository } from "@/lib/repositories/admin-ops.repository"
+import { assertAdmin } from "@/lib/services/admin/assert-admin"
 
 const num = z.coerce.number().nullable().transform((v) => v ?? 0)
 
@@ -39,38 +41,28 @@ export interface AiUsageReport {
 }
 
 /**
- * Monthly AI cost report for the admin panel. Reads the aggregated views
- * (`security_invoker`, so RLS decides who sees what - only admins see every
- * user). Aggregation lives in SQL because PostgREST aggregates are disabled.
+ * Monthly AI cost report for the admin panel. Confirms the caller is an admin
+ * first, then reads the aggregated views through the repository (they are
+ * `security_invoker`, so RLS still decides who sees what). Aggregation lives
+ * in SQL because PostgREST aggregates are disabled.
  *
  * @param month First day of the month, `YYYY-MM-01`.
+ * @throws {AdminForbiddenError} when the caller is not an admin.
  */
 export async function getAiUsageReport(
   supabase: SupabaseClient<Database>,
   month: string
 ): Promise<AiUsageReport> {
-  const [models, users, budget] = await Promise.all([
-    supabase.from("ai_usage_monthly").select("*").eq("month", month).order("cost_usd", { ascending: false }),
-    supabase
-      .from("ai_usage_by_user_monthly")
-      .select("user_id, full_name, calls, cost_usd")
-      .eq("month", month)
-      .order("cost_usd", { ascending: false })
-      .limit(20),
-    supabase
-      .from("ai_budget")
-      .select("limit_usd")
-      .lte("month", month)
-      .order("month", { ascending: false })
-      .limit(1)
-      .maybeSingle()
+  await assertAdmin(supabase)
+  const repo = createAdminAiUsageRepository(supabase)
+  const [models, users, budgetUsd] = await Promise.all([
+    repo.listByModel(month),
+    repo.listTopUsers(month),
+    repo.getBudgetLimit(month)
   ])
-  if (models.error) throw models.error
-  if (users.error) throw users.error
-  if (budget.error) throw budget.error
 
-  const byModel = z.array(byModelSchema).parse(models.data)
-  const topUsers = z.array(byUserSchema).parse(users.data)
+  const byModel = z.array(byModelSchema).parse(models)
+  const topUsers = z.array(byUserSchema).parse(users)
 
   const totals = byModel.reduce(
     (acc, r) => ({
@@ -83,6 +75,5 @@ export async function getAiUsageReport(
     { costUsd: 0, calls: 0, errors: 0, fallbacks: 0, unpricedCalls: 0 }
   )
 
-  const budgetUsd = budget.data ? Number(budget.data.limit_usd) : null
   return { month, budgetUsd, totals, byModel, topUsers }
 }

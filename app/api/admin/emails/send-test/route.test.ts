@@ -15,11 +15,18 @@ jest.mock('@/lib/auth/require-admin', () => ({
   requireAdmin: jest.fn()
 }));
 
+// The service confirms the actor again with `is_admin()` through this session.
+const mockRpc = jest.fn();
+jest.mock('@/lib/utils/supabase/server', () => ({
+  createClient: jest.fn(async () => ({ rpc: mockRpc }))
+}));
+
 const mockRequireAdmin = requireAdmin as jest.MockedFunction<typeof requireAdmin>;
 
 describe('POST /api/admin/emails/send-test', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockRpc.mockResolvedValue({ data: true, error: null });
     mockRequireAdmin.mockResolvedValue({
       ok: true,
       admin: { userId: 'admin-uuid', role: 'admin' }
@@ -31,6 +38,19 @@ describe('POST /api/admin/emails/send-test', () => {
       ok: false,
       response: NextResponse.json({ error: 'Acesso negado' }, { status: 403 })
     });
+
+    const req = new NextRequest('http://localhost:3000/api/admin/emails/send-test', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'valid@menvo.com.br', template: 'confirmation' })
+    });
+    const res = await POST(req);
+
+    expect(res.status).toBe(403);
+    expect(brevoModule.sendTestEmail).not.toHaveBeenCalled();
+  });
+
+  it('should return 403 and send nothing when is_admin() does not confirm', async () => {
+    mockRpc.mockResolvedValue({ data: false, error: null });
 
     const req = new NextRequest('http://localhost:3000/api/admin/emails/send-test', {
       method: 'POST',

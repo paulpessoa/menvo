@@ -31,17 +31,23 @@ function hashToken(token: string): string {
  * Rotating (`resend: true`) also clears `response`/`opened_at` so someone
  * who already responded can be re-invited for a later campaign wave, or
  * get a fresh link after their first one expired.
+ *
+ * `supabase` is the privileged client. The admin path passes the one built by
+ * the admin composition (after `assertAdmin`); the retention cron, which has no
+ * admin session, keeps the default.
  */
-export async function createInviteToken(params: {
-  userId: string
-  campaign: string
-  subject: string
-  /** Admin who triggered the send, or `null` for a system-generated e-mail (e.g. the retention cron's warnings). */
-  sentBy: string | null
-  resend?: boolean
-}): Promise<{ token: string; inviteId: string }> {
+export async function createInviteToken(
+  params: {
+    userId: string
+    campaign: string
+    subject: string
+    /** Admin who triggered the send, or `null` for a system-generated e-mail (e.g. the retention cron's warnings). */
+    sentBy: string | null
+    resend?: boolean
+  },
+  supabase: ReturnType<typeof createServiceRoleClient> = createServiceRoleClient()
+): Promise<{ token: string; inviteId: string }> {
   ensureServerSide()
-  const supabase = createServiceRoleClient()
 
   const token = randomBytes(TOKEN_BYTES).toString("base64url")
   const tokenHash = hashToken(token)
