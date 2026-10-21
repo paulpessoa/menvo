@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useQueryClient } from "@tanstack/react-query"
 import { useChatConversations } from "@/hooks/chat/useChatConversations"
+import { useMediaQuery } from "@/hooks/useMediaQuery"
 import { chatKeys } from "@/lib/query/keys/chat"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -35,6 +36,8 @@ function MessagesContent() {
   const { data, isLoading } =useChatConversations()
   const conversations: Conversation[] = data ?? []
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
+  // Uma copia so do ChatInterface: duas abririam o mesmo canal realtime e o Supabase recusa a segunda.
+  const isDesktop = useMediaQuery("(min-width: 768px)")
   const [searchTerm, setSearchTerm] = useState('')
   const [archivedIds, setArchivedIds] = useState<Set<string>>(new Set())
 
@@ -239,7 +242,7 @@ function MessagesContent() {
 
         {/* Main Chat Area */}
         <div className="hidden md:flex flex-1 flex-col bg-white overflow-hidden">
-          {selectedConversation ? (
+          {selectedConversation && isDesktop ? (
             <ChatInterface
               key={selectedConversation.id}
               mentorId={selectedConversation.other_user.id}
@@ -280,7 +283,7 @@ function MessagesContent() {
         </div>
 
         {/* Mobile Chat Fullscreen */}
-        {selectedConversation && (
+        {selectedConversation && !isDesktop && (
           <div className="md:hidden fixed inset-0 bg-background z-50 flex flex-col">
             <div className="p-3 border-b flex items-center justify-between gap-3 bg-white">
               <div className="flex items-center gap-3">
