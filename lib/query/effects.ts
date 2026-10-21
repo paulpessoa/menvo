@@ -12,6 +12,7 @@
 import type { QueryClient } from "@tanstack/react-query"
 import { adminUsersEffects } from "./effects/admin-users"
 import { appointmentsEffects } from "./effects/appointments"
+import { chatEffects } from "./effects/chat"
 import { meEffects } from "./effects/me"
 import { orgEffects } from "./effects/org"
 import { profileEffects } from "./effects/profile"
@@ -27,6 +28,7 @@ export const effects = {
   ...orgEffects,
   ...appointmentsEffects,
   ...adminUsersEffects,
+  ...chatEffects,
 } satisfies Record<string, (ctx: never) => Keys>
 
 export function runEffects(qc: QueryClient, keys: Keys) {

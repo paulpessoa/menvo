@@ -13,6 +13,8 @@
  */
 import { adminUsersKeys } from "./keys/admin-users"
 import { appointmentsKeys } from "./keys/appointments"
+import { chatKeys } from "./keys/chat"
+import { communityKeys } from "./keys/community"
 import { meKeys } from "./keys/me"
 import { mentorsKeys } from "./keys/mentors"
 import { orgKeys } from "./keys/org"
@@ -27,4 +29,6 @@ export const qk = {
   org: orgKeys,
   appointments: appointmentsKeys,
   adminUsers: adminUsersKeys,
+  chat: chatKeys,
+  community: communityKeys,
 } as const
