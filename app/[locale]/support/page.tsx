@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useAuth } from "@/lib/auth"
 import { ShieldAlert, Info, UploadCloud, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,12 +8,12 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
-import { createBrowserClient } from "@supabase/ssr"
+import { useSubmitReport } from "@/hooks/reports/useSubmitReport"
 
 export default function SupportPage() {
-  const { user } = useAuth()
   const { toast } = useToast()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const submitReport = useSubmitReport()
+  const isSubmitting = submitReport.isPending
   const [file, setFile] = useState<File | null>(null)
   
   const [formData, setFormData] = useState({
@@ -44,44 +43,13 @@ export default function SupportPage() {
       return
     }
 
-    setIsSubmitting(true)
     try {
-      let uploadedPaths: string[] = []
-      
-      // Upload evidence if present
-      if (file && user) {
-        // Use browser client directly for storage upload
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-        const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey)
-        
-        const fileExt = file.name.split('.').pop()
-        const fileName = `${Date.now()}_evidence.${fileExt}`
-        const filePath = `${user.id}/${fileName}`
-
-        const { error: uploadError } = await supabase.storage
-          .from("reports_evidence")
-          .upload(filePath, file)
-
-        if (uploadError) {
-          throw new Error("Erro ao enviar anexo de evidência.")
-        }
-        uploadedPaths.push(filePath)
-      }
-
-      // Submit Report
-      const res = await fetch("/api/reports", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category: formData.category,
-          description: formData.description,
-          reported_email: formData.reported_email,
-          evidence_paths: uploadedPaths
-        })
+      await submitReport.mutateAsync({
+        category: formData.category,
+        description: formData.description,
+        reported_email: formData.reported_email,
+        file,
       })
-
-      if (!res.ok) throw new Error("Erro ao enviar denúncia.")
 
       toast({
         title: "Denúncia registrada",
@@ -103,8 +71,6 @@ export default function SupportPage() {
         description: error instanceof Error ? error.message : "Erro desconhecido.",
         variant: "destructive"
       })
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
@@ -165,7 +131,8 @@ export default function SupportPage() {
                 Envie prints de tela, áudios ou documentos que comprovem a denúncia.
               </p>
               <Input 
-                type="file" 
+                type="file"
+                accept="image/jpeg,image/png,image/webp,application/pdf"
                 className="max-w-[250px]"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
               />
