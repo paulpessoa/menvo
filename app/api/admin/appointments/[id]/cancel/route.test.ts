@@ -12,7 +12,8 @@ import {
 
 jest.mock("@/lib/auth/require-admin", () => ({ requireAdmin: jest.fn() }))
 jest.mock("@/lib/audit-logger", () => ({ logAdminAction: jest.fn() }))
-jest.mock("@/lib/utils/supabase/service-role", () => ({ createServiceRoleClient: jest.fn(() => ({ fake: true })) }))
+jest.mock("@/lib/utils/supabase/server", () => ({ createClient: jest.fn(async () => ({ session: true })) }))
+jest.mock("@/lib/services/admin/ops.composition", () => ({ buildAdminAppointmentsDeps: jest.fn(() => ({ fake: true })) }))
 jest.mock("@/lib/services/appointments/admin-appointments.service", () => ({
   ...jest.requireActual("@/lib/services/appointments/admin-appointments.service"),
   cancelAppointmentAsAdmin: jest.fn()

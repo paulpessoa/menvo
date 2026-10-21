@@ -1,93 +1,48 @@
 import { createClient } from "@/lib/utils/supabase/server"
-import { NextRequest, NextResponse } from "next/server"
-import {
-  errorResponse,
-  handleApiError,
-  successResponse
-} from "@/lib/api/error-handler"
-import { sendMentorNewReviewNotification } from "@/lib/email/brevo"
+import { NextRequest } from "next/server"
+import { errorResponse, successResponse } from "@/lib/api/error-handler"
 import { requireAdmin } from "@/lib/auth/require-admin"
+import { feedbackModerationBodySchema } from "@/lib/schemas/admin"
+import { adminForbiddenResponse } from "@/lib/services/admin/assert-admin"
+import { FeedbackNotFoundError } from "@/lib/services/admin/feedbacks.service"
+import { buildAdminFeedbacksService } from "@/lib/services/admin/ops.composition"
 
-/**
- * API para Gestão e Moderação de Feedbacks (Admin)
- */
+/** Traduz o erro do service para a resposta; erro de banco não vaza mensagem. */
+function failure(error: unknown, context: string) {
+  const forbidden = adminForbiddenResponse(error)
+  if (forbidden) return forbidden
+  if (error instanceof FeedbackNotFoundError) {
+    return errorResponse(error.message, "NOT_FOUND", error.status)
+  }
+  console.error(`[${context}] Error:`, error)
+  return errorResponse("Erro interno do servidor", "INTERNAL_ERROR", 500)
+}
 
-/**
- * GET /api/admin/feedbacks - avaliações pendentes de moderação. Movido de
- * `adminService.getPendingFeedbacks`, que consultava `appointment_feedbacks`
- * direto do navegador (docs/COMMUNITY_CONTACT_PLAN.md §13).
- */
+/** GET /api/admin/feedbacks - avaliações pendentes de moderação. */
 export async function GET() {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard.response
   try {
-    const guard = await requireAdmin()
-    if (!guard.ok) return guard.response
-
-    const supabase = await createClient()
-
-    const { data, error } = await supabase
-      .from("appointment_feedbacks")
-      .select(`
-        id, rating, status, created_at,
-        comment:public_feedback,
-        mentee:profiles!reviewer_id(full_name, avatar_url),
-        mentor:profiles!reviewed_id(full_name, avatar_url)
-      `)
-      .eq("status", "pending")
-      .order("created_at", { ascending: true })
-
-    if (error) throw error
-
-    return successResponse(data || [])
+    const service = buildAdminFeedbacksService(await createClient())
+    return successResponse(await service.listPending())
   } catch (error) {
-    return handleApiError(error)
+    return failure(error, "GET /api/admin/feedbacks")
   }
 }
 
+/** PATCH /api/admin/feedbacks - aprova ou rejeita uma avaliação (audita e avisa o mentor). */
 export async function PATCH(request: NextRequest) {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard.response
+
+  const body = feedbackModerationBodySchema.safeParse(await request.json().catch(() => null))
+  if (!body.success) return errorResponse("Invalid data", "VALIDATION_ERROR", 400)
+
   try {
-    const guard = await requireAdmin()
-    if (!guard.ok) return guard.response
-
-    const supabase = await createClient()
-
-    // 2. Processar a atualização
-    const { feedbackId, status, rejectionReason } = await request.json()
-
-    if (!feedbackId || !['approved', 'rejected'].includes(status)) {
-      return errorResponse("Invalid data", "VALIDATION_ERROR", 400)
-    }
-
-    // 3. Atualizar status do feedback
-    const { data: updatedFeedback, error: updateError } = await supabase
-      .from("appointment_feedbacks")
-      .update({ 
-          status,
-          rejection_reason: rejectionReason || null,
-          updated_at: new Date().toISOString()
-      } as any)
-      .eq('id', feedbackId)
-      .select(`
-        *,
-        mentee:profiles!reviewer_id(full_name),
-        mentor:profiles!reviewed_id(full_name, email)
-      `)
-      .single() as any
-
-    if (updateError) throw updateError
-
-    // 4. Se foi aprovado, notificar o mentor via e-mail
-    if (status === 'approved' && updatedFeedback.mentor?.email) {
-        sendMentorNewReviewNotification({
-            mentorEmail: updatedFeedback.mentor.email,
-            mentorName: updatedFeedback.mentor.full_name || 'Mentor',
-            menteeName: updatedFeedback.mentee.full_name || 'Um aluno',
-            rating: updatedFeedback.rating,
-            comment: updatedFeedback.public_feedback
-        }).catch(err => console.error("[API] Erro ao enviar email para mentor:", err))
-    }
-
-    return successResponse(updatedFeedback, "Feedback moderado com sucesso")
+    const service = buildAdminFeedbacksService(await createClient())
+    const updated = await service.moderate(guard.admin.userId, body.data)
+    return successResponse(updated, "Feedback moderado com sucesso")
   } catch (error) {
-    return handleApiError(error)
+    return failure(error, "PATCH /api/admin/feedbacks")
   }
 }

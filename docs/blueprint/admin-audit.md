@@ -222,3 +222,38 @@ PATCH antes de mexer). O resto é baixo.
 - `moderator` saiu de `AdminRole` e de `emails/preview`, `feature-flags` GET e `users` GET. O enum de papéis em `users/[id]` (atribuir `moderator`) não mudou: é da L1-2.
 - Helper: `lib/services/admin/assert-admin.ts` (`assertAdmin(db)` com a sessão, `AdminForbiddenError`, `adminForbiddenResponse` para o 403). Ainda não usado em nenhum service: cada grupo chama no seu (teste modelo: "não-admin recusado").
 - ADR: `docs/governance/adr/0009-admin-service-role.md`. Próximo: L1-2 e L2-2.
+
+**L2-2 e L2-3 (feitos, sem migration).**
+- `retention` GET passou para a sessao (sem service_role); `retention/exempt` valida UUID, usa `assertAdmin`, grava auditoria (acao `user_status_changed` com `details.reason = "retention_exempt"`, falta um `AuditAction` proprio no `audit-logger`).
+- `overview`: fila de inativos pela sessao; `appointments` segue no client privilegiado, lazy, vindo de `lib/services/admin/ops.composition.ts` (agora com `loadAdminOverview` e `buildAdminRetentionService`). `getAdminOverview(db, getPrivilegedDb, now)` chama `assertAdmin`.
+- Novos: `lib/repositories/admin-ops.repository.ts`, `lib/schemas/admin.ts`, `lib/services/admin/retention.service.ts`. Proximos grupos da L2 somam neles e na composition.
+
+**L2-4 e L2-5 (feitos, sem migration).**
+- L2-4: `admin-appointments.service` recebe `AdminAppointmentsDeps` (sessao, `db()` lazy, mailer e calendar por port) e chama `assertAdmin` em cada funcao; `buildAdminAppointmentsDeps` em `ops.composition.ts`; as 3 rotas sem `service_role`.
+- L2-5: `feature-flags` com Zod (`lib/schemas/admin.ts`), `createAdminFeatureFlagsRepository`, `feature-flags.service.ts` (`assertAdmin`, auditoria em criar/ligar/apagar) e `buildAdminFeatureFlagsService`. Metodo segue `PUT` (nao PATCH). Erro de banco agora responde 500 generico; id inexistente 404; entrada invalida 400.
+- Pedido ao orquestrador: nenhum arquivo compartilhado editado.
+**L1-2 e L1-3 (feitos, sem migration).**
+- L1-2: `lib/schemas/admin-users.ts` (PATCH, query da lista com `limit` max 100, `verify` com UUID), `lib/domain/admin/user.entity.ts`; `admin.service.ts` apagado; `moderator` saiu do enum de `users/[id]`.
+- L1-3: `admin-users.repository.ts` (lista pela sessao; leitura de `cv_url` privilegiada), `lib/services/admin/users/users.service.ts` (`assertAdmin` primeiro) e `users.composition.ts` (primeiro `service_role` da L1 em composition). `users` GET fino, com teste de rota.
+- Para o L1-4: `users.composition.ts` ja existe, so acrescentar o repository privilegiado de `profiles`. `fetchCvUrls` segue vivo para `verification-list.service` e `ai-menvo/mentor-review/draft` (L1-6/L1-7).
+- Pedido ao orquestrador: nenhum arquivo compartilhado editado ate aqui.
+**L1-4 e L1-5 (feitos, sem migration).**
+- L1-4: `users.service.updateUser` (`assertAdmin`, bloqueia retirar o proprio `admin` com 400, auditoria `user_updated`/`user_role_changed`); `profiles` pelo privilegiado, `mentee_profiles` e `user_roles` pela sessao; 500 com mensagem fixa; erro de escrita em papel agora falha (antes era ignorado). Novo `self-action.error.ts`.
+- L1-5: `delete-user.service.ts` sem criar client (`deleteUserWithClient` + `createAdminDeleteUser`); `delete-user.composition.ts` cria o client. Sobrou o wrapper `@deprecated deleteUserCompletely` para `profile/delete`, `invites/delete` e `retention/*` (migrar para a composition e apagar o wrapper).
+- Pedido ao orquestrador: nenhum arquivo compartilhado editado. DELETE segue sem auditoria (a acao `user_deleted` existe; fora do escopo do L1-5).
+**L1-6 e L1-7 (feitos, sem migration).**
+- L1-6: `admin-mentor-verification.repository.ts` (filas e `mentors_view` pela sessao), `verification-list.service.ts` (`assertAdmin`; CV via `AdminUserCvReader`), `verification.composition.ts` (unico `service_role`, lazy). `pending`, `completed` e `mentors` finas, com teste de rota.
+- L1-7: `notification.service.ts` virou `createMentorVerificationService` (ports de papeis/perfil/chat/e-mail, `assertAdmin`, auditoria `user_status_changed` com `details.reason = "mentor_verification"`). `verify`: 403 do service, 404 perfil inexistente, 500 com mensagem fixa; erro de escrita em papel agora falha (antes ignorado).
+- `fetchCvUrls` segue vivo so para `ai-menvo/mentor-review/draft` (rota de rascunho da IA, fora de L1-6/7). Pedido ao orquestrador: nenhum arquivo compartilhado editado; falta `AuditAction` proprio (ex.: `mentor_verification_decided`) em `audit-logger`.
+
+**L2-6 e L2-7 (feitos, sem migration).**
+- L2-6: `organizations`, `[id]`, `[id]/admins` e `org-leads` pela SESSAO (sem service_role) via `organizations.service.ts` (`assertAdmin`) e `createAdminOrganizationsRepository`/`createAdminOrgLeadsRepository`; id inexistente agora 404 e `[id]` invalido 400; `org-leads.service.ts` ficou so com `createOrganizationLead` (E8). Erro de banco: texto fixo.
+- L2-7: `invites/*` e `emails/*` com `invites.service.ts`/`emails.service.ts` (`assertAdmin`), port `lib/ports/admin-email.ts` + adapter Brevo; client privilegiado so em `ops.composition.ts`; `resolveAudience(params, db)` e `createInviteToken(params, db?)` recebem o client (cron de retencao segue com o default).
+- Pedido ao orquestrador: nenhum arquivo compartilhado editado; `AuditAction` ainda sem `invite_batch_sent` (usa `bulk_action`).
+
+**L1-8 (feito, sem migration).**
+- `lib/query/keys/admin-users.ts` (`adminUsersKeys`), `lib/query/effects/admin-users.ts` (`adminUsers.update|delete|verification.decide`), respostas em `lib/schemas/admin-users-responses.ts`, hooks em `hooks/admin-users/` (`useAdminUsers`, `useAdminUpdateUser`, `useAdminDeleteUser`, `useMentorVerifications`, `useDecideVerification`), sem uso ainda.
+- Pedido ao orquestrador: em `keys.ts` `import { adminUsersKeys } from "./keys/admin-users"` + `adminUsers: adminUsersKeys,`; em `effects.ts` `import { adminUsersEffects } from "./effects/admin-users"` + `...adminUsersEffects,`. A raiz `["mentors"]` esta fixa no effect (falta `qk.mentors.all`).
+**L2-8 (feito, sem migration).**
+- `feedbacks` (GET/PATCH), `reports`, `activity-logs` e `ai-usage` pela SESSAO (sem service_role): repositories em `admin-ops.repository.ts`, services com `assertAdmin` (`feedbacks.service.ts`, `admin-reports.service.ts`, `activity-logs.service.ts`, `ai-usage.service.ts`), Zod em `lib/schemas/admin.ts`, `buildAdminFeedbacksService` na composition. Sem `as any`.
+- PATCH de feedback audita (`bulk_action` com `details.reason = "feedback_moderation"`; falta `AuditAction` proprio) e id inexistente da 404; entrada invalida 400; erro de banco 500 fixo. Pedido ao orquestrador: nenhum arquivo compartilhado editado.

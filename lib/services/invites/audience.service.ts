@@ -81,8 +81,9 @@ export interface ResolveAudienceResult {
  * `auth` schema isn't exposed to it). Used only by the "never signed in"
  * audience, an infrequent admin action, so the O(users) scan is fine.
  */
-export async function fetchSignedInUserIds(): Promise<Set<string>> {
-  const supabase = createServiceRoleClient()
+export async function fetchSignedInUserIds(
+  supabase: ReturnType<typeof createServiceRoleClient> = createServiceRoleClient()
+): Promise<Set<string>> {
   const signedIn = new Set<string>()
   const perPage = 1000
   let page = 1
@@ -108,15 +109,21 @@ export async function fetchSignedInUserIds(): Promise<Set<string>> {
  * campaign (unless `resend` is set). Shared by the count-preview
  * endpoint and the send endpoint so what the admin previews is exactly
  * who gets an e-mail.
+ *
+ * The privileged client comes from the caller (the admin composition, after
+ * `assertAdmin`), never from here: this file no longer builds `service_role`
+ * for the admin path (ADR 0009).
  */
-export async function resolveAudience(params: {
-  audience: InviteAudience
-  campaign: string
-  userIds?: string[]
-  resend?: boolean
-}): Promise<ResolveAudienceResult> {
+export async function resolveAudience(
+  params: {
+    audience: InviteAudience
+    campaign: string
+    userIds?: string[]
+    resend?: boolean
+  },
+  supabase: ReturnType<typeof createServiceRoleClient>
+): Promise<ResolveAudienceResult> {
   ensureServerSide()
-  const supabase = createServiceRoleClient()
 
   if (params.audience === "selected" && !params.userIds?.length) {
     return { eligible: [], skipped: { suppressed: 0, optedOut: 0, alreadyInvited: 0, noEmail: 0 } }
@@ -135,7 +142,7 @@ export async function resolveAudience(params: {
   let candidates = profiles
 
   if (params.audience === "never_signed_in") {
-    const signedIn = await fetchSignedInUserIds()
+    const signedIn = await fetchSignedInUserIds(supabase)
     candidates = candidates.filter(p => !signedIn.has(p.id))
   } else if (params.audience === "unresponsive_invitees") {
     const unopened = await fetchAllRows((from, to) =>

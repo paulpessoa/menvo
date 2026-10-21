@@ -1,4 +1,8 @@
+import type { SupabaseClient } from "@supabase/supabase-js"
+import type { Database } from "@/lib/types/supabase"
 import { createServiceRoleClient, ensureServerSide } from "@/lib/utils/supabase/service-role"
+import { assertAdmin } from "./assert-admin"
+import { AdminSelfActionError } from "./self-action.error"
 import { hashEmail, suppress } from "@/lib/services/invites/suppression.service"
 import { CV_BUCKET, cvStoragePath } from "@/lib/services/mentees/cv-storage"
 
@@ -19,21 +23,21 @@ export interface DeleteUserResult {
  * the same storage files, and suppress the same e-mail from future
  * campaigns/imports.
  *
- * Runs with the service-role client because deleting from `auth.users`
- * requires the Admin API (there is no user-facing equivalent) - the
- * caller must already be authorized (`requireAdmin()` for the admin
- * path, a validated invite token for the self-service path). See
- * docs/domains/reengagement-invites.md §3.3 for why this is a deliberate,
- * scoped exception to the "never use service_role as a shortcut" rule in
- * AGENTS.md rather than a violation of it.
+ * Needs a service-role client because deleting from `auth.users` requires
+ * the Admin API (there is no user-facing equivalent). The client is passed
+ * in, never created here: the admin path gets it from
+ * `delete-user.composition.ts` after `assertAdmin`. See
+ * docs/domains/reengagement-invites.md §3.3 and ADR 0009 for why this is a
+ * deliberate, scoped exception to the "never use service_role as a shortcut"
+ * rule in AGENTS.md rather than a violation of it.
+ *
+ * @param supabase Privileged client; the caller must already be authorized.
  */
-export async function deleteUserCompletely(
+export async function deleteUserWithClient(
+  supabase: SupabaseClient<Database>,
   userId: string,
   options: { source: DeletionSource; campaign?: string }
 ): Promise<DeleteUserResult> {
-  ensureServerSide()
-  const supabase = createServiceRoleClient()
-
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("email")
@@ -105,4 +109,42 @@ export async function deleteUserCompletely(
   }
 
   return { success: true, filesRemoved }
+}
+
+/**
+ * Legacy entry point for the NON-admin flows (self-service, invite token,
+ * retention jobs), which have no admin session and still import this name.
+ * @deprecated Move those callers to `delete-user.composition.ts`
+ * (`deleteUserCompletely` there) and delete this wrapper; it is the last
+ * place in this file that creates a service-role client.
+ */
+export async function deleteUserCompletely(
+  userId: string,
+  options: { source: DeletionSource; campaign?: string }
+): Promise<DeleteUserResult> {
+  ensureServerSide()
+  return deleteUserWithClient(createServiceRoleClient() as SupabaseClient<Database>, userId, options)
+}
+
+export interface AdminDeleteUserDeps {
+  /** Client da sessão do chamador: só serve para `assertAdmin`. */
+  session: SupabaseClient<Database>
+  /** Apaga a conta; cria o client privilegiado só quando chamado (depois do `assertAdmin`). */
+  deleteUser: (userId: string, options: { source: DeletionSource }) => Promise<DeleteUserResult>
+}
+
+/**
+ * Remoção de conta pelo painel admin. Confere `assertAdmin` com a SESSÃO antes
+ * de qualquer client privilegiado existir e não deixa o admin apagar a si mesmo.
+ * @throws {AdminForbiddenError} quando a sessão não é de admin.
+ * @throws {AdminSelfActionError} quando o alvo é o próprio admin.
+ */
+export function createAdminDeleteUser(deps: AdminDeleteUserDeps) {
+  return async function deleteUserAsAdmin(actorId: string, targetId: string): Promise<DeleteUserResult> {
+    await assertAdmin(deps.session)
+    if (actorId === targetId) {
+      throw new AdminSelfActionError("Você não pode remover a própria conta de administrador")
+    }
+    return deps.deleteUser(targetId, { source: "admin" })
+  }
 }

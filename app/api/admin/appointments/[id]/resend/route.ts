@@ -3,7 +3,8 @@ import { z } from "zod"
 import { requireAdmin } from "@/lib/auth/require-admin"
 import { logAdminAction } from "@/lib/audit-logger"
 import { adminResendAppointmentSchema } from "@/lib/schemas/appointment"
-import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
+import { createClient } from "@/lib/utils/supabase/server"
+import { buildAdminAppointmentsDeps } from "@/lib/services/admin/ops.composition"
 import {
   resendConfirmation,
   resendMentorRequest,
@@ -35,13 +36,13 @@ export async function POST(
   }
 
   try {
-    const client = createServiceRoleClient()
+    const deps = buildAdminAppointmentsDeps(await createClient())
     const { target } = parsed.data
 
     const result =
       target === "mentor_request"
-        ? await resendMentorRequest(client, id)
-        : await resendConfirmation(client, id)
+        ? await resendMentorRequest(deps, id)
+        : await resendConfirmation(deps, id)
 
     await logAdminAction(
       guard.admin.userId,
