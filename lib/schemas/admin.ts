@@ -31,4 +31,44 @@ export const featureFlagDeleteQuerySchema = z.object({
   id: z.coerce.number().int().positive()
 })
 
+/** Status de um pedido de organização (`organization_leads.status`). */
+export const orgLeadStatusSchema = z.enum(["new", "contacted", "closed"])
+
+/** Body de `PATCH /api/admin/org-leads`. */
+export const orgLeadPatchBodySchema = z.object({
+  id: z.string().uuid(),
+  status: orgLeadStatusSchema
+})
+
+/** Body de `POST /api/admin/invites/audience`: quem uma campanha alcançaria. */
+export const inviteAudienceBodySchema = z.object({
+  audience: z.enum(["selected", "jotform_not_invited", "never_signed_in", "all", "unresponsive_invitees"]),
+  campaign: z.string().trim().min(1).max(100),
+  userIds: z.array(z.string().uuid()).max(5000).optional(),
+  resend: z.boolean().optional()
+})
+
+/** Body de `POST /api/admin/invites/send`: um lote (até 25, cabe no timeout da função). */
+export const inviteSendBodySchema = z.object({
+  campaign: z.string().trim().min(1).max(100),
+  subject: z.string().trim().min(1).max(200),
+  body: z.string().trim().min(1).max(10000),
+  userIds: z.array(z.string().uuid()).min(1).max(25),
+  resend: z.boolean().optional()
+})
+
+/** Body de `POST /api/admin/invites/preview`. */
+export const invitePreviewBodySchema = z.object({
+  body: z.string().trim().min(1).max(10000)
+})
+
+/** Body de `POST /api/admin/emails/send-test`. */
+export const emailSendTestBodySchema = z.object({
+  email: z.string().email("Por favor, insira um e-mail válido."),
+  template: z.string().min(1, "Template é obrigatório.")
+})
+
+export type InviteAudienceBody = z.infer<typeof inviteAudienceBodySchema>
+export type InviteSendBody = z.infer<typeof inviteSendBodySchema>
+
 export type FeatureFlagCreateBody = z.infer<typeof featureFlagCreateBodySchema>

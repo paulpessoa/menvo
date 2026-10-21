@@ -8,6 +8,14 @@ import { resolveAudience } from "@/lib/services/invites/audience.service"
 
 jest.mock("@/lib/auth/require-admin", () => ({ requireAdmin: jest.fn() }))
 jest.mock("@/lib/services/invites/audience.service", () => ({ resolveAudience: jest.fn() }))
+// The service confirms the actor again with `is_admin()` through this session.
+const mockRpc = jest.fn()
+jest.mock("@/lib/utils/supabase/server", () => ({
+  createClient: jest.fn(async () => ({ rpc: mockRpc }))
+}))
+jest.mock("@/lib/utils/supabase/service-role", () => ({
+  createServiceRoleClient: jest.fn().mockReturnValue({})
+}))
 
 const mockRequireAdmin = requireAdmin as jest.MockedFunction<typeof requireAdmin>
 
@@ -21,6 +29,7 @@ function makeRequest(body: any) {
 describe("POST /api/admin/invites/audience", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockRpc.mockResolvedValue({ data: true, error: null })
     mockRequireAdmin.mockResolvedValue({ ok: true, admin: { userId: "admin-1", role: "admin" } })
   })
 
@@ -29,6 +38,13 @@ describe("POST /api/admin/invites/audience", () => {
     mockRequireAdmin.mockResolvedValue({ ok: false, response: NextResponse.json({ error: "x" }, { status: 403 }) })
     const res = await POST(makeRequest({ audience: "all", campaign: "c1" }))
     expect(res.status).toBe(403)
+  })
+
+  it("rejects when is_admin() does not confirm, before reading any audience", async () => {
+    mockRpc.mockResolvedValue({ data: false, error: null })
+    const res = await POST(makeRequest({ audience: "all", campaign: "c1" }))
+    expect(res.status).toBe(403)
+    expect(resolveAudience).not.toHaveBeenCalled()
   })
 
   it("rejects an invalid audience value", async () => {
@@ -45,5 +61,13 @@ describe("POST /api/admin/invites/audience", () => {
     const json = await res.json()
     expect(res.status).toBe(200)
     expect(json).toEqual({ eligibleUserIds: ["u1", "u2"], skipped: { suppressed: 1, optedOut: 0, alreadyInvited: 2, noEmail: 0 } })
+  })
+
+  it("does not leak the database message on failure", async () => {
+    ;(resolveAudience as jest.Mock).mockRejectedValue(new Error('relation "profiles" does not exist'))
+    jest.spyOn(console, "error").mockImplementation(() => undefined)
+    const res = await POST(makeRequest({ audience: "all", campaign: "c1" }))
+    expect(res.status).toBe(500)
+    expect(JSON.stringify(await res.json())).not.toContain("relation")
   })
 })
