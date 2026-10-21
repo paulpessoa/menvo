@@ -42,6 +42,16 @@ export function createMentorProfileService({ mentors, availability }: MentorProf
   return {
     findPublic,
 
+    /** Um mentor do diretório; erro de banco propaga (a rota responde 500, não 404). */
+    getPublicMentor(slugOrId: string): Promise<PublicMentor | null> {
+      return mentors.findPublicBySlugOrId(slugOrId)
+    },
+
+    /** Vários mentores por id (favoritos, recomendação da IA). Ids repetidos são ignorados. */
+    listPublicMentors(ids: string[]): Promise<PublicMentor[]> {
+      return mentors.findPublicByIds([...new Set(ids)])
+    },
+
     async getPublicProfile(slugOrId: string): Promise<PublicProfileOutcome> {
       const mentor = await findPublic(slugOrId)
       if (!mentor?.id) return { kind: "not_found" }

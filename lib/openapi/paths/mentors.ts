@@ -15,7 +15,13 @@ import {
   availabilitySaveResponseSchema,
   setAvailabilitySchema,
 } from "@/lib/schemas/availability"
-import { mentorApproachResponseSchema, mentorSlugParamSchema } from "@/lib/schemas/mentors"
+import {
+  mentorApproachResponseSchema,
+  mentorDetailResponseSchema,
+  mentorSlugParamSchema,
+  mentorsByIdsQuerySchema,
+  mentorsListResponseSchema,
+} from "@/lib/schemas/mentors"
 import { createAvailabilityAlertSchema, queryAvailabilityAlertSchema } from "@/lib/schemas/availability-alert"
 
 const json = <T extends z.ZodTypeAny>(schema: T) => ({ "application/json": { schema } })
@@ -50,6 +56,35 @@ registry.registerPath({
     400: error("Body inválido (`details` do Zod) ou slot que termina antes de começar (`code`: `INVALID_RANGE`)"),
     401: error("Não autenticado"),
     500: error("Falha ao salvar"),
+  },
+})
+
+registry.registerPath({
+  method: "get",
+  path: "/api/mentors",
+  tags: ["mentors"],
+  summary: "Perfis públicos de vários mentores por id",
+  description:
+    "`ids` é uma lista de UUIDs separada por vírgula (1 a 50). Pública: não exige login. Só devolve mentores que o diretório lista (verificados e públicos); ids desconhecidos ou ocultos são omitidos, sem erro.",
+  request: { query: mentorsByIdsQuerySchema },
+  responses: {
+    200: { description: "Mentores encontrados (ordem não garantida)", content: json(mentorsListResponseSchema) },
+    400: error("`ids` ausente, vazio, com mais de 50 itens ou com item que não é UUID"),
+    500: error("Falha ao buscar"),
+  },
+})
+
+registry.registerPath({
+  method: "get",
+  path: "/api/mentors/{slug}",
+  tags: ["mentors"],
+  summary: "Perfil público de um mentor",
+  description: "Aceita slug ou UUID. Pública: não exige login.",
+  request: { params: mentorSlugParamSchema },
+  responses: {
+    200: { description: "Perfil do mentor", content: json(mentorDetailResponseSchema) },
+    404: error("Mentor não encontrado ou não listado no diretório"),
+    500: error("Falha ao buscar"),
   },
 })
 

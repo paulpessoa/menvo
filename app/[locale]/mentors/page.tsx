@@ -28,7 +28,7 @@ import { MentorSkeletonCard } from "@/components/mentors/MentorSkeletonCard"
 import { AIMatchButton } from "@/components/ai-match/AIMatchButton"
 import { toast } from "sonner"
 import { useLocale, useTranslations } from "next-intl"
-import { mentorService } from "@/lib/services/mentors/mentors.service"
+import { useMentorsByIds } from "@/hooks/mentors/useMentorsByIds"
 import { searchCatalogAction, getCatalogFilterOptionsAction } from "@/app/actions/mentors"
 import { useDebounce } from "@/hooks/useDebounce"
 import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
@@ -106,7 +106,9 @@ export default function MentorsPage() {
   >({})
   const [aiJustification, setAiJustification] = useState<string | null>(null)
   const [aiQuery, setAiQuery] = useState<string | null>(null)
-  const [aiRecommendedProfiles, setAiRecommendedProfiles] = useState<MentorProfile[]>([])
+  const [aiRecommendedIds, setAiRecommendedIds] = useState<string[]>([])
+  // Read through GET /api/mentors; the list shape matches the catalog cards the page already renders.
+  const aiRecommendedProfiles = (useMentorsByIds(aiRecommendedIds).data ?? []) as unknown as MentorProfile[]
   const [isAIMode, setIsAIMode] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
   const { quota: aiQuota, setQuota: setAiQuota } = useAiQuota("match")
@@ -318,12 +320,7 @@ export default function MentorsPage() {
     setAiJustification(justification)
     setAiQuery(searchQuery || null)
 
-    try {
-      const suggestedProfiles = await mentorService.getMentorsByIds(ids)
-      setAiRecommendedProfiles(suggestedProfiles)
-    } catch (err) {
-      console.error("Erro ao carregar mentores recomendados pela IA:", err)
-    }
+    setAiRecommendedIds(ids)
 
     // Além dos 3-4 destaques da IA, aproveitamos os temas sugeridos por ela
     // para ampliar a lista abaixo com outros mentores do mesmo assunto -
@@ -349,7 +346,7 @@ export default function MentorsPage() {
     setSuggestedMentors({})
     setAiJustification(null)
     setAiQuery(null)
-    setAiRecommendedProfiles([])
+    setAiRecommendedIds([])
     setIsAIMode(false)
     setFilters((prev) => ({ ...prev, search: "", topics: [] }))
   }

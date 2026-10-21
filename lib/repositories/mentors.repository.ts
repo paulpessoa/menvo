@@ -22,6 +22,8 @@ import { RepositoryError } from "./repository-error"
 
 export interface MentorsRepository {
   findPublicBySlugOrId(slugOrId: string): Promise<PublicMentor | null>
+  /** Vários mentores do diretório por UUID, numa única consulta (sem N+1). */
+  findPublicByIds(ids: string[]): Promise<PublicMentor[]>
   findApproachBySlugOrId(slugOrId: string): Promise<MentorApproach | null>
   findSlugsByNames(names: string[]): Promise<MentorSlugMatch[]>
 }
@@ -40,6 +42,18 @@ export function createMentorsRepository(db: SupabaseClient<Database>): MentorsRe
       const { data, error } = await listed(PUBLIC_COLUMNS, slugOrId).maybeSingle()
       if (error) throw new RepositoryError("mentors.findPublicBySlugOrId", error)
       return (data as PublicMentor | null) ?? null
+    },
+
+    async findPublicByIds(ids) {
+      if (ids.length === 0) return []
+      const { data, error } = await db
+        .from("mentors_view")
+        .select(PUBLIC_COLUMNS)
+        .eq("verified", true)
+        .eq("is_public", true)
+        .in("id", ids)
+      if (error) throw new RepositoryError("mentors.findPublicByIds", error)
+      return (data as unknown as PublicMentor[] | null) ?? []
     },
 
     async findApproachBySlugOrId(slugOrId) {

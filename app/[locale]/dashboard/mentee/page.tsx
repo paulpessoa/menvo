@@ -22,7 +22,7 @@ import { MentorChangesRequestedBanner } from "@/components/dashboard/MentorChang
 import { useDiagnosticHref } from "@/hooks/useDiagnosticHref"
 import { useLatestQuiz } from "@/hooks/quiz/useLatestQuiz"
 import { mentorshipService } from "@/lib/services/mentorship/mentorship.service"
-import { mentorService } from "@/lib/services/mentors/mentors.service"
+import { useMentorsByIds } from "@/hooks/mentors/useMentorsByIds"
 import { useOnboarding } from "@/hooks/useOnboarding"
 
 interface MenteeStats {
@@ -46,16 +46,6 @@ interface Appointment {
   }
 }
 
-interface FavoriteMentor {
-  id: string
-  full_name: string
-  avatar_url: string | null
-  job_title: string | null
-  company: string | null
-  average_rating: number
-  slug: string | null
-}
-
 export default function MenteeDashboard() {
   const t = useTranslations("dashboard")
   const locale = useLocale()
@@ -69,9 +59,7 @@ export default function MenteeDashboard() {
     totalHours: 0
   })
   const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([])
-  const [favoriteMentorsData, setFavoriteMentorsData] = useState<FavoriteMentor[]>([])
   const [loading, setLoading] = useState(true)
-  const [loadingFavorites, setLoadingFavorites] = useState(false)
   // Sent quizzes invalidate this (lib/query/effects.ts), so the card refreshes without a reload.
   const latestQuiz = useLatestQuiz(user?.id)
   const quizSummary = latestQuiz.data ?? null
@@ -79,6 +67,10 @@ export default function MenteeDashboard() {
 
   const [hasPendingReview, setHasPendingReview] = useState(false)
   const { favorites } = useFavorites(user?.id)
+  // The dashboard shows at most 4 favorites; the BFF route (GET /api/mentors) does the read.
+  const favoriteMentors = useMentorsByIds(favorites.slice(0, 4), { enabled: !!user?.id })
+  const favoriteMentorsData = favoriteMentors.data ?? []
+  const loadingFavorites = favoriteMentors.isLoading
 
   const fetchMenteeStats = async () => {
     if (!user?.id) return
@@ -106,30 +98,12 @@ export default function MenteeDashboard() {
     }
   }
 
-  const fetchFavoriteMentorsDetails = async () => {
-    if (!favorites.length) return
-    setLoadingFavorites(true)
-    try {
-      const data = await mentorService.getFavoriteMentors(favorites)
-      setFavoriteMentorsData(data)
-    } catch (error) {
-      console.error("Error fetching favorite mentors details:", error)
-    } finally {
-      setLoadingFavorites(false)
-    }
-  }
-
   useEffect(() => {
     if (user?.id) {
       fetchMenteeStats()
       fetchUpcomingAppointments()
     }
   }, [user?.id, profile])
-
-  useEffect(() => {
-    if (user?.id && favorites.length > 0) fetchFavoriteMentorsDetails()
-    else setFavoriteMentorsData([])
-  }, [user?.id, favorites])
 
   const getGreeting = () => {
     const hour = new Date().getHours()
