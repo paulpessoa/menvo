@@ -10,6 +10,7 @@
  * não editem o mesmo arquivo.
  */
 import type { QueryClient } from "@tanstack/react-query"
+import { adminUsersEffects } from "./effects/admin-users"
 import { appointmentsEffects } from "./effects/appointments"
 import { meEffects } from "./effects/me"
 import { orgEffects } from "./effects/org"
@@ -25,6 +26,7 @@ export const effects = {
   ...meEffects,
   ...orgEffects,
   ...appointmentsEffects,
+  ...adminUsersEffects,
 } satisfies Record<string, (ctx: never) => Keys>
 
 export function runEffects(qc: QueryClient, keys: Keys) {

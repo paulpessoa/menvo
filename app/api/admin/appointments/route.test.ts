@@ -7,7 +7,8 @@ import { requireAdmin } from "@/lib/auth/require-admin"
 import { listAdminAppointments, AdminAppointmentError } from "@/lib/services/appointments/admin-appointments.service"
 
 jest.mock("@/lib/auth/require-admin", () => ({ requireAdmin: jest.fn() }))
-jest.mock("@/lib/utils/supabase/service-role", () => ({ createServiceRoleClient: jest.fn(() => ({ fake: true })) }))
+jest.mock("@/lib/utils/supabase/server", () => ({ createClient: jest.fn(async () => ({ session: true })) }))
+jest.mock("@/lib/services/admin/ops.composition", () => ({ buildAdminAppointmentsDeps: jest.fn(() => ({ fake: true })) }))
 jest.mock("@/lib/services/appointments/admin-appointments.service", () => ({
   ...jest.requireActual("@/lib/services/appointments/admin-appointments.service"),
   listAdminAppointments: jest.fn()

@@ -1,45 +1,32 @@
 import { NextResponse } from "next/server"
-import { createServiceRoleClient } from "@/lib/utils/supabase/service-role"
+import { createClient } from "@/lib/utils/supabase/server"
 import { requireAdmin } from "@/lib/auth/require-admin"
+import { retentionExemptBodySchema } from "@/lib/schemas/admin"
+import { adminForbiddenResponse } from "@/lib/services/admin/assert-admin"
+import { buildAdminRetentionService } from "@/lib/services/admin/ops.composition"
 
 /**
- * Isenta um usuário da fila de retenção LGPD (JotForm).
- * A isenção é feita mudando a origin_platform do registro em import_records
- * para 'menvo' (tratando-o como um usuário normal que não está sujeito à
- * exclusão de importados). Os dados importados são preservados
- * e removendo-o da tabela account_retention.
+ * POST /api/admin/retention/exempt - isenta um usuário da fila de retenção
+ * LGPD (JotForm): a origem passa a `menvo`, os dados importados ficam e o
+ * registro sai de `account_retention`. Grava auditoria.
  */
 export async function POST(request: Request) {
+  const guard = await requireAdmin(["admin"])
+  if (!guard.ok) return guard.response
+
+  const body = retentionExemptBodySchema.safeParse(await request.json().catch(() => null))
+  if (!body.success) {
+    return NextResponse.json({ error: "userId is required" }, { status: 400 })
+  }
+
   try {
-    const guard = await requireAdmin(["admin"])
-    if (!guard.ok) return guard.response
-
-    const { userId } = await request.json()
-    if (!userId) {
-      return NextResponse.json({ error: "userId is required" }, { status: 400 })
-    }
-
-    const supabase = createServiceRoleClient()
-
-    // 1. Muda a origem para menvo
-    const { error: updateError } = await supabase
-      .from("import_records")
-      .update({ origin_platform: "menvo", updated_at: new Date().toISOString() })
-      .eq("user_id", userId)
-
-    if (updateError) throw updateError
-
-    // 2. Remove da fila de retenção
-    const { error: deleteError } = await supabase
-      .from("account_retention")
-      .delete()
-      .eq("user_id", userId)
-
-    if (deleteError) throw deleteError
-
+    const service = buildAdminRetentionService(await createClient())
+    await service.exemptFromRetention(guard.admin.userId, body.data.userId)
     return NextResponse.json({ success: true })
-  } catch (error: any) {
+  } catch (error) {
+    const forbidden = adminForbiddenResponse(error)
+    if (forbidden) return forbidden
     console.error("[POST /api/admin/retention/exempt] Error:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: "Não foi possível isentar o usuário" }, { status: 500 })
   }
 }

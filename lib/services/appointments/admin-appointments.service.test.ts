@@ -13,26 +13,31 @@ import {
   resendMentorRequest,
   toAdminAppointment
 } from "./admin-appointments.service"
-import {
-  sendAppointmentCancellation,
-  sendAppointmentConfirmation,
-  sendAppointmentRequest
-} from "@/lib/email/brevo"
-import {
-  deleteCalendarEvent,
-  isGoogleCalendarConfigured
-} from "@/lib/services/mentorship/google-calendar.service"
+import { AdminForbiddenError } from "@/lib/services/admin/assert-admin"
 
-jest.mock("@/lib/email/brevo", () => ({
-  sendAppointmentRequest: jest.fn().mockResolvedValue(undefined),
-  sendAppointmentConfirmation: jest.fn().mockResolvedValue(undefined),
-  sendAppointmentCancellation: jest.fn().mockResolvedValue(undefined)
-}))
+// Portas falsas: o service recebe e-mail e Calendar por parâmetro.
+const sendAppointmentRequest = jest.fn()
+const sendAppointmentConfirmation = jest.fn()
+const sendAppointmentCancellation = jest.fn()
+const deleteCalendarEvent = jest.fn()
+const isGoogleCalendarConfigured = jest.fn()
+const sessionRpc = jest.fn()
 
-jest.mock("@/lib/services/mentorship/google-calendar.service", () => ({
-  deleteCalendarEvent: jest.fn().mockResolvedValue(true),
-  isGoogleCalendarConfigured: jest.fn().mockReturnValue(true)
-}))
+function makeDeps(db: any) {
+  return {
+    sessionDb: { rpc: sessionRpc } as any,
+    db: () => db,
+    mailer: {
+      sendRequest: sendAppointmentRequest,
+      sendConfirmation: sendAppointmentConfirmation,
+      sendCancellation: sendAppointmentCancellation
+    },
+    calendar: {
+      availability: async () => ({ configured: isGoogleCalendarConfigured(), missing: [] }),
+      deleteEvent: deleteCalendarEvent
+    }
+  }
+}
 
 const NOW = new Date("2026-10-01T12:00:00.000Z")
 const FUTURE = "2026-10-07T16:00:00.000Z"
@@ -108,13 +113,18 @@ function makeClient(opts: {
           : { data: opts.list ?? [], error: opts.listError ?? null }
       ).then(resolve, reject)
   }
-  return { client: { from: jest.fn(() => builder) } as any, calls }
+  const db = { from: jest.fn(() => builder) }
+  return { client: makeDeps(db) as any, db, calls }
 }
 
 beforeEach(() => {
   jest.clearAllMocks()
-  ;(isGoogleCalendarConfigured as jest.Mock).mockReturnValue(true)
-  ;(deleteCalendarEvent as jest.Mock).mockResolvedValue(true)
+  sessionRpc.mockResolvedValue({ data: true, error: null })
+  sendAppointmentRequest.mockResolvedValue(undefined)
+  sendAppointmentConfirmation.mockResolvedValue(undefined)
+  sendAppointmentCancellation.mockResolvedValue(undefined)
+  isGoogleCalendarConfigured.mockReturnValue(true)
+  deleteCalendarEvent.mockResolvedValue(true)
 })
 
 describe("isPlaceholderName", () => {
@@ -427,7 +437,7 @@ describe("cancelAppointmentAsAdmin", () => {
   })
 
   it("keeps the cancellation and reports it when the calendar call fails", async () => {
-    ;(deleteCalendarEvent as jest.Mock).mockRejectedValue(new Error("google down"))
+    ;deleteCalendarEvent.mockRejectedValue(new Error("google down"))
     const { client } = makeClient({ single: row({ status: "confirmed", google_event_id: "evt-1" }) })
     const result = await cancelAppointmentAsAdmin(client, APPT_ID, ADMIN_ID, "Motivo de teste válido", NOW)
 
@@ -436,7 +446,7 @@ describe("cancelAppointmentAsAdmin", () => {
   })
 
   it("skips the calendar when Google is not configured", async () => {
-    ;(isGoogleCalendarConfigured as jest.Mock).mockReturnValue(false)
+    ;isGoogleCalendarConfigured.mockReturnValue(false)
     const { client } = makeClient({ single: row({ status: "confirmed", google_event_id: "evt-1" }) })
     const result = await cancelAppointmentAsAdmin(client, APPT_ID, ADMIN_ID, "Motivo de teste válido", NOW)
 
@@ -474,5 +484,23 @@ describe("cancelAppointmentAsAdmin", () => {
     await expect(
       cancelAppointmentAsAdmin(client, APPT_ID, ADMIN_ID, "Motivo de teste válido", NOW)
     ).rejects.toBeInstanceOf(AdminAppointmentError)
+  })
+})
+
+describe("assertAdmin guard", () => {
+  it.each([
+    ["list", (c: any) => listAdminAppointments(c)],
+    ["resendMentorRequest", (c: any) => resendMentorRequest(c, APPT_ID, NOW)],
+    ["resendConfirmation", (c: any) => resendConfirmation(c, APPT_ID, NOW)],
+    ["cancel", (c: any) => cancelAppointmentAsAdmin(c, APPT_ID, ADMIN_ID, "Motivo de teste válido", NOW)]
+  ])("%s refuses a non-admin before touching the privileged client", async (_name, run) => {
+    sessionRpc.mockResolvedValue({ data: false, error: null })
+    const { client, db } = makeClient({ single: row(), list: [] })
+    await expect(run(client)).rejects.toBeInstanceOf(AdminForbiddenError)
+    expect(db.from).not.toHaveBeenCalled()
+    expect(sendAppointmentRequest).not.toHaveBeenCalled()
+    expect(sendAppointmentConfirmation).not.toHaveBeenCalled()
+    expect(sendAppointmentCancellation).not.toHaveBeenCalled()
+    expect(deleteCalendarEvent).not.toHaveBeenCalled()
   })
 })

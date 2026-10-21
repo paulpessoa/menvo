@@ -1,37 +1,31 @@
 import { NextRequest, NextResponse } from "next/server"
-import { z } from "zod"
+import { createClient } from "@/lib/utils/supabase/server"
 import { requireAdmin } from "@/lib/auth/require-admin"
-import { buildReengagementInviteHtml } from "@/lib/email/brevo"
-
-const bodySchema = z.object({
-  body: z.string().trim().min(1).max(10000)
-})
+import { invitePreviewBodySchema } from "@/lib/schemas/admin"
+import { adminForbiddenResponse } from "@/lib/services/admin/assert-admin"
+import { buildAdminInvitesService } from "@/lib/services/admin/ops.composition"
 
 /**
  * Renders the reengagement e-mail HTML with placeholder data, so the
- * admin modal's preview step is exactly what `buildReengagementInviteHtml`
- * produces for a real send - same function, fake name/token.
+ * admin modal's preview step is exactly what the real send produces -
+ * same template, fake name/token.
  */
 export async function POST(request: NextRequest) {
+  const guard = await requireAdmin()
+  if (!guard.ok) return guard.response
+
+  const parsed = invitePreviewBodySchema.safeParse(await request.json().catch(() => null))
+  if (!parsed.success) {
+    return NextResponse.json({ error: "O corpo do e-mail é obrigatório" }, { status: 400 })
+  }
+
   try {
-    const guard = await requireAdmin()
-    if (!guard.ok) return guard.response
-
-    const parsed = bodySchema.safeParse(await request.json().catch(() => null))
-    if (!parsed.success) {
-      return NextResponse.json({ error: "O corpo do e-mail é obrigatório" }, { status: 400 })
-    }
-
-    const html = buildReengagementInviteHtml({
-      name: "Mariana Silva",
-      bodyText: parsed.data.body,
-      inviteUrl: `${process.env.NEXT_PUBLIC_APP_URL || "https://www.menvo.com.br"}/convite/preview-token`
-    })
-
-    return NextResponse.json({ html })
+    const service = buildAdminInvitesService(await createClient(), request)
+    return NextResponse.json({ html: await service.previewInvite(parsed.data.body) })
   } catch (error) {
+    const forbidden = adminForbiddenResponse(error)
+    if (forbidden) return forbidden
     console.error("[API INVITES PREVIEW] Erro:", error)
-    const message = error instanceof Error ? error.message : "Erro interno do servidor"
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: "Erro interno do servidor" }, { status: 500 })
   }
 }

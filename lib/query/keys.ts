@@ -11,6 +11,7 @@
  * Domínios ainda não migrados têm chaves soltas
  * (`grep -rn "queryKey:" hooks components app lib`).
  */
+import { adminUsersKeys } from "./keys/admin-users"
 import { appointmentsKeys } from "./keys/appointments"
 import { meKeys } from "./keys/me"
 import { mentorsKeys } from "./keys/mentors"
@@ -25,4 +26,5 @@ export const qk = {
   me: meKeys,
   org: orgKeys,
   appointments: appointmentsKeys,
+  adminUsers: adminUsersKeys,
 } as const
