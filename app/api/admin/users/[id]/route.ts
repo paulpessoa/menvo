@@ -1,129 +1,56 @@
-
-import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
-import { z } from "zod"
+import { createClient } from "@/lib/utils/supabase/server"
 import { requireAdmin } from "@/lib/auth/require-admin"
-import { deleteUserCompletely } from "@/lib/services/admin/delete-user.service"
-import { splitMenteeFields } from "@/lib/services/mentees/mentee-profile-fields"
-import { toPlainText } from "@/lib/schemas/plain-text"
-
-// Admin client com service role para ignorar RLS
-// Built per request, never at import time: `next build` imports every route
-// to collect page data, and a module-scope client throws when the key is
-// absent (CI, preview builds without secrets).
-function getSupabaseAdmin() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false
-      }
-    }
-  )
-}
+import { buildAdminDeleteUser } from "@/lib/services/admin/delete-user.composition"
+import { adminUserPatchBodySchema } from "@/lib/schemas/admin-users"
+import { adminForbiddenResponse } from "@/lib/services/admin/assert-admin"
+import { adminSelfActionResponse } from "@/lib/services/admin/self-action.error"
+import { buildAdminUsersService } from "@/lib/services/admin/users.composition"
 
 /**
- * Profile fields an admin may edit from the user modal. Verification columns
- * (`verified`, `verification_status`, `verification_notes`, `is_pending_mentor`)
- * are deliberately NOT here: they only change through POST /api/admin/verify,
- * which also assigns the mentor role and notifies the person. Unknown keys
- * are stripped.
+ * Edita um usuário no painel admin. A rota autentica (`requireAdmin`), valida o
+ * corpo e delega: `assertAdmin`, a regra de não retirar o próprio `admin` e a
+ * auditoria ficam no service. O erro 500 tem mensagem fixa (o texto do banco
+ * não sai para o cliente).
  */
-const updatesSchema = z.object({
-  first_name: z.string().max(100).optional(),
-  last_name: z.string().max(100).optional(),
-  bio: z.string().max(5000).transform(toPlainText).optional(),
-  avatar_url: z.string().max(2000).optional(),
-  is_public: z.boolean().optional(),
-  institution: z.string().max(200).optional(),
-  course: z.string().max(200).optional(),
-  academic_level: z.string().max(100).optional(),
-  expected_graduation: z.string().max(50).optional()
-})
-
-const patchBodySchema = z.object({
-  updates: updatesSchema.default({}),
-  roles: z.array(z.enum(["mentee", "mentor", "admin", "moderator"])).optional()
-})
-
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabaseAdmin = getSupabaseAdmin()
   try {
     const guard = await requireAdmin()
     if (!guard.ok) return guard.response
 
     const { id } = await params
-    const parsed = patchBodySchema.safeParse(await request.json().catch(() => null))
+    const parsed = adminUserPatchBodySchema.safeParse(await request.json().catch(() => null))
     if (!parsed.success) {
       return NextResponse.json({ error: "Dados inválidos" }, { status: 400 })
     }
-    const { updates, roles } = parsed.data
 
-    // 2. Atualizar Perfil (acadêmico vai para mentee_profiles)
-    const { profile: profileUpdates, mentee: menteeUpdates } = splitMenteeFields(updates)
+    const supabase = await createClient()
+    const updated = await buildAdminUsersService(supabase).updateUser({
+      actorId: guard.admin.userId,
+      targetId: id,
+      body: parsed.data,
+      request,
+    })
 
-    if (Object.keys(menteeUpdates).length > 0) {
-      const { error: menteeError } = await supabaseAdmin
-        .from('mentee_profiles')
-        .upsert({ user_id: id, ...menteeUpdates }, { onConflict: 'user_id' })
-      if (menteeError) throw menteeError
-    }
-
-    const { data: updatedProfile, error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .update({
-        ...profileUpdates,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (profileError) throw profileError
-
-    // 3. Atualizar Roles se fornecidas (Otimizado para evitar webhooks desnecessários)
-    if (roles && Array.isArray(roles)) {
-      // Buscar roles atuais do usuário
-      const { data: currentRolesData } = await supabaseAdmin
-        .from('user_roles')
-        .select('roles(name)')
-        .eq('user_id', id)
-      
-      const currentRoleNames = (currentRolesData as any[])?.map(r => r.roles?.name) || []
-      
-      // Verificar se as roles mudaram
-      const sortedCurrent = [...currentRoleNames].sort().join(',')
-      const sortedNew = [...roles].sort().join(',')
-
-      if (sortedCurrent !== sortedNew) {
-        // Remover roles atuais
-        await supabaseAdmin.from('user_roles').delete().eq('user_id', id)
-        
-        // Buscar IDs das novas roles
-        const { data: roleObjects } = await supabaseAdmin.from('roles').select('id, name').in('name', roles)
-        
-        if (roleObjects && roleObjects.length > 0) {
-          const roleInserts = roleObjects.map(r => ({ user_id: id, role_id: r.id }))
-          await supabaseAdmin.from('user_roles').insert(roleInserts)
-        }
-      }
-    }
-
-    return NextResponse.json({ success: true, data: updatedProfile })
-
-  } catch (error: any) {
+    return NextResponse.json({ success: true, data: updated })
+  } catch (error) {
+    const known = adminForbiddenResponse(error) ?? adminSelfActionResponse(error)
+    if (known) return known
     console.error("Erro no update de admin:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: "Erro ao atualizar usuário" }, { status: 500 })
   }
 }
 
+/**
+ * Remove a conta de um usuário. A rota autentica e delega: `assertAdmin` e a
+ * regra de não apagar a própria conta ficam no service; o client privilegiado
+ * vem da composition.
+ */
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -132,23 +59,18 @@ export async function DELETE(
 
     const { id } = await params
 
-    if (id === guard.admin.userId) {
-      return NextResponse.json(
-        { error: "Você não pode remover a própria conta de administrador" },
-        { status: 400 }
-      )
-    }
-
-    const result = await deleteUserCompletely(id, { source: "admin" })
+    const supabase = await createClient()
+    const result = await buildAdminDeleteUser(supabase)(guard.admin.userId, id)
 
     return NextResponse.json({
       success: true,
       message: "Usuário removido permanentemente",
       filesRemoved: result.filesRemoved
     })
-
-  } catch (error: any) {
+  } catch (error) {
+    const known = adminForbiddenResponse(error) ?? adminSelfActionResponse(error)
+    if (known) return known
     console.error("Erro ao deletar usuário:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: "Erro ao remover usuário" }, { status: 500 })
   }
 }

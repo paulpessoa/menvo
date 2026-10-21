@@ -1,0 +1,90 @@
+/**
+ * Camada 4 · Zod do painel admin (linha L2)
+ * Regra: valida o que entra nas rotas `/api/admin/*` da L2. Cada grupo soma os
+ * seus schemas aqui; a L1 (usuários) tem o próprio `admin-users.ts`.
+ * Não faz: checar permissão (é do `requireAdmin` + `assertAdmin`).
+ */
+import { z } from "zod"
+
+/** Body de `POST /api/admin/retention/exempt`: quem sai da fila LGPD. */
+export const retentionExemptBodySchema = z.object({
+  userId: z.string().uuid()
+})
+
+export type RetentionExemptBody = z.infer<typeof retentionExemptBodySchema>
+
+/** Body de `POST /api/admin/feature-flags`: nasce sempre desligada. */
+export const featureFlagCreateBodySchema = z.object({
+  name: z.string().trim().min(1, "Nome é obrigatório").max(100),
+  description: z.string().trim().max(500).nullish(),
+  tags: z.array(z.string().trim().min(1).max(50)).max(20).optional()
+})
+
+/** Body de `PUT /api/admin/feature-flags`: liga ou desliga uma flag. */
+export const featureFlagToggleBodySchema = z.object({
+  id: z.number().int().positive(),
+  enabled: z.boolean()
+})
+
+/** Query de `DELETE /api/admin/feature-flags?id=`: chega como texto. */
+export const featureFlagDeleteQuerySchema = z.object({
+  id: z.coerce.number().int().positive()
+})
+
+/** Status de um pedido de organização (`organization_leads.status`). */
+export const orgLeadStatusSchema = z.enum(["new", "contacted", "closed"])
+
+/** Body de `PATCH /api/admin/org-leads`. */
+export const orgLeadPatchBodySchema = z.object({
+  id: z.string().uuid(),
+  status: orgLeadStatusSchema
+})
+
+/** Body de `POST /api/admin/invites/audience`: quem uma campanha alcançaria. */
+export const inviteAudienceBodySchema = z.object({
+  audience: z.enum(["selected", "jotform_not_invited", "never_signed_in", "all", "unresponsive_invitees"]),
+  campaign: z.string().trim().min(1).max(100),
+  userIds: z.array(z.string().uuid()).max(5000).optional(),
+  resend: z.boolean().optional()
+})
+
+/** Body de `POST /api/admin/invites/send`: um lote (até 25, cabe no timeout da função). */
+export const inviteSendBodySchema = z.object({
+  campaign: z.string().trim().min(1).max(100),
+  subject: z.string().trim().min(1).max(200),
+  body: z.string().trim().min(1).max(10000),
+  userIds: z.array(z.string().uuid()).min(1).max(25),
+  resend: z.boolean().optional()
+})
+
+/** Body de `POST /api/admin/invites/preview`. */
+export const invitePreviewBodySchema = z.object({
+  body: z.string().trim().min(1).max(10000)
+})
+
+/** Body de `POST /api/admin/emails/send-test`. */
+export const emailSendTestBodySchema = z.object({
+  email: z.string().email("Por favor, insira um e-mail válido."),
+  template: z.string().min(1, "Template é obrigatório.")
+})
+
+/** Body de `PATCH /api/admin/feedbacks`: decisão de moderação sobre uma avaliação. */
+export const feedbackModerationBodySchema = z.object({
+  feedbackId: z.string().uuid(),
+  status: z.enum(["approved", "rejected"]),
+  rejectionReason: z.string().trim().max(1000).nullish()
+})
+
+/** Query de `GET /api/admin/reports?since=`: data `YYYY-MM-DD`, padrão desde 2020. */
+export const reportsQuerySchema = z.object({
+  since: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .default("2020-01-01")
+})
+
+export type FeedbackModerationBody = z.infer<typeof feedbackModerationBodySchema>
+export type InviteAudienceBody =z.infer<typeof inviteAudienceBodySchema>
+export type InviteSendBody = z.infer<typeof inviteSendBodySchema>
+
+export type FeatureFlagCreateBody = z.infer<typeof featureFlagCreateBodySchema>
