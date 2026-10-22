@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import {  Star, CheckCircle2, XCircle , Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
-export type MentorApplicationStatus = "pending" | "approved" | "rejected" | null
+export type MentorApplicationStatus = "pending" | "approved" | "rejected" | "changes_requested" | string | null
 
 interface MentorApplicationPanelProps {
   userId: string
@@ -27,7 +27,8 @@ const STATUS_LABEL: Record<string, { label: string; className: string }> = {
   none: { label: "Não pediu para ser mentor", className: "bg-muted text-muted-foreground" },
   pending: { label: "Aguardando aprovação", className: "bg-yellow-100 text-yellow-800" },
   approved: { label: "Mentor aprovado", className: "bg-green-100 text-green-800" },
-  rejected: { label: "Ajustes solicitados", className: "bg-orange-100 text-orange-800" }
+  rejected: { label: "Ajustes solicitados", className: "bg-orange-100 text-orange-800" },
+  changes_requested: { label: "Ajustes solicitados", className: "bg-orange-100 text-orange-800" }
 }
 
 /**
@@ -50,7 +51,7 @@ export function MentorApplicationPanel({
   const [notifyEmail, setNotifyEmail] = useState(true)
   const [submitting, setSubmitting] = useState<"approved" | "rejected" | null>(null)
 
-  const statusInfo = STATUS_LABEL[status ?? "none"]
+  const statusInfo = (status && STATUS_LABEL[status]) || STATUS_LABEL.none
   const listed = isMentor && isPublic && hasTopics
 
   const decide = async (decision: "approved" | "rejected") => {

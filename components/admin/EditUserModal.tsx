@@ -476,7 +476,7 @@ export function EditUserModal({
                     <p className="text-gray-900 whitespace-pre-wrap">{user.learning_goals}</p>
                   </div>
                 )}
-                {user.expertise_areas && user.expertise_areas.length > 0 && (
+                {Array.isArray(user.expertise_areas) && user.expertise_areas.length > 0 && (
                   <div className="space-y-1 sm:col-span-2">
                     <p className="font-semibold text-gray-500">Áreas de Expertise</p>
                     <div className="flex flex-wrap gap-1 mt-1">
@@ -486,7 +486,7 @@ export function EditUserModal({
                     </div>
                   </div>
                 )}
-                {user.mentorship_topics && user.mentorship_topics.length > 0 && (
+                {Array.isArray(user.mentorship_topics) && user.mentorship_topics.length > 0 && (
                   <div className="space-y-1 sm:col-span-2">
                     <p className="font-semibold text-gray-500">Tópicos de Mentoria</p>
                     <div className="flex flex-wrap gap-1 mt-1">
@@ -514,7 +514,7 @@ export function EditUserModal({
                     <p className="text-gray-900 whitespace-pre-wrap">{user.ideal_mentee}</p>
                   </div>
                 )}
-                {user.inclusive_tags && user.inclusive_tags.length > 0 && (
+                {Array.isArray(user.inclusive_tags) && user.inclusive_tags.length > 0 && (
                   <div className="space-y-1 sm:col-span-2">
                     <p className="font-semibold text-gray-500">Tags Inclusivas</p>
                     <div className="flex flex-wrap gap-1 mt-1">
@@ -532,10 +532,10 @@ export function EditUserModal({
           <MentorApplicationPanel
             userId={user.id}
             status={user.verification_status ?? null}
-            isMentor={(user.roles || []).includes("mentor")}
+            isMentor={Array.isArray(user.roles) && user.roles.includes("mentor")}
             hasTopics={
-              (user.expertise_areas?.length ?? 0) > 0 ||
-              (user.mentorship_topics?.length ?? 0) > 0
+              ((Array.isArray(user.expertise_areas) ? user.expertise_areas.length : 0) > 0) ||
+              ((Array.isArray(user.mentorship_topics) ? user.mentorship_topics.length : 0) > 0)
             }
             isPublic={formData.is_public ?? false}
             onIsPublicChange={(value) => setFormData({ ...formData, is_public: value })}

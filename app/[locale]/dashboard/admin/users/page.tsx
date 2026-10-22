@@ -1,7 +1,7 @@
 "use client"
 
 import { MenvoDots } from "@/components/ui/menvo-loader"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -45,6 +45,21 @@ interface UserStats {
 }
 
 export default function AdminUsersPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3">
+          <MenvoDots />
+          <p className="text-sm text-muted-foreground">Carregando usuários...</p>
+        </div>
+      }
+    >
+      <AdminUsersContent />
+    </Suspense>
+  )
+}
+
+function AdminUsersContent() {
   const searchParams = useSearchParams()
 
   const [users, setUsers] = useState<UserProfile[]>([])
@@ -102,15 +117,20 @@ export default function AdminUsersPage() {
       if (!response.ok) throw new Error("Erro na API")
 
       const result = await response.json()
-      const newUsers = (result.data.users || []).map((u: any) => ({
+      const rawUsers = result.data?.users || []
+      const newUsers = rawUsers.map((u: any) => ({
         ...u,
-        roles: u.user_roles?.map((ur: any) => ur.roles?.name) || []
+        roles: Array.isArray(u.roles)
+          ? u.roles
+          : (u.user_roles?.map((ur: any) => ur.roles?.name).filter(Boolean) as string[]) || []
       }))
 
       setUsers(newUsers)
-      setTotalPages(result.data.pagination.totalPages)
-      setTotalItems(result.data.pagination.total)
-      setStats(result.data.counts)
+      setTotalPages(result.data?.pagination?.totalPages || 1)
+      setTotalItems(result.data?.pagination?.total || 0)
+      if (result.data?.counts) {
+        setStats(result.data.counts)
+      }
       
       // Update URL silently
       window.history.replaceState(null, '', `?${params.toString()}`)
@@ -312,7 +332,7 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div className="w-32 hidden md:flex justify-center flex-shrink-0">
-                        {(user.roles.includes('mentor') || user.verification_status === 'pending') && (
+                        {((Array.isArray(user.roles) && user.roles.includes('mentor')) || user.verification_status === 'pending') && (
                           <Badge variant={user.verified ? "default" : "secondary"} className={user.verified ? "bg-green-600" : "bg-yellow-100 text-yellow-800 border-none"}>
                             {user.verified ? "VERIFICADO" : "PENDENTE"}
                           </Badge>
@@ -320,14 +340,14 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div className="w-32 hidden md:flex justify-center gap-1 flex-shrink-0">
-                        {user.roles.map(role => (
+                        {Array.isArray(user.roles) && user.roles.map(role => (
                           <Badge key={role} variant="outline" className="text-[10px] uppercase">{role}</Badge>
                         ))}
                       </div>
 
                       <div className="w-20 flex items-center justify-end flex-shrink-0 gap-1">
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50" onClick={() => {
-                          const isMentor = user.roles.includes('mentor');
+                          const isMentor = Array.isArray(user.roles) && user.roles.includes('mentor');
                           const path = isMentor ? 'mentors' : 'mentee';
                           const identifier = user.slug || user.id;
                           window.open(`/${path}/${identifier}`, '_blank');
